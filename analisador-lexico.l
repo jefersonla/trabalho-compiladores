@@ -1,3 +1,8 @@
+/* Flex Definitions */
+
+/* Allow read of only one file */
+%option noyywrap
+
 %{
 
 /** ****** Analisador Léxico ****** **/
