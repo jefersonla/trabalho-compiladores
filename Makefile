@@ -21,5 +21,8 @@ main: lex.yy.c
 lex.yy.c: $(FLEXSRC)
 	flex $(FLEXSRC)
 
+test:
+	bash $(EXECUTABLE)
+
 clean:
 	rm *.yy.c *.o $(EXECUTABLE)

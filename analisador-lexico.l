@@ -38,16 +38,59 @@
 #include <string.h>
 #include <math.h>
 
+/*
+
+Types Allowed
+
+T_NAME      T_NUMBER    T_AND       T_NOT 
+T_OR        T_ELSEIF    T_WHILE     T_DO 
+T_FUNCTION  T_END       T_FOR       T_ELSE 
+T_IF        T_THEN      T_RETURN    T_LOCAL 
+T_NIL       T_PLUS      T_MINUS     T_TIMES 
+T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR 
+T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ   
+T_LTEQ      T_GTEQ      T_LT        T_GT
+
+*/
+	
 %}
 
 	/*** * Definitions Section * ***/  
 
+D   [0-9]
+E   [{E}e][+-]?{D}+
+L   [a-zA-Z_]
+
+NUMBER  ({D}+|{D}*.{D}+|{D}+.{D}*){E}?
+
+WS  [ \t\n\v\f]+
+
+ESC [\\]
+SQ  [']
+DQ  ["]
+
+STRX {SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
+STRY {DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
 
 %%
 
 	/*** **** Rules Section **** ***/   
-
+	
+{NUMBER}    { printf("NUMBER"); }
+{STRX}   { printf("STRING TYPE X"); }
+{STRY}   { printf("STRING TYPE Y"); }
 
 %%
 
 	/*** **** C Code Section **** ***/
+
+int main( int argc, char **argv ) {
+	++argv, --argc; /* skip over program name */
+	
+	if ( argc > 0 )
+		yyin = fopen(argv[0], "r");
+	else
+		yyin = stdin;
+	
+	yylex();
+}

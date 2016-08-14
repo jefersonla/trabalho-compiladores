@@ -27,3 +27,10 @@
 *.exe
 *.out
 *.app
+compilador
+
+# Test files
+test.out
+
+# Lex files
+*.yy.c
