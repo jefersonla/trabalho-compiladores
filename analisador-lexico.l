@@ -40,14 +40,14 @@
 
 %}
 
-    /*** * Definitions Section * ***/  
+	/*** * Definitions Section * ***/  
 
 
 %%
 
-    /*** **** Rules Section **** ***/   
+	/*** **** Rules Section **** ***/   
 
 
 %%
 
-    /*** **** C Code Section **** ***/
+	/*** **** C Code Section **** ***/
