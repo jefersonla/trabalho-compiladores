@@ -10,7 +10,7 @@ DEBUG_FLEXFLAGS=--debug --verbose
 # Codigo fonte
 SOURCES=lex.yy.c
 # Nome do executavel
-EXECUTABLE=analisadorlexico
+EXECUTABLE=compilador
 # Analisador Léxico
 FLEXSRC=analisador-lexico.l
 
@@ -18,18 +18,18 @@ FLEXSRC=analisador-lexico.l
 all: main
 
 # Compilação padrão
-main: lex.yy.c analisadorlexico
+main: lex.yy.c $(EXECUTABLE)
 
 lex.yy.c: $(FLEXSRC)
 	flex $(FLEXFLAGS) $(FLEXSRC)
 
 # Compilação em modo Debug
-debug: debug.lex.yy.c analisadorlexico
+debug: debug.lex.yy.c $(EXECUTABLE)
 
 debug.lex.yy.c: $(FLEXSRC)
 	flex $(DEBUG_FLEXFLAGS) $(FLEXSRC)
 
-analisadorlexico: $(SOURCES)
+$(EXECUTABLE): $(SOURCES)
 	$(CC) $(SOURCES) -o $(EXECUTABLE) $(CFLAGS)
 
 # Executa apenas um teste
