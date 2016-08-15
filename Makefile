@@ -30,7 +30,7 @@ compilador: $(SOURCES)
 	$(CC) $(CFLAGS) $(SOURCES) -o $(EXECUTABLE)
 
 test:
-	bash test.sh
+	bash test.sh $(EXECUTABLE)
 
 clean:
 	\rm -f *.yy.c *.o $(EXECUTABLE) *.out

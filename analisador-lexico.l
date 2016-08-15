@@ -136,6 +136,7 @@ T_LTEQ 		\<\=
 T_GTEQ 		\>\=
 T_LT 		\<
 T_GT 		\>
+T_CONCAT	\.\.
 
 	/*** MATCHES FOR NUMBERS ***/
 
@@ -193,7 +194,7 @@ T_UNTIL		until
 
 	/*** MATCHES FOR COMMENTS ***/
 
-WS_COMMENT	^--.+$
+WS_COMMENT	--.*
 
 %%
 
@@ -220,7 +221,7 @@ WS_COMMENT	^--.+$
 {T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 		}
 {T_LT} 			{ PUT_TOKEN("T_LT"); 		}
 {T_GT} 			{ PUT_TOKEN("T_GT"); 		}
-
+{T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");	}
 
 	/*** SOME TYPES OF VALUES ***/
 
@@ -277,6 +278,10 @@ WS_COMMENT	^--.+$
 			return 0;
 		}
 
+	/*** DEFAULT BEHAVIOR ***/
+
+.				{ /* process default here */ }
+
 %%
 
 	/*** **** C Code Section **** ***/
@@ -285,21 +290,37 @@ int main( int argc, char **argv ) {
 	++argv, --argc; /* skip over program name */
 
 	// Verify if there's a file, or receive code using stdin
-	if ( argc > 0 ){
-		// Input file for Flex
-		yyin = fopen(argv[0], "r");
-		
-		// Output filename will be input_name+.out
-		strcpy(output_filename, argv[0]);
-		strcpy(&output_filename[strlen(output_filename)], ".out");
+	switch(argc){
+		case 0:
+			// Input stdin
+			yyin = stdin;
 
-		// Output File for Flex
-		output_file = fopen(output_filename, "w");
-	}
-	else{
-		// Input stdin
-		yyin = stdin;
+			// The output will be a.out
+			strcpy(output_filename, "a.out");
+		case 1:
+			// Input file for Flex
+			yyin = fopen(argv[0], "r");
+			
+			// Output filename will be input_name+.out
+			strcpy(output_filename, argv[0]);
+			strcpy(&output_filename[strlen(output_filename)], ".out");
+			
+			break;
+		case 2:
+			// Input file for Flex
+			yyin = fopen(argv[0], "r");
+			
+			// Output filename
+			strcpy(output_filename, argv[1]);
+
+			break;
+		default:
+			printf( "PLEASE USE CORRECT SYNTAX!!! \n "\
+					"SYNTAX ./compilador [INPUT] [OUTPUT]");
 	}
 	
+	// Output File for Flex
+	output_file = fopen(output_filename, "w");
+
 	yylex();
 }
