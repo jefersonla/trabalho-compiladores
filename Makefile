@@ -37,10 +37,10 @@ test:
 	bash test.sh $(EXECUTABLE) tests/test.lua
 
 # Executa diversos testes
-tests:
+all-tests:
 	bash test.sh $(EXECUTABLE) tests/test.lua
 	bash test.sh $(EXECUTABLE) tests/hello.lua
 
 # Limpa o ambiente
 clean:
-	\rm -f *.yy.c *.o $(EXECUTABLE) *.out
+	\rm -f *.yy.c *.o $(EXECUTABLE) *.out tests/*.out

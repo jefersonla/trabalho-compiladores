@@ -40,7 +40,7 @@
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
 #define PUT_TOKEN(TOKEN) 				do{FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);}while(0)
-#define PUT_LITERAL(TOKEN) 				do{strcpy(temp, &yytext[1]);temp[strlen(temp)-1]=0;FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", temp);}while(0)
+#define PUT_LITERAL(TOKEN) 				do{yytext[strlen(yytext)-1]=0;FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", &yytext[1]);}while(0)
 #define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
