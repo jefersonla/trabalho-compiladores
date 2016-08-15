@@ -192,9 +192,13 @@ T_REPEAT	repeat
 T_TRUE		true
 T_UNTIL		until
 
+	/*** MATCHES FOR MULTILINE CONTENT ***/
+
+MULTILINE	\[\[[^\]\]]*\]\]
+
 	/*** MATCHES FOR COMMENTS ***/
 
-WS_COMMENT	--.*
+WS_COMMENT	--({MULTILINE}|.*)
 
 %%
 
