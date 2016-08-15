@@ -7,4 +7,7 @@ function fact (n)
   end
 end
 --!@"!@" -- Test with undefinied tokens is fine
+--[[
+	multiline comments
+]]
 print(fact(7))

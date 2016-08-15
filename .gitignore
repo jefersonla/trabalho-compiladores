@@ -28,6 +28,7 @@
 *.out
 *.app
 compilador
+analisadorlexico
 
 # Test files
 *.out
