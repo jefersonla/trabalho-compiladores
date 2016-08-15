@@ -148,7 +148,10 @@ WS			[\ \t\r\n\v\f]+
 
 	/*** MATCHES FOR MULTILINE CONTENT ***/
 
-MULTILINE	\[\[[^\]\]]*\]\]
+BC  		\[\[
+EC 			\]\]			
+
+MULTILINE	{BC}[^{EC}]*{EC}
 
 	/*** MATCHES FOR COMMENTS ***/
 
