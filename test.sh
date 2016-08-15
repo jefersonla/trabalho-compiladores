@@ -30,7 +30,7 @@ OUPUT_FILE=$2.out
 if [ -e $OUPUT_FILE ]
 then
 	# File EXIST
-	echo "TESTING "$1 
+	echo "TESTING "$2" WITH BINARY "$1 
 else
 	echo "OUTPUT FILE NOT EXIST!"
 	exit 1
