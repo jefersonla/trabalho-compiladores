@@ -85,7 +85,7 @@ T_NUMBER	({D}+|{D}*.{D}+|{D}+.{D}*){E}?
 
 WS	[\ \t\r\n\v\f]+
 
-	/**** MATCHES TO DIFFERENTS TYPES OF STRING ***/
+	/*** MATCHES TO DIFFERENTS TYPES OF STRING ***/
 
 ESC	\\
 SQ	'
@@ -94,14 +94,63 @@ DQ	["]
 STRX	{SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
 STRY	{DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
 
+	/*** MATCHES FOR RESERVED WORDS ***/
+
+T_AND	and
+T_BREAK	break
+T_DO	do
+T_ELSE	else
+T_ELSEIF	elseif
+T_END	end
+T_FALSE	false
+T_FOR	for
+T_FUNCTION	function
+T_GLOBAL	global
+T_IF	if
+T_IN	in
+T_LOCAL	local
+T_NIL	nil
+T_NOT	not
+T_OR	or
+T_REPEAT	repeat
+T_RETURN	return
+T_THEN	then
+T_TRUE	true
+T_UNTIL	until
+T_WHILE	while
+
 %%
 
 	/*** **** Rules Section **** ***/   
 
-{T_NUMBER}	{ printf("[T_NUMBER],\n"); }
-{STRX}		{ printf("[T_STRING_1],\n"); }
-{STRY}		{ printf("[T_STRING_2],\n"); }
-{WS}		{ printf("WS\n"); }
+{T_NUMBER}	{ printf("[T_NUMBER],\n"); 		}
+{STRX}		{ printf("[T_STRING_1],\n"); 	}
+{STRY}		{ printf("[T_STRING_2],\n"); 	}
+{WS}		{ }
+
+	/*** RESERVED WORDS ***/
+{T_AND}			{ printf("[T_AND],\n"); 	}
+{T_BREAK}		{ printf("[T_BREAK],\n"); 	}
+{T_DO}			{ printf("[T_DO],\n"); 		}
+{T_ELSE}		{ printf("[T_ELSE],\n"); 	}
+{T_ELSEIF}		{ printf("[T_ELSEIF],\n"); 	}
+{T_END}			{ printf("[T_END],\n"); 	}
+{T_FALSE}		{ printf("[T_FALSE],\n"); 	}
+{T_FOR}			{ printf("[T_FOR],\n"); 	}
+{T_FUNCTION}	{ printf("[T_FUNCTION],\n");}
+{T_GLOBAL}		{ printf("[T_GLOBAL],\n"); 	}
+{T_IF}			{ printf("[T_IF],\n"); 		}
+{T_IN}			{ printf("[T_IN],\n"); 		}
+{T_LOCAL}		{ printf("[T_LOCAL],\n"); 	}
+{T_NIL}			{ printf("[T_NIL],\n"); 	}
+{T_NOT}			{ printf("[T_NOT],\n"); 	}
+{T_OR}			{ printf("[T_OR],\n"); 		}
+{T_REPEAT}		{ printf("[T_REPEAT],\n"); 	}
+{T_RETURN}		{ printf("[T_RETURN],\n"); 	}
+{T_THEN}		{ printf("[T_THEN],\n"); 	}
+{T_TRUE}		{ printf("[T_TRUE],\n"); 	}
+{T_UNTIL}		{ printf("[T_UNTIL],\n"); 	}
+{T_WHILE}		{ printf("[T_WHILE],\n"); 	}
 
 %%
 
