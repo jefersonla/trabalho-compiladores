@@ -92,6 +92,15 @@ T_GTEQ 		\>\=
 T_LT 		\<
 T_GT 		\>
 T_CONCAT	\.\.
+T_MOD		\%
+T_EXP 		\^
+T_FLOOR		\/\/
+T_BIT_AND 	\&
+T_BIT_OR 	\|
+T_BIT_XOR 	\~
+T_BIT_RSH 	\>\>
+T_BIT_LSH 	\<\<
+T_BIT_NOT 	\~
 
 	/*** MATCHES FOR NUMBERS ***/
 
@@ -153,7 +162,7 @@ MULTILINE	\[\[[^\]\]]*\]\]
 
 	/*** MATCHES FOR COMMENTS ***/
 
-WS_COMMENT	--({MULTILINE}|.*)
+WS_COMMENT	--({MULTILINE}|.*)|#.*
 
 %%
 
@@ -181,6 +190,15 @@ WS_COMMENT	--({MULTILINE}|.*)
 {T_LT} 			{ PUT_TOKEN("T_LT"); 		}
 {T_GT} 			{ PUT_TOKEN("T_GT"); 		}
 {T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");	}
+{T_MOD} 		{ PUT_TOKEN("T_MOD");		}
+{T_EXP} 		{ PUT_TOKEN("T_EXP");		}
+{T_FLOOR} 		{ PUT_TOKEN("T_FLOOR");		}
+{T_BIT_AND} 	{ PUT_TOKEN("T_BIT_AND");	}
+{T_BIT_OR} 		{ PUT_TOKEN("T_BIT_OR");	}
+{T_BIT_XOR} 	{ PUT_TOKEN("T_BIT_XOR");	}
+{T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");	}
+{T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");	}
+{T_BIT_NOT} 	{ PUT_TOKEN("T_BIT_NOT");	}
 
 	/*** SOME TYPES OF VALUES ***/
 
