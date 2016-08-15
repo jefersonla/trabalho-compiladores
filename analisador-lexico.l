@@ -84,6 +84,7 @@ enum{
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR, VAR)
 #define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"],\n", yytext)
+#define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
@@ -206,7 +207,7 @@ WS_COMMENT	--({MULTILINE}|.*)
 
 	/*** COMENTARIOS ***/
 
-{WS_COMMENT}	{ printf(""); 				}
+{WS_COMMENT}	{ PRINT_COMMENT_DEBUG;		}
 
 	/*** SYMBOLS ***/
 
