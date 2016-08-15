@@ -269,8 +269,10 @@ WS_COMMENT	^--.+$
 	/*   REMOVE COMMA OF THE LAST LINE     */
 <<EOF>>	{
 			fclose(output_file);
-			output_file = fopen(output_filename, "a+");
+			output_file = fopen(output_filename, "r+");
 			while(getc(output_file) != ',');
+			fseek(output_file, -2, SEEK_END);
+			fputs(" ", output_file);
 			fclose(output_file);
 			return 0;
 		}

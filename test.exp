@@ -28,4 +28,4 @@
 [T_OPENPAR, "("],
 [T_NUMBER, "7"],
 [T_CLOSEPAR, ")"],
-[T_CLOSEPAR, ")"],
+[T_CLOSEPAR, ")"] 
