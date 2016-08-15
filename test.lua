@@ -1,5 +1,4 @@
 -- defines a factorial function
-oratoria = 20
 function fact (n)
   if n == 0 then
     return 1

@@ -44,44 +44,46 @@
 #define T_NAME					100
 
 /* Global Enums */
-#define T_OPENPAR	1
-#define T_CLOSEPAR	2
-#define T_PLUS		3
-#define T_MINUS		4
-#define T_TIMES		5
-#define T_DIV		6
-#define T_COMMA		7
-#define T_SEMICOL	8
-#define T_ASSIGN	9
-#define T_EQ		10
-#define T_NEQ		11
-#define T_LTEQ		12
-#define T_GTEQ		13
-#define T_LT		14
-#define T_GT		15
-#define T_NUMBER	16
-#define T_AND		17
-#define T_DO		18
-#define T_ELSE		19
-#define T_ELSEIF	20
-#define T_END		21
-#define T_FOR		22
-#define T_FUNCTION	23
-#define T_IF		24
-#define T_LOCAL		25
-#define T_NIL		26
-#define T_NOT		27
-#define T_OR		28
-#define T_RETURN	29
-#define T_THEN		30
-#define T_WHILE		31
-#define T_BREAK		32
-#define T_GLOBAL	33
-#define T_IN		34
-#define T_REPEAT	35
-#define T_TRUE		36
-#define T_FALSE		37
-#define T_UNTIL		38
+enum{
+	T_OPENPAR,
+	T_CLOSEPAR,
+	T_PLUS,	
+	T_MINUS,	
+	T_TIMES,	
+	T_DIV,	
+	T_COMMA,	
+	T_SEMICOL,
+	T_ASSIGN,
+	T_EQ,	
+	T_NEQ,	
+	T_LTEQ,	
+	T_GTEQ,	
+	T_LT,	
+	T_GT,	
+	T_NUMBER,
+	T_AND,	
+	T_DO,	
+	T_ELSE,	
+	T_ELSEIF,
+	T_END,	
+	T_FOR,	
+	T_FUNCTION,
+	T_IF,	
+	T_LOCAL,	
+	T_NIL,	
+	T_NOT,	
+	T_OR,	
+	T_RETURN,
+	T_THEN,	
+	T_WHILE,	
+	T_BREAK,	
+	T_GLOBAL,
+	T_IN,	
+	T_REPEAT,
+	T_TRUE,	
+	T_FALSE,	
+	T_UNTIL,
+} T_TYPES;
 
 /* General Macros */
 #define PUT_TOKEN(TOKEN) fprintf(output_file, "[" TOKEN ", \"%s\"],\n", yytext);
@@ -161,8 +163,8 @@ ESC			\\
 SQ			'
 DQ			["]
 
-STRX		{SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
-STRY		{DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
+T_LITERAL_SQ	{SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
+T_LITERAL_DQ 	{DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
 
 	/*** MATCHES FOR RESERVED WORDS ***/
 
@@ -226,8 +228,8 @@ WS_COMMENT	^--.+$
 	/*** SOME TYPES OF VALUES ***/
 
 {T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 	}
-{STRX}			{ PUT_TOKEN("T_STRING1"); 	}
-{STRY}			{ PUT_TOKEN("T_STRING2"); 	}
+{T_LITERAL_SQ}	{ PUT_TOKEN("T_STRING1"); 	}
+{T_LITERAL_DQ}	{ PUT_TOKEN("T_STRING2"); 	}
 
 	/*** RESERVED WORDS ***/
 
