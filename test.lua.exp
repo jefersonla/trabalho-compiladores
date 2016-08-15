@@ -1,2 +1,1 @@
 [T_FUNCTION, "function"], [T_NAME, "fact"], [T_OPENPAR, "("], [T_NAME, "n"], [T_CLOSEPAR, ")"], [T_IF, "if"], [T_NAME, "n"], [T_EQ, "=="], [T_NUMBER, "0"], [T_THEN, "then"], [T_RETURN, "return"], [T_NUMBER, "1"], [T_ELSE, "else"], [T_RETURN, "return"], [T_NAME, "n"], [T_TIMES, "*"], [T_NAME, "fact"], [T_OPENPAR, "("], [T_NAME, "n"], [T_MINUS, "-"], [T_NUMBER, "1"], [T_CLOSEPAR, ")"], [T_END, "end"], [T_END, "end"], [T_NAME, "print"], [T_OPENPAR, "("], [T_NAME, "fact"], [T_OPENPAR, "("], [T_NUMBER, "7"], [T_CLOSEPAR, ")"], [T_CLOSEPAR, ")"]
- 

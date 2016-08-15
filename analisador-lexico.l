@@ -283,12 +283,39 @@ T_UNTIL		until
 	/*   CLOSE FILE, OPEN IT AGAIN AS A+   */
 	/*   REMOVE COMMA OF THE LAST LINE     */
 <<EOF>>	{
-			fclose(output_file);
+			// Close output file, and reopen then with read and write mode
+            fclose(output_file);
 			output_file = fopen(output_filename, "r+");
-			fseek(output_file, -2, SEEK_END);
-			fputs("\n", output_file);
-			fclose(output_file);
-			return 0;
+			// Remove last token comma and put a new newline char
+            fseek(output_file, -2, SEEK_END);
+			fputc('\n', output_file);
+            fclose(output_file);
+            // Reopen output file as only read
+            output_file = fopen(output_filename, "r");
+            char *copy_tmp_filename = ".out_copy.tmp";
+            FILE *copy_tmp_file = fopen(copy_tmp_filename, "w");
+            // First copy all content of the output file to tmp file
+            char read_char;
+            do{
+                read_char = fgetc(output_file);
+                if(read_char == '\n') break;
+                fputc(read_char, copy_tmp_file);
+            }while(read_char != EOF);
+            // After that close and reopen output file erasing previous content
+            fclose(output_file);
+            fclose(copy_tmp_file);
+            output_file = fopen(output_filename, "w");
+            copy_tmp_file = fopen(copy_tmp_filename, "r");
+            do{
+                read_char = fgetc(copy_tmp_file);
+                if(read_char == EOF) break;
+                fputc(read_char, output_file);
+            }while(read_char != EOF);
+            // Then close all open files, remove temp file and exit program
+            fclose(output_file);
+            fclose(copy_tmp_file);
+            remove(copy_tmp_filename);
+            return EXIT_SUCCESS;
 		}
 
 	/*** DEFAULT BEHAVIOR ***/
@@ -340,5 +367,6 @@ int main( int argc, char **argv ) {
 	// Output File for Flex
 	output_file = fopen(output_filename, "w");
 
-	yylex();
+    // Return yylex()   
+	return (yylex());
 }
