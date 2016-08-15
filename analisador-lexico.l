@@ -296,7 +296,8 @@ int main( int argc, char **argv ) {
 			yyin = stdin;
 
 			// The output will be a.out
-			strcpy(output_filename, "a.out");
+			strcpy(output_filename, "stdin.out");
+			break;
 		case 1:
 			// Input file for Flex
 			yyin = fopen(argv[0], "r");
