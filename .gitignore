@@ -30,7 +30,7 @@
 compilador
 
 # Test files
-test.out
+*.out
 
 # Lex files
 *.yy.c
