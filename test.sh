@@ -4,4 +4,11 @@
 ./compilador test.lua 2>&1
 
 # Compara os resultados
-diff -q test.lua.out test.exp
+DIFF=$(diff -q test.lua.out test.exp) 
+
+if [ "$DIFF" != "" ]
+then
+    echo "ERROR RESULT IS DIFFERENT FROM WHAT IS EXPECTED"
+else
+    echo "COMPLETED! EVERYTHING IS CORRECT :)"	
+fi

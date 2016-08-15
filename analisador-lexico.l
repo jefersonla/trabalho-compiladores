@@ -2,10 +2,6 @@
 
 /* Allow read of only one file */
 %option noyywrap
-/* Run in Debug mode */
-%option debug
-/* Run in Verbose mode */
-%option verbose
 /* Enable Warnings */
 %option warn
 
@@ -86,7 +82,8 @@ enum{
 } T_TYPES;
 
 /* General Macros */
-#define PUT_TOKEN(TOKEN) fprintf(output_file, "[" TOKEN ", \"%s\"],\n", yytext);
+#define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR, VAR)
+#define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"],\n", yytext)
 
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
