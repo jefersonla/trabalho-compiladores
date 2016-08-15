@@ -40,6 +40,7 @@
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR "\n", VAR)
 #define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext)
+#define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
 /* External Variables */
@@ -138,6 +139,14 @@ T_LABEL 	\:\:{L}+\:\:
 
 WS			[\ \t\r\n\v\f]+
 
+	/*** MATCHES FOR MULTILINE CONTENT ***/
+
+MULTILINE	\[\[[^\]\]]*\]\]
+
+	/*** MATCHES FOR COMMENTS ***/
+
+WS_COMMENT	--({MULTILINE}|.*)|#.*
+
 	/*** MATCHES TO DIFFERENTS TYPES OF STRING ***/
 
 ESC			\\
@@ -174,14 +183,6 @@ T_IN		in
 T_REPEAT	repeat
 T_TRUE		true
 T_UNTIL		until
-
-	/*** MATCHES FOR MULTILINE CONTENT ***/
-
-MULTILINE	\[\[[^\]\]]*\]\]
-
-	/*** MATCHES FOR COMMENTS ***/
-
-WS_COMMENT	--({MULTILINE}|.*)|#.*
 
 %%
 
@@ -257,6 +258,7 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 
 {T_NAME}		{ PUT_TOKEN("T_NAME"); 		}
 {T_LABEL}		{ PUT_TOKEN("T_LABEL");		}
+
 
 	/*** WHITESPACES ***/
 
