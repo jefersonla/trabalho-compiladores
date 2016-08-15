@@ -51,34 +51,57 @@ T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR
 T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ   
 T_LTEQ      T_GTEQ      T_LT        T_GT
 
+DONE
+
+T_NUMBER -
+
+
+TODO
+
+T_NAME      T_AND       T_NOT 
+T_OR        T_ELSEIF    T_WHILE     T_DO 
+T_FUNCTION  T_END       T_FOR       T_ELSE 
+T_IF        T_THEN      T_RETURN    T_LOCAL 
+T_NIL       T_PLUS      T_MINUS     T_TIMES 
+T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR 
+T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ   
+T_LTEQ      T_GTEQ      T_LT        T_GT
+
 */
 	
 %}
 
 	/*** * Definitions Section * ***/  
 
-D   [0-9]
-E   [{E}e][+-]?{D}+
-L   [a-zA-Z_]
+	/*** MATCHES FOR NUMBERS ***/
 
-NUMBER  ({D}+|{D}*.{D}+|{D}+.{D}*){E}?
+D	[0-9]
+E	[{E}e][+-]?{D}+
+L	[a-zA-Z_]
 
-WS  [ \t\n\v\f]+
+T_NUMBER	({D}+|{D}*.{D}+|{D}+.{D}*){E}?
 
-ESC [\\]
-SQ  [']
-DQ  ["]
+	/*** MATCHES FOR WHITESPACES ***/
 
-STRX {SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
-STRY {DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
+WS	[\ \t\r\n\v\f]+
+
+	/**** MATCHES TO DIFFERENTS TYPES OF STRING ***/
+
+ESC	\\
+SQ	'
+DQ	["]
+
+STRX	{SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
+STRY	{DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
 
 %%
 
 	/*** **** Rules Section **** ***/   
-	
-{NUMBER}    { printf("NUMBER"); }
-{STRX}   { printf("STRING TYPE X"); }
-{STRY}   { printf("STRING TYPE Y"); }
+
+{T_NUMBER}	{ printf("[T_NUMBER],\n"); }
+{STRX}		{ printf("[T_STRING_1],\n"); }
+{STRY}		{ printf("[T_STRING_2],\n"); }
+{WS}		{ printf("WS\n"); }
 
 %%
 
@@ -87,6 +110,7 @@ STRY {DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
 int main( int argc, char **argv ) {
 	++argv, --argc; /* skip over program name */
 	
+	// Verify if there's a file, or receive code using stdin
 	if ( argc > 0 )
 		yyin = fopen(argv[0], "r");
 	else
