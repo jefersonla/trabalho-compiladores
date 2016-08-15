@@ -2,6 +2,6 @@
 [T_NAME, "fact"],
 [T_OPENPAR, "("],
 [T_NAME, "n"],
-[T_CLOSEPAR, ")"], 
+[T_CLOSEPAR, ")"],
 [T_IF, "if"],
 [T_NAME, "n"],

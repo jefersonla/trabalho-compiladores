@@ -38,11 +38,18 @@
 #include <string.h>
 #include <math.h>
 
-/* External Files */
-FILE *output_file;
+/* Global Macros */
+#define MAX_OUTPUT_FILENAME		100
+
+/* Global Enums */
+
 
 /* General Macros */
-#define PUT_TOKEN(TOKEN, TEXT) 
+#define PUT_TOKEN(TOKEN) fprintf(output_file, "[" TOKEN ", \"%s\"],\n", yytext);
+
+/* External Variables */
+char output_filename[MAX_OUTPUT_FILENAME];
+FILE *output_file;
 
 /*
 
@@ -84,14 +91,15 @@ DONE
 - T_RETURN
 - T_THEN
 - T_WHILE
-
+- T_OPENPAR
+- T_CLOSEPAR
 
 TODO
 
 T_NAME		T_PLUS      T_MINUS     T_TIMES 
-T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR 
-T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ   
-T_LTEQ      T_GTEQ      T_LT        T_GT
+T_DIV       T_COMMA     T_SEMICOL   T_ASSIGN
+T_EQ        T_NEQ   	T_LTEQ      T_GTEQ
+T_LT        T_GT
 
 */
 	
@@ -99,13 +107,31 @@ T_LTEQ      T_GTEQ      T_LT        T_GT
 
 	/*** * Definitions Section * ***/  
 
+	/*** MATCHES FOR SYMBOLS ***/
+
+T_OPENPAR	\(
+T_CLOSEPAR 	\)
+T_PLUS		\+
+T_MINUS		\-
+T_TIMES		\*
+T_DIV		\/
+T_COMMA		\,
+T_SEMICOL	\;
+T_ASSIGN	\=
+T_EQ 		\=\=
+T_NEQ 		\~\=
+T_LTEQ 		\<\=
+T_GTEQ 		\>\=
+T_LT 		\<
+T_GT 		\>
+
 	/*** MATCHES FOR NUMBERS ***/
 
 D			[0-9]
 E			[{E}e][+-]?{D}+
 L			[a-zA-Z_]
 
-T_NUMBER	({D}+|{D}*.{D}+|{D}+.{D}*){E}?
+T_NUMBER	((?:{D}*\.)?{D}+)
 
 	/*** MATCHES FOR WHITESPACES ***/
 
@@ -152,42 +178,67 @@ T_UNTIL		until
 
 	/*** **** Rules Section **** ***/   
 
-{T_NUMBER}		{ printf("[T_NUMBER],\n"); 	}
-{STRX}			{ printf("[T_STRING1],\n"); }
-{STRY}			{ printf("[T_STRING2],\n"); }
+	/*** SYMBOLS ***/
+
+{T_OPENPAR}		{ PUT_TOKEN("T_OPENPAR"); 	}
+{T_CLOSEPAR}	{ PUT_TOKEN("T_CLOSEPAR"); 	}
+{T_PLUS} 		{ PUT_TOKEN("T_PLUS"); 		}
+{T_MINUS} 		{ PUT_TOKEN("T_MINUS"); 	}
+{T_TIMES} 		{ PUT_TOKEN("T_TIMES"); 	}
+{T_DIV} 		{ PUT_TOKEN("T_DIV"); 		}
+{T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 	}
+{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 	}	
+{T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 	}
+{T_EQ} 			{ PUT_TOKEN("T_EQ"); 		}
+{T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 		}
+{T_LTEQ} 		{ PUT_TOKEN("T_LTEQ"); 		}
+{T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 		}
+{T_LT} 			{ PUT_TOKEN("T_LT"); 		}
+{T_GT} 			{ PUT_TOKEN("T_GT"); 		}
+
+
+	/*** SOME TYPES OF VALUES ***/
+
+{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 	}
+{STRX}			{ PUT_TOKEN("T_STRING1"); 	}
+{STRY}			{ PUT_TOKEN("T_STRING2"); 	}
 
 	/*** RESERVED WORDS ***/
 
-{T_AND}			{ printf("[T_AND],\n"); 	}
-{T_DO}			{ printf("[T_DO],\n"); 		}
-{T_ELSE}		{ printf("[T_ELSE],\n"); 	}
-{T_ELSEIF}		{ printf("[T_ELSEIF],\n"); 	}
-{T_END}			{ printf("[T_END],\n"); 	}
-{T_FOR}			{ printf("[T_FOR],\n"); 	}
-{T_FUNCTION}	{ printf("[T_FUNCTION],\n");}
-{T_IF}			{ printf("[T_IF],\n"); 		}
-{T_LOCAL}		{ printf("[T_LOCAL],\n"); 	}
-{T_NIL}			{ printf("[T_NIL],\n"); 	}
-{T_NOT}			{ printf("[T_NOT],\n"); 	}
-{T_OR}			{ printf("[T_OR],\n"); 		}
-{T_RETURN}		{ printf("[T_RETURN],\n"); 	}
-{T_THEN}		{ printf("[T_THEN],\n"); 	}
-{T_WHILE}		{ printf("[T_WHILE],\n"); 	}
+{T_AND}			{ PUT_TOKEN("T_AND"); 		}
+{T_DO}			{ PUT_TOKEN("T_DO"); 		}
+{T_ELSE}		{ PUT_TOKEN("T_ELSE"); 		}
+{T_ELSEIF}		{ PUT_TOKEN("T_ELSEIF"); 	}
+{T_END}			{ PUT_TOKEN("T_END"); 		}
+{T_FOR}			{ PUT_TOKEN("T_FOR"); 		}
+{T_FUNCTION}	{ PUT_TOKEN("T_FUNCTION");	}	
+{T_IF}			{ PUT_TOKEN("T_IF"); 		}
+{T_LOCAL}		{ PUT_TOKEN("T_LOCAL"); 	}
+{T_NIL}			{ PUT_TOKEN("T_NIL"); 		}
+{T_NOT}			{ PUT_TOKEN("T_NOT"); 		}
+{T_OR}			{ PUT_TOKEN("T_OR"); 		}
+{T_RETURN}		{ PUT_TOKEN("T_RETURN"); 	}
+{T_THEN}		{ PUT_TOKEN("T_THEN"); 		}
+{T_WHILE}		{ PUT_TOKEN("T_WHILE"); 	}
 
 	/*** EXTRA RESERVED WORDS ***/
 
-{T_BREAK}		{ printf("[T_BREAK],\n"); 	}
-{T_GLOBAL}		{ printf("[T_GLOBAL],\n"); 	}
-{T_IN}			{ printf("[T_IN],\n"); 		}
-{T_REPEAT}		{ printf("[T_REPEAT],\n"); 	}
-{T_TRUE}		{ printf("[T_TRUE],\n"); 	}
-{T_FALSE}		{ printf("[T_FALSE],\n"); 	}
-{T_UNTIL}		{ printf("[T_UNTIL],\n"); 	}
+{T_BREAK}		{ PUT_TOKEN("T_BREAK"); 	}
+{T_GLOBAL}		{ PUT_TOKEN("T_GLOBAL"); 	}
+{T_IN}			{ PUT_TOKEN("T_IN"); 		}
+{T_REPEAT}		{ PUT_TOKEN("T_REPEAT"); 	}
+{T_TRUE}		{ PUT_TOKEN("T_TRUE"); 		}
+{T_FALSE}		{ PUT_TOKEN("T_FALSE"); 	}
+{T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 	}
 
 
 	/*** WHITESPACES ***/
 
 {WS}			{ printf(""); 				}
+
+	/*** END OF FILE ***/
+
+<<EOF>>		{ PUT_TOKEN("HAHAHAHAHA") ; fclose(output_file); return 0; }
 
 %%
 
@@ -202,7 +253,6 @@ int main( int argc, char **argv ) {
 		yyin = fopen(argv[0], "r");
 		
 		// Output filename will be input_name+.out
-		char output_filename[100];
 		strcpy(output_filename, argv[0]);
 		strcpy(&output_filename[strlen(output_filename)], ".out");
 
