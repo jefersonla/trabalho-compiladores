@@ -38,13 +38,15 @@
 #include "types_lexical.h"
 
 /* General Macros */
-#define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR "\n", VAR)
-#define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext)
+#define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
+#define PUT_TOKEN(TOKEN) 				do{FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);}while(0)
+#define PUT_LITERAL(TOKEN) 				do{strcpy(temp, &yytext[1]);temp[strlen(temp)-1]=0;FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", temp);}while(0)
 #define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
+char temp[MAX_TEMP_STRING];
 FILE *output_file;
 
 /*
@@ -223,8 +225,8 @@ T_UNTIL		until
 	/*** SOME TYPES OF VALUES ***/
 
 {T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 	}
-{T_LITERAL_SQ}	{ PUT_TOKEN("T_STRING1"); 	}
-{T_LITERAL_DQ}	{ PUT_TOKEN("T_STRING2"); 	}
+{T_LITERAL_SQ}	{ PUT_LITERAL("T_LITERAL"); }
+{T_LITERAL_DQ}	{ PUT_LITERAL("T_LITERAL"); }
 
 	/*** RESERVED WORDS ***/
 

@@ -1,6 +1,7 @@
 
 /* Global defines */
 #define MAX_OUTPUT_FILENAME		100
+#define MAX_TEMP_STRING			100
 #define WS 						0
 #define T_NAME					100
 
