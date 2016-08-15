@@ -27,10 +27,10 @@ debug.lex.yy.c: $(FLEXSRC)
 	flex $(DEBUG_FLEXFLAGS) $(FLEXSRC)
 
 analisadorlexico: $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES) -o $(EXECUTABLE)
+	$(CC) $(SOURCES) -o $(EXECUTABLE) $(CFLAGS)
 
 test:
-	bash test.sh $(EXECUTABLE)
+	bash test.sh $(EXECUTABLE) test.lua
 
 clean:
 	\rm -f *.yy.c *.o $(EXECUTABLE) *.out

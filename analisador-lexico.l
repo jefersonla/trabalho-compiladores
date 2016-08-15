@@ -82,7 +82,7 @@ DONE
  * @param error_msg	Message that will represent the error
  */
 #define PARSE_ERRO(ERROR_MSG) 	do{ 												\
-									printf("%s at line %d\n", ERROR_MSG, yylineno);	\
+									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
 									fclose(output_file); 							\
 									remove(output_filename); 						\
 								}while(0)
@@ -109,6 +109,7 @@ T_LTEQ 		\<\=
 T_GTEQ 		\>\=
 T_LT 		\<
 T_GT 		\>
+T_SEP 		\.
 T_CONCAT	\.\.
 T_LIST 		\.\.\.
 T_MOD		\%
@@ -119,6 +120,10 @@ T_BIT_OR 	\|
 T_BIT_N_XOR \~
 T_BIT_RSH 	\>\>
 T_BIT_LSH 	\<\<
+T_OPENBRACE  	\{
+T_CLOSEBRACE 	\}
+T_OPENBRACKET 	\[
+T_CLOSEBRACKET  \]
 
 	/*** MATCHES FOR NUMBERS ***/
 
@@ -212,6 +217,7 @@ T_UNTIL		until
 {T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 		}
 {T_LT} 			{ PUT_TOKEN("T_LT"); 		}
 {T_GT} 			{ PUT_TOKEN("T_GT"); 		}
+{T_SEP} 		{ PUT_TOKEN("T_SEP"); 		}
 {T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");	}
 {T_MOD} 		{ PUT_TOKEN("T_MOD");		}
 {T_EXP} 		{ PUT_TOKEN("T_EXP");		}
@@ -221,6 +227,10 @@ T_UNTIL		until
 {T_BIT_N_XOR} 	{ PUT_TOKEN("T_BIT_N_XOR");	}
 {T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");	}
 {T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");	}
+{T_OPENBRACE} 	 { PUT_TOKEN("T_OPENBRACE");	}
+{T_CLOSEBRACE} 	 { PUT_TOKEN("T_CLOSEBRACE");	}
+{T_OPENBRACKET}  { PUT_TOKEN("T_OPENBRACKET");	}
+{T_CLOSEBRACKET} { PUT_TOKEN("T_CLOSEBRACKET");	}
 
 	/*** SOME TYPES OF VALUES ***/
 

@@ -1,23 +1,29 @@
 #!/bin/bash
 
-# Check if theres a variable
+# Check if theres a  variable
 if [ -z $1 ]
 then
 	echo "NOT SPECIFIED EXECUTABLE FILES!"
 	exit 1
 fi
 
+if [ -z $2 ]
+then
+        echo "NOT SPECIFIED FILE FOR TEST!"
+        exit 1
+fi
+
 # Check if file exists and can be executed
 if [ -e $1 ] && [ -s $1 ] && [ -x $1 ]
 then
 	# Execute compiled code and save the result in a test file
-	./$1 test.lua 2>&1	
+	./$1 $2 2>&1	
 else
 	echo "FILE NOT EXIST, IS EMPTY OR CAN'T BE EXECUTABLE!"
 	exit 1
 fi
 
-OUPUT_FILE=test.lua.out
+OUPUT_FILE=$2.out
 
 # Check if the other file exist
 # Check if file exists and can be executed
@@ -32,7 +38,7 @@ fi
 
 
 # Compara os resultados
-DIFF=$(diff -q test.lua.out test.exp) 
+DIFF=$(diff -q $2.out $2.exp)
 
 if [ "$DIFF" != "" ]
 then
