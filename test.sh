@@ -4,4 +4,4 @@
 ./compilador test.lua 2>&1
 
 # Compara os resultados
-diff -q test.out test.expected.out
+diff -q test.lua.out test.exp

@@ -42,8 +42,7 @@
 FILE *output_file;
 
 /* General Macros */
-
-
+#define PUT_TOKEN(TOKEN, TEXT) 
 
 /*
 
@@ -139,7 +138,7 @@ T_RETURN	return
 T_THEN		then
 T_WHILE		while
 
-	/* PALAVRAS RESERVADAS EXTRAS */
+	/*** EXTRA RESERVED WORD ***/
 
 T_FALSE		false
 T_BREAK		break
@@ -160,27 +159,31 @@ T_UNTIL		until
 	/*** RESERVED WORDS ***/
 
 {T_AND}			{ printf("[T_AND],\n"); 	}
-{T_BREAK}		{ printf("[T_BREAK],\n"); 	}
 {T_DO}			{ printf("[T_DO],\n"); 		}
 {T_ELSE}		{ printf("[T_ELSE],\n"); 	}
 {T_ELSEIF}		{ printf("[T_ELSEIF],\n"); 	}
 {T_END}			{ printf("[T_END],\n"); 	}
-{T_FALSE}		{ printf("[T_FALSE],\n"); 	}
 {T_FOR}			{ printf("[T_FOR],\n"); 	}
 {T_FUNCTION}	{ printf("[T_FUNCTION],\n");}
-{T_GLOBAL}		{ printf("[T_GLOBAL],\n"); 	}
 {T_IF}			{ printf("[T_IF],\n"); 		}
-{T_IN}			{ printf("[T_IN],\n"); 		}
 {T_LOCAL}		{ printf("[T_LOCAL],\n"); 	}
 {T_NIL}			{ printf("[T_NIL],\n"); 	}
 {T_NOT}			{ printf("[T_NOT],\n"); 	}
 {T_OR}			{ printf("[T_OR],\n"); 		}
-{T_REPEAT}		{ printf("[T_REPEAT],\n"); 	}
 {T_RETURN}		{ printf("[T_RETURN],\n"); 	}
 {T_THEN}		{ printf("[T_THEN],\n"); 	}
-{T_TRUE}		{ printf("[T_TRUE],\n"); 	}
-{T_UNTIL}		{ printf("[T_UNTIL],\n"); 	}
 {T_WHILE}		{ printf("[T_WHILE],\n"); 	}
+
+	/*** EXTRA RESERVED WORDS ***/
+
+{T_BREAK}		{ printf("[T_BREAK],\n"); 	}
+{T_GLOBAL}		{ printf("[T_GLOBAL],\n"); 	}
+{T_IN}			{ printf("[T_IN],\n"); 		}
+{T_REPEAT}		{ printf("[T_REPEAT],\n"); 	}
+{T_TRUE}		{ printf("[T_TRUE],\n"); 	}
+{T_FALSE}		{ printf("[T_FALSE],\n"); 	}
+{T_UNTIL}		{ printf("[T_UNTIL],\n"); 	}
+
 
 	/*** WHITESPACES ***/
 

@@ -25,4 +25,4 @@ test:
 	bash $(EXECUTABLE)
 
 clean:
-	rm *.yy.c *.o $(EXECUTABLE)
+	\rm -f *.yy.c *.o $(EXECUTABLE) *.out
