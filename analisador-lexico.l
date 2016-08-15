@@ -38,8 +38,8 @@
 #include "types_lexical.h"
 
 /* General Macros */
-#define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR, VAR)
-#define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"],\n", yytext)
+#define FPRINTF_PRINTF(OUT, STR, VAR)	fprintf(OUT, STR, VAR);printf(STR "\n", VAR)
+#define PUT_TOKEN(TOKEN) 				FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
 /* External Variables */
@@ -268,9 +268,8 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 <<EOF>>	{
 			fclose(output_file);
 			output_file = fopen(output_filename, "r+");
-			while(getc(output_file) != ',');
 			fseek(output_file, -2, SEEK_END);
-			fputs(" ", output_file);
+			fputs("\n", output_file);
 			fclose(output_file);
 			return 0;
 		}
