@@ -6,5 +6,5 @@ function fact (n)
     return n * fact(n-1)
   end
 end
-   
+--!@"!@" -- Test with undefinied tokens is fine
 print(fact(7))

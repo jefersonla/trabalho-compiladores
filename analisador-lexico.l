@@ -4,6 +4,8 @@
 %option noyywrap
 /* Enable Warnings */
 %option warn
+/* Enable line number */
+%option yylineno
 
 %{
 
@@ -69,7 +71,19 @@ DONE
 - T_UNTIL
 
 */
-	
+
+/* External macro */
+/**
+ * Display error message, close current output file, and after that remove
+ * 
+ * @param error_msg	Message that will represent the error
+ */
+#define PARSE_ERRO(ERROR_MSG) 	do{ 												\
+									printf("%s at line %d\n", ERROR_MSG, yylineno);	\
+									fclose(output_file); 							\
+									remove(output_filename); 						\
+								}while(0)
+
 %}
 
 	/*** * Definitions Section * ***/  
@@ -84,6 +98,7 @@ T_TIMES		\*
 T_DIV		\/
 T_COMMA		\,
 T_SEMICOL	\;
+T_COLON		\:
 T_ASSIGN	\=
 T_EQ 		\=\=
 T_NEQ 		\~\=
@@ -92,15 +107,15 @@ T_GTEQ 		\>\=
 T_LT 		\<
 T_GT 		\>
 T_CONCAT	\.\.
+T_LIST 		\.\.\.
 T_MOD		\%
 T_EXP 		\^
 T_FLOOR		\/\/
 T_BIT_AND 	\&
 T_BIT_OR 	\|
-T_BIT_XOR 	\~
+T_BIT_N_XOR \~
 T_BIT_RSH 	\>\>
 T_BIT_LSH 	\<\<
-T_BIT_NOT 	\~
 
 	/*** MATCHES FOR NUMBERS ***/
 
@@ -114,6 +129,10 @@ T_NUMBER	((?:{D}*\.)?{D}+)
 L 			[a-zA-Z_]
 
 T_NAME		{L}({L}|{D})*
+
+	/*** MATCHES FOR LABELS ***/
+
+T_LABEL 	\:\:{L}+\:\:
 
 	/*** MATCHES FOR WHITESPACES ***/
 
@@ -181,7 +200,8 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 {T_TIMES} 		{ PUT_TOKEN("T_TIMES"); 	}
 {T_DIV} 		{ PUT_TOKEN("T_DIV"); 		}
 {T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 	}
-{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 	}	
+{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 	}
+{T_COLON} 		{ PUT_TOKEN("T_COLON"); 	}	
 {T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 	}
 {T_EQ} 			{ PUT_TOKEN("T_EQ"); 		}
 {T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 		}
@@ -195,10 +215,9 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 {T_FLOOR} 		{ PUT_TOKEN("T_FLOOR");		}
 {T_BIT_AND} 	{ PUT_TOKEN("T_BIT_AND");	}
 {T_BIT_OR} 		{ PUT_TOKEN("T_BIT_OR");	}
-{T_BIT_XOR} 	{ PUT_TOKEN("T_BIT_XOR");	}
+{T_BIT_N_XOR} 	{ PUT_TOKEN("T_BIT_N_XOR");	}
 {T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");	}
 {T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");	}
-{T_BIT_NOT} 	{ PUT_TOKEN("T_BIT_NOT");	}
 
 	/*** SOME TYPES OF VALUES ***/
 
@@ -234,9 +253,10 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 {T_FALSE}		{ PUT_TOKEN("T_FALSE"); 	}
 {T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 	}
 
-	/*** VARIABLES OR NAMES ***/
+	/*** VARIABLES, NAMES OR LABELS ***/
 
 {T_NAME}		{ PUT_TOKEN("T_NAME"); 		}
+{T_LABEL}		{ PUT_TOKEN("T_LABEL");		}
 
 	/*** WHITESPACES ***/
 
@@ -257,7 +277,10 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 
 	/*** DEFAULT BEHAVIOR ***/
 
-.				{ /* process default here */ }
+.				{
+					PARSE_ERRO("undefinied token");
+					yyterminate();
+				}
 
 %%
 
