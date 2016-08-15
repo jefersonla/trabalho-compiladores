@@ -315,8 +315,9 @@ int main( int argc, char **argv ) {
 
 			break;
 		default:
-			printf( "PLEASE USE CORRECT SYNTAX!!! \n "\
-					"SYNTAX ./compilador [INPUT] [OUTPUT]");
+			printf( "PLEASE USE THE CORRECT SYNTAX!!! \n "\
+					"SYNTAX ./analisador-lexico [INPUT] [OUTPUT]");
+			return EXIT_FAILURE;
 	}
 	
 	// Output File for Flex
