@@ -35,3 +35,6 @@ analisadorlexico
 
 # Lex files
 *.yy.c
+
+# Temp files
+*.swp
