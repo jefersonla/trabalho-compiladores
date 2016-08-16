@@ -25,8 +25,13 @@
 /** ******************************* **/
 /**  Compilar este  projeto usando  **/
 /**     flex analisador-lexico.l    **/
-/** gcc -lfl -o compilador lex.yy.c **/
+/** gcc -o compilador lex.yy.c -lfl **/
 /**           Ou... make            **/
+/** ******************************* **/
+
+/** ******************************* **/
+/**       LEIA O README PARA        **/
+/**        MAIS INFORMAÇÔES         **/
 /** ******************************* **/
 
 /* External Definitions*/
@@ -35,6 +40,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+
+/* Language definitions and types */
 #include "types_lexical.h"
 
 /* General Macros */
@@ -64,20 +71,11 @@ T_LTEQ      T_GTEQ      T_LT        T_GT
 
 DONE
 
-// NOT SURE ABOUT THIS
-- T_TRUE
-- T_FALSE
-- T_BREAK
-- T_GLOBAL
-- T_IN
-- T_REPEAT
-- T_UNTIL
-
 */
 
 /* External macro */
 /**
- * Display error message, close current output file, and after that remove
+ * Display error message, close current output file, and after that remove file
  * 
  * @param error_msg	Message that will represent the error
  */
@@ -274,14 +272,14 @@ T_UNTIL		until
 {T_NAME}		{ PUT_TOKEN("T_NAME"); 		}
 {T_LABEL}		{ PUT_TOKEN("T_LABEL");		}
 
-
 	/*** WHITESPACES ***/
 
 {WS}			{ printf(""); 				}
 
 	/*** END OF FILE ***/
-	/*   CLOSE FILE, OPEN IT AGAIN AS A+   */
-	/*   REMOVE COMMA OF THE LAST LINE     */
+    /** ROUTINES TO CLOSE AND FINISH FILE **/
+    /** TODO UNCLOSED LITERAL AND MULTILINE COMMENTS **/
+
 <<EOF>>	{
 			// Close output file, and reopen then with read and write mode
             fclose(output_file);
@@ -315,10 +313,13 @@ T_UNTIL		until
             fclose(output_file);
             fclose(copy_tmp_file);
             remove(copy_tmp_filename);
+            // Print Complete message
+            printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n\n");
             return EXIT_SUCCESS;
 		}
 
 	/*** DEFAULT BEHAVIOR ***/
+    /** THROW ERROR IF THERE'S NO RULE TO MATCH **/
 
 .				{
 					PARSE_ERRO("undefinied token");
@@ -332,8 +333,15 @@ T_UNTIL		until
 int main( int argc, char **argv ) {
 	++argv, --argc; /* skip over program name */
 
-	// Verify if there's a file, or receive code using stdin
+    /* Code Begin Message */
+	printf( " ::: LUA MIPS Compiler - Lexical Analyser ::: \n"  \
+            "Version 0.1 - Pre Alpha - LUA 5.3 Compilant\n"     \
+            "Developed by Jeferson Lima and Jefferson Rene\n"   \
+            "\n");
+
+	// Verify number of parameters
 	switch(argc){
+        // STDIN Input file
 		case 0:
 			// Input stdin
 			yyin = stdin;
@@ -341,6 +349,7 @@ int main( int argc, char **argv ) {
 			// The output will be a.out
 			strcpy(output_filename, "stdin.out");
 			break;
+        // Default output filename
 		case 1:
 			// Input file for Flex
 			yyin = fopen(argv[0], "r");
@@ -350,6 +359,7 @@ int main( int argc, char **argv ) {
 			strcpy(&output_filename[strlen(output_filename)], ".out");
 			
 			break;
+        // Both parameters specified
 		case 2:
 			// Input file for Flex
 			yyin = fopen(argv[0], "r");
@@ -359,11 +369,24 @@ int main( int argc, char **argv ) {
 
 			break;
 		default:
-			printf( "PLEASE USE THE CORRECT SYNTAX!!! \n "\
-					"SYNTAX ./analisador-lexico [INPUT] [OUTPUT]");
+            printf( "Incorrect number of parrameters used!\n"                                   \
+                    "\n"                                                                        \
+                    "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
+                    "\t<input_file>\tFile to be compiled\n"                                     \
+                    "\t<output_file>\tCompiled file result\n"                                   \
+                    "\n"                                                                        \
+                    "Both <input_file> and <output_file> parameters are optional if no\n"       \
+                    "parameter is specified input file will be stdin and the result content\n"  \
+                    "will be available both in stdout and file 'stdout.out'. The default\n"     \
+                    "behavior when there's no <output_file> is create a file in the following\n"\
+                    "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
+            
 			return EXIT_FAILURE;
 	}
-	
+
+    // Message of starting compilation
+    printf("::: STARTING LEX PARSER PROCESS :::\n\n");
+
 	// Output File for Flex
 	output_file = fopen(output_filename, "w");
 
