@@ -37,7 +37,8 @@ all: main
 #main: lex.yy.c y.tab.h y.tab.c
 #	$(CC)
 # TODO Constroi o compilador
-main:
+# Por enquanto o compilador vai ser o parser
+main: parser
 	echo "TODO: Constroi compilador"
 
 # Compilação Analisador Sintático/Semântico
