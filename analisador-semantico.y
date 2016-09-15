@@ -37,7 +37,11 @@ term        : number                {$$ = $1;}
 
 %%
 
-/* New main will come here */
+/* New main will come there */
+
+void yyerror(char *s) {
+    fprintf(stdout, "%s\n", s);
+}
 
 int main(){
     return yyparse();
