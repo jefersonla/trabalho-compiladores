@@ -4,43 +4,102 @@ CC=gcc
 CFLAGS=-lfl
 # Flags para o Linker
 LDFLAGS=
-# Flagas para o Flex
-FLEXFLAGS=
+# Flags para o Flex
+FLEX_FLAGS=
 DEBUG_FLEXFLAGS=--debug --verbose
-# Codigo fonte
-SOURCES=lex.yy.c
+# Flags para o Bison
+BISON_FLAGS=
+DEBUG_BISONFLAGS=--debug --verbose
 # Nome do executavel
 EXECUTABLE=compilador
+# Executavel Analisador Léxico
+LEXICAL_EXECUTABLE=analisador_lexico
+# Executavel Analisador Semantico/Sintatico
+PARSER_EXECUTABLE=analisador_semantico
+# Todos os executaveis
+EXECUTABLES=$(LEXICAL_EXECUTABLE) $(PARSER_EXECUTABLE) $(EXECUTABLE)
 # Analisador Léxico
-FLEXSRC=analisador-lexico.l
+FLEX_SRC=analisador-lexico.l
+# Analisador Sintatico/Semantico
+BISON_SRC=analisador-semantico.y
+# Arquivos a serem criados pelo FLEX
+FLEX_HEADER_FILE=lex.yy.h
+# Arquivos a serem criados pelo BISON
+BISON_HEADER_FILE=y.tab.h
+# Codigos fontes
+SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 
 # Rota padrão
 all: main
 
-# Compilação padrão
-main: lex.yy.c $(EXECUTABLE)
+# Pega os dois arquivos
+#main: lex.yy.c y.tab.h y.tab.c
+#	$(CC)
+# TODO Constroi o compilador
+main:
+	echo "TODO: Constroi compilador"
 
-lex.yy.c: $(FLEXSRC)
-	flex $(FLEXFLAGS) $(FLEXSRC)
+# Compilação Analisador Sintático/Semântico
+parser: lex.yy.c y.tab.c $(PARSER_EXECUTABLE)
 
-# Compilação em modo Debug
-debug: debug.lex.yy.c $(EXECUTABLE)
+# Compilação Bison
+y.tab.c: $(BISON_SRC)
+	bison $(BISON_SRC) -d -o y.tab.c
 
-debug.lex.yy.c: $(FLEXSRC)
-	flex $(DEBUG_FLEXFLAGS) $(FLEXSRC)
+# Compilação Bison em modo Debug
+parser_debug: debug.lex.yy.c debug.y.tab.c debug_parser_executable
 
-$(EXECUTABLE): $(SOURCES)
-	$(CC) $(SOURCES) -o $(EXECUTABLE) $(CFLAGS)
+# Compilação Bison Debug
+debug.y.tab.c:
+	bison $(BISON_SRC) -d -o debug.y.tab.c $(DEBUG_BISONFLAGS)
 
-# Executa apenas um teste
-test:
-	bash test.sh $(EXECUTABLE) tests/test.lua
+# Executavel com debug habilitado
+debug_parser_executable: debug.lex.yy.c debug.y.tab.c
+	$(CC) -o $(PARSER_EXECUTABLE) debug.y.tab.c debug.lex.yy.c $(CFLAGS) -D DEBUG_MODE
 
-# Executa diversos testes
-all-tests:
-	bash test.sh $(EXECUTABLE) tests/test.lua
-	bash test.sh $(EXECUTABLE) tests/hello.lua
+# Executavel Analisador Semantico/Sintatico
+$(PARSER_EXECUTABLE): lex.yy.c y.tab.c
+	$(CC) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(CFLAGS)
+
+# Compilação Analisador Léxico
+lexical: lex.yy.c $(LEXICAL_EXECUTABLE)
+
+# Compilação Flex
+lex.yy.c: $(FLEX_SRC)
+	flex $(FLEX_FLAGS) $(FLEX_SRC)
+
+# Compilação Flex em modo Debug
+lexical_debug: debug.lex.yy.c debug_lexical_executable
+
+# Compilação Flex Debug
+debug.lex.yy.c: $(FLEX_SRC)
+	flex -o debug.lex.yy.c $(DEBUG_FLEXFLAGS) $(FLEX_SRC)
+
+# Executavel de Debug Analisador Lexico
+debug_lexical_executable: lex.yy.c
+	$(CC) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS) -D LEXICAL_ANALYSER
+
+# Executavel Analisador Lexico
+$(LEXICAL_EXECUTABLE): lex.yy.c
+	$(CC) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS) -D LEXICAL_ANALYSER
+
+# Executa o teste do analisador léxico
+lexical-test:
+	bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+
+# Executa diversos testes no analisador léxico
+lexical-all-tests:
+	bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+	bash test.sh $(LEXICAL_EXECUTABLE) tests/hello.lua
+
+# TODO Executa testes unitários no parser
+parser-test:
+	echo "TODO:Unit tests for parser"
+
+# TODO Varios testes unitários para o parser
+parser-all-tests:
+	echo "TODO: All Unit tests for parser"
 
 # Limpa o ambiente
 clean:
-	\rm -f *.yy.c *.o $(EXECUTABLE) *.out tests/*.out
+	\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out

@@ -6,6 +6,8 @@
 %option warn
 /* Enable line number */
 %option yylineno
+/* Make flex create a header file */
+%option header-file="lex.yy.h"
 
 %{
 
@@ -35,14 +37,26 @@
 /** ******************************* **/
 
 /* External Definitions*/
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <string.h>
-#include <math.h>
+//#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdint.h>
+//#include <string.h>
+//#include <math.h>
+/* These includes are already defined on generated source */
 
 /* Language definitions and types */
-#include "types_lexical.h"
+#include "lexical.defs.h"
+
+/* Include table file if compilation mode is parse */
+#ifndef LEXICAL_ANALYSER
+/* Change name of the import if debug mode is enabled */
+#ifdef DEBUG_MODE
+#include "debug.y.tab.h"
+/* Otherwise just include the default table file */
+#else
+#include "y.tab.h"
+#endif
+#endif
 
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
@@ -60,13 +74,13 @@ FILE *output_file;
 
 Types Allowed
 
-T_NAME      T_NUMBER    T_AND       T_NOT 
-T_OR        T_ELSEIF    T_WHILE     T_DO 
-T_FUNCTION  T_END       T_FOR       T_ELSE 
-T_IF        T_THEN      T_RETURN    T_LOCAL 
-T_NIL       T_PLUS      T_MINUS     T_TIMES 
-T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR 
-T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ   
+T_NAME      T_NUMBER    T_AND       T_NOT
+T_OR        T_ELSEIF    T_WHILE     T_DO
+T_FUNCTION  T_END       T_FOR       T_ELSE
+T_IF        T_THEN      T_RETURN    T_LOCAL
+T_NIL       T_PLUS      T_MINUS     T_TIMES
+T_DIV       T_COMMA     T_OPENPAR   T_CLOSEPAR
+T_SEMICOL   T_ASSIGN    T_EQ        T_NEQ
 T_LTEQ      T_GTEQ      T_LT        T_GT
 
 DONE
@@ -76,18 +90,18 @@ DONE
 /* External macro */
 /**
  * Display error message, close current output file, and after that remove file
- * 
+ *
  * @param error_msg	Message that will represent the error
  */
-#define PARSE_ERRO(ERROR_MSG) 	do{ 												\
+#define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
 									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
-									fclose(output_file); 							\
-									remove(output_filename); 						\
+									fclose(output_file); 							        \
+									remove(output_filename); 						        \
 								}while(0)
 
 %}
 
-	/*** * Definitions Section * ***/  
+	/*** * Definitions Section * ***/
 
 	/*** MATCHES FOR SYMBOLS ***/
 
@@ -147,7 +161,7 @@ WS			[\ \t\r\n\v\f]+
 	/*** MATCHES FOR MULTILINE CONTENT ***/
 
 BC  		\[\[
-EC 			\]\]			
+EC 			\]\]
 
 MULTILINE	{BC}[^{EC}]*{EC}
 
@@ -158,11 +172,11 @@ WS_COMMENT	--({MULTILINE}|.*)|#.*
 	/*** MATCHES TO DIFFERENTS TYPES OF STRING ***/
 
 ESC			\\
-SQ			'
-DQ			["]
+SQ			\'
+DQ			\"
 
-T_LITERAL_SQ	{SQ}(?:[^{SQ}{ESC}]|{ESC}.)*{SQ}
-T_LITERAL_DQ 	{DQ}(?:[^{DQ}{ESC}]|{ESC}.)*{DQ}
+    /*** POSIX DEFAULT TO LITERAL CONTENT ***/
+T_LITERAL   \"[^\"\\]*(\\(.|\n)[^\"\\]*)*\"|\'[^\'\\]*(\\(.|\n)[^\'\\]*)*\'
 
 	/*** MATCHES FOR RESERVED WORDS ***/
 
@@ -194,7 +208,7 @@ T_UNTIL		until
 
 %%
 
-	/*** **** Rules Section **** ***/   
+	/*** **** Rules Section **** ***/
 
 	/*** COMENTARIOS ***/
 
@@ -210,7 +224,7 @@ T_UNTIL		until
 {T_DIV} 		{ PUT_TOKEN("T_DIV"); 		}
 {T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 	}
 {T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 	}
-{T_COLON} 		{ PUT_TOKEN("T_COLON"); 	}	
+{T_COLON} 		{ PUT_TOKEN("T_COLON"); 	}
 {T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 	}
 {T_EQ} 			{ PUT_TOKEN("T_EQ"); 		}
 {T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 		}
@@ -236,8 +250,7 @@ T_UNTIL		until
 	/*** SOME TYPES OF VALUES ***/
 
 {T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 	}
-{T_LITERAL_SQ}	{ PUT_LITERAL("T_LITERAL"); }
-{T_LITERAL_DQ}	{ PUT_LITERAL("T_LITERAL"); }
+{T_LITERAL}     { PUT_LITERAL("T_LITERAL"); }
 
 	/*** RESERVED WORDS ***/
 
@@ -247,7 +260,7 @@ T_UNTIL		until
 {T_ELSEIF}		{ PUT_TOKEN("T_ELSEIF"); 	}
 {T_END}			{ PUT_TOKEN("T_END"); 		}
 {T_FOR}			{ PUT_TOKEN("T_FOR"); 		}
-{T_FUNCTION}	{ PUT_TOKEN("T_FUNCTION");	}	
+{T_FUNCTION}	{ PUT_TOKEN("T_FUNCTION");	}
 {T_IF}			{ PUT_TOKEN("T_IF"); 		}
 {T_LOCAL}		{ PUT_TOKEN("T_LOCAL"); 	}
 {T_NIL}			{ PUT_TOKEN("T_NIL"); 		}
@@ -321,15 +334,30 @@ T_UNTIL		until
 	/*** DEFAULT BEHAVIOR ***/
     /** THROW ERROR IF THERE'S NO RULE TO MATCH **/
 
-.				{
-					PARSE_ERRO("undefinied token");
-					yyterminate();
-				}
+.	{
+		PARSE_ERRO("undefinied token");
+        switch(yytext[0]){
+            case UNCLOSED_MULTILINE_COMMENT:
+                printf("UNCLOSED MULTILINE COMMENT!\n");
+                break;
+            case UNCLOSED_LITERAL_DQUOTE:
+            case UNCLOSED_LITERAL_SQUOTE:
+                printf("UNCLOSED LITERAL!\n");
+                break;
+            default:
+                printf(">> %s\n", yytext);
+                printf("INVALID CHARACTER!\n");
+        }
+        // Stop Application
+        yyterminate();
+	}
 
 %%
 
 	/*** **** C Code Section **** ***/
 
+/* Main is only necessary when lexical analyser is being compiled */
+#ifdef LEXICAL_ANALYSER
 int main( int argc, char **argv ) {
 	++argv, --argc; /* skip over program name */
 
@@ -339,12 +367,32 @@ int main( int argc, char **argv ) {
             "Developed by Jeferson Lima and Jefferson Rene\n"   \
             "\n");
 
+    // If you have one or more arguments and they start with --
+    if((argc == 1) && (argv[0][0] == '-' && argv[0][1] == '-')){
+        printf( "Help usage!\n"                                                             \
+                "\n"                                                                        \
+                "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
+                "\t<input_file>\tFile to be compiled\n"                                     \
+                "\t<output_file>\tCompiled file result\n"                                   \
+                "\n"                                                                        \
+                "Both <input_file> and <output_file> parameters are optional if no\n"       \
+                "parameter is specified input file will be stdin and the result content\n"  \
+                "will be available both in stdout and file 'stdout.out'. The default\n"     \
+                "behavior when there's no <output_file> is create a file in the following\n"\
+                "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
+
+		return EXIT_SUCCESS;
+    }
+
 	// Verify number of parameters
 	switch(argc){
         // STDIN Input file
 		case 0:
 			// Input stdin
 			yyin = stdin;
+
+            // Print specified format
+            printf(":: STDIN COMMAND MODE SELECTED ::\n\n");
 
 			// The output will be a.out
 			strcpy(output_filename, "stdin.out");
@@ -353,17 +401,21 @@ int main( int argc, char **argv ) {
 		case 1:
 			// Input file for Flex
 			yyin = fopen(argv[0], "r");
-			
+
+            // Print specified format
+            printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n"
+                    ":: OUTPUT FILE WILL BE %s.out ::", argv[0]);
+
 			// Output filename will be input_name+.out
 			strcpy(output_filename, argv[0]);
 			strcpy(&output_filename[strlen(output_filename)], ".out");
-			
+
 			break;
         // Both parameters specified
 		case 2:
 			// Input file for Flex
 			yyin = fopen(argv[0], "r");
-			
+
 			// Output filename
 			strcpy(output_filename, argv[1]);
 
@@ -380,7 +432,7 @@ int main( int argc, char **argv ) {
                     "will be available both in stdout and file 'stdout.out'. The default\n"     \
                     "behavior when there's no <output_file> is create a file in the following\n"\
                     "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
-            
+
 			return EXIT_FAILURE;
 	}
 
@@ -390,6 +442,7 @@ int main( int argc, char **argv ) {
 	// Output File for Flex
 	output_file = fopen(output_filename, "w");
 
-    // Return yylex()   
+    // Return yylex()
 	return (yylex());
 }
+#endif

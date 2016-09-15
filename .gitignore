@@ -35,6 +35,11 @@ analisadorlexico
 
 # Lex files
 *.yy.c
+*.yy.h
+
+# Bison files
+*.tab.h
+*.tab.c
 
 # Temp files
 *.swp
