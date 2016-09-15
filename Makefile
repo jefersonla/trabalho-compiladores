@@ -78,11 +78,11 @@ debug.lex.yy.c: $(FLEX_SRC)
 	flex -o debug.lex.yy.c $(DEBUG_FLEXFLAGS) $(FLEX_SRC)
 
 # Executavel de Debug Analisador Lexico
-debug_lexical_executable: lex.yy.c
+debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
 	$(CC) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Executavel Analisador Lexico
-$(LEXICAL_EXECUTABLE): lex.yy.c
+$(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Executa o teste do analisador léxico

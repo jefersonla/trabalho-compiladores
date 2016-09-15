@@ -47,15 +47,12 @@
 /* Language definitions and types */
 #include "lexical.defs.h"
 
-/* Include table file if compilation mode is parse */
-#ifndef LEXICAL_ANALYSER
 /* Change name of the import if debug mode is enabled */
 #ifdef DEBUG_MODE
 #include "debug.y.tab.h"
 /* Otherwise just include the default table file */
 #else
 #include "y.tab.h"
-#endif
 #endif
 
 /* Common define */
