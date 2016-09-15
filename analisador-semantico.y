@@ -26,13 +26,35 @@
 /* Definições do Flex */
 #include "lex.yy.h"
 
+/* Definições dos tipos */
+#include "parser.defs.h"
+
 /* Needed by bison */
 void yyerror(char *);
+
+/* Contain actual token */
+char *string_addr;
 
 %}
 
 
+/* Definition of token iterator */
+%union{
+	/* Number Value */
+	int integer_number;
+	float float_number;
+	/* Literal Value */
+	char *string_literal;
+	/* Label Definition */
+	char *string_label;
+	/* Variable Name */
+	char *string_variable_name;
+	/* Pointer to a token node */
+	// TokenNode *ptr_token_node;
+}
+
 /* Types imported from flex */
+/* Need to organize precende and values */
 %token T_OPENPAR
 %token T_CLOSEPAR
 %token T_PLUS
@@ -86,23 +108,24 @@ void yyerror(char *);
 %token T_TRUE
 %token T_FALSE
 %token T_UNTIL
+
 %token T_LABEL
 %token T_NAME
 %token T_LITERAL
 
-/* Exemplo tudo aqui*/
-%union {
-    int num;
-    char id;
-}
+/* ################ Começo do Exemplo ################ */
+//%union {
+//    int num;
+//    char id;
+//}
 
-%start line
-%token print
-%token exit_command
-%token <num> number
-%token <id> identifier
-%type <num> line exp term
-%type <id> assingment
+%start 	line
+%token 	print
+%token 	exit_command
+%token 	<integer_number> 		number
+%token 	<string_variable_name> 	identifier
+%type 	<integer_number> 		line exp term
+%type 	<string_variable_name> 	assingment
 
 %%
 
@@ -121,6 +144,8 @@ exp         : term
 term        : number                {$$ = $1;}
             | identifier            {$$ = $1;}
             ;
+
+/* ################ Fim do Exemplo ################ */
 
 %%
 
