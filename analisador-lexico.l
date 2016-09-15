@@ -28,7 +28,7 @@
 /**  Compilar este  projeto usando  **/
 /**     flex analisador-lexico.l    **/
 /** gcc -o compilador lex.yy.c -lfl **/
-/**           Ou... make            **/
+/**       Ou... make lexical        **/
 /** ******************************* **/
 
 /** ******************************* **/
@@ -58,6 +58,11 @@
 #endif
 #endif
 
+/* Common define */
+#define yyerrorfound -1
+#define yycheckstate(VAR) (VAR != yyerrorfound)
+
+#ifdef LEXICAL_ANALYSER
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
 #define PUT_TOKEN(TOKEN) 				do{FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);}while(0)
@@ -69,6 +74,17 @@
 char output_filename[MAX_OUTPUT_FILENAME];
 char temp[MAX_TEMP_STRING];
 FILE *output_file;
+#else
+/* General Macros */
+#define PUT_TOKEN(TOKEN) 				do{ \
+                                            printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                        }while(0)
+#define PUT_LITERAL(TOKEN) 				do{ \
+                                            yytext[strlen(yytext)-1]=0; \
+                                            printf("[" TOKEN ", \"%s\"], ", &yytext[1]); \
+                                        }while(0)
+#define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
+#endif
 
 /*
 
@@ -93,12 +109,17 @@ DONE
  *
  * @param error_msg	Message that will represent the error
  */
+#ifdef LEXICAL_ANALYSER
 #define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
 									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
-									fclose(output_file); 							        \
+                                    fclose(output_file); 							        \
 									remove(output_filename); 						        \
 								}while(0)
-
+#else
+#define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
+									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
+								}while(0)
+#endif
 %}
 
 	/*** * Definitions Section * ***/
@@ -167,7 +188,7 @@ MULTILINE	{BC}[^{EC}]*{EC}
 
 	/*** MATCHES FOR COMMENTS ***/
 
-WS_COMMENT	--({MULTILINE}|.*)|#.*
+WS_COMMENT	--(\[\[[^\]\]]*\]\]|.*)|#.*
 
 	/*** MATCHES TO DIFFERENTS TYPES OF STRING ***/
 
@@ -294,7 +315,9 @@ T_UNTIL		until
     /** TODO UNCLOSED LITERAL AND MULTILINE COMMENTS **/
 
 <<EOF>>	{
-			// Close output file, and reopen then with read and write mode
+            /* Only close file if it's being compiled the lexical analyser */
+			#ifdef LEXICAL_ANALYSER
+            // Close output file, and reopen then with read and write mode
             fclose(output_file);
 			output_file = fopen(output_filename, "r+");
 			// Remove last token comma and put a new newline char
@@ -329,6 +352,10 @@ T_UNTIL		until
             // Print Complete message
             printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n\n");
             return EXIT_SUCCESS;
+            #else
+            /* Just tell that the program has ended */
+            // TODO!
+            #endif
 		}
 
 	/*** DEFAULT BEHAVIOR ***/
@@ -349,7 +376,7 @@ T_UNTIL		until
                 printf("INVALID CHARACTER!\n");
         }
         // Stop Application
-        yyterminate();
+        return yyerrorfound;
 	}
 
 %%
@@ -429,7 +456,7 @@ int main( int argc, char **argv ) {
                     "\n"                                                                        \
                     "Both <input_file> and <output_file> parameters are optional if no\n"       \
                     "parameter is specified input file will be stdin and the result content\n"  \
-                    "will be available both in stdout and file 'stdout.out'. The default\n"     \
+                    "will be availabyyerror_le both in stdout and file 'stdout.out'. The default\n"     \
                     "behavior when there's no <output_file> is create a file in the following\n"\
                     "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
 
@@ -442,7 +469,11 @@ int main( int argc, char **argv ) {
 	// Output File for Flex
 	output_file = fopen(output_filename, "w");
 
-    // Return yylex()
-	return (yylex());
+    // While there are tokens to process
+    int yylex_state;
+    for(yylex_state = yylex() ; (yylex_state) && (yylex_state != yyerrorfound) ; yylex_state = yylex());
+
+    // If no errors has been related EXIT_SUCCESS
+	return yycheckstate(yylex_state);
 }
 #endif

@@ -1,4 +1,29 @@
 %{
+/** **** Analisador  Semantico **** **/
+/** Desenvolvido por Jeferson Lima  **/
+/**              e   Jefferson Renê **/
+/** Versão      1.0                 **/
+/** Linguagem   LUA                 **/
+/** Licença     MIT                 **/
+/** Descrição:  Analisador          **/
+/**             Sintatico/Semantico **/
+/**             para a linguagem    **/
+/**             LUA.                **/
+/**                                 **/
+/**   2º TRABALHO DE COMPILADORES   **/
+/** ******************************* **/
+
+/** ******************************* **/
+/**  Compilar este  projeto usando  **/
+/**  make parse    ou         make  **/
+/** ******************************* **/
+
+/** ******************************* **/
+/**       LEIA O README PARA        **/
+/**        MAIS INFORMAÇÔES         **/
+/** ******************************* **/
+
+
 int symbols[100];
 #include "lex.yy.h"
 /* Needed by bison */

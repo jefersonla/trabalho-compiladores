@@ -28,7 +28,8 @@
 *.out
 *.app
 compilador
-analisadorlexico
+analisador_lexico
+analisador_semantico
 
 # Test files
 *.out
