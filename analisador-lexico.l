@@ -230,78 +230,78 @@ T_UNTIL		until
 
 	/*** COMENTARIOS ***/
 
-{WS_COMMENT}	{ PRINT_COMMENT_DEBUG();	}
+{WS_COMMENT}	{ PRINT_COMMENT_DEBUG();		}
 
 	/*** SYMBOLS ***/
 
-{T_OPENPAR}		{ PUT_TOKEN("T_OPENPAR"); 	}
-{T_CLOSEPAR}	{ PUT_TOKEN("T_CLOSEPAR"); 	}
-{T_PLUS} 		{ PUT_TOKEN("T_PLUS"); 		}
-{T_MINUS} 		{ PUT_TOKEN("T_MINUS"); 	}
-{T_TIMES} 		{ PUT_TOKEN("T_TIMES"); 	}
-{T_DIV} 		{ PUT_TOKEN("T_DIV"); 		}
-{T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 	}
-{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 	}
-{T_COLON} 		{ PUT_TOKEN("T_COLON"); 	}
-{T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 	}
-{T_EQ} 			{ PUT_TOKEN("T_EQ"); 		}
-{T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 		}
-{T_LTEQ} 		{ PUT_TOKEN("T_LTEQ"); 		}
-{T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 		}
-{T_LT} 			{ PUT_TOKEN("T_LT"); 		}
-{T_GT} 			{ PUT_TOKEN("T_GT"); 		}
-{T_SEP} 		{ PUT_TOKEN("T_SEP"); 		}
-{T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");	}
-{T_MOD} 		{ PUT_TOKEN("T_MOD");		}
-{T_EXP} 		{ PUT_TOKEN("T_EXP");		}
-{T_FLOOR} 		{ PUT_TOKEN("T_FLOOR");		}
-{T_BIT_AND} 	{ PUT_TOKEN("T_BIT_AND");	}
-{T_BIT_OR} 		{ PUT_TOKEN("T_BIT_OR");	}
-{T_BIT_N_XOR} 	{ PUT_TOKEN("T_BIT_N_XOR");	}
-{T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");	}
-{T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");	}
-{T_OPENBRACE} 	 { PUT_TOKEN("T_OPENBRACE");	}
-{T_CLOSEBRACE} 	 { PUT_TOKEN("T_CLOSEBRACE");	}
-{T_OPENBRACKET}  { PUT_TOKEN("T_OPENBRACKET");	}
-{T_CLOSEBRACKET} { PUT_TOKEN("T_CLOSEBRACKET");	}
+{T_OPENPAR}		{ PUT_TOKEN("T_OPENPAR"); 		return T_OPENPAR; 		}
+{T_CLOSEPAR}	{ PUT_TOKEN("T_CLOSEPAR"); 		return T_CLOSEPAR; 		}
+{T_PLUS} 		{ PUT_TOKEN("T_PLUS"); 			return T_PLUS; 		 	}
+{T_MINUS} 		{ PUT_TOKEN("T_MINUS"); 		return T_MINUS; 		}
+{T_TIMES} 		{ PUT_TOKEN("T_TIMES"); 		return T_TIMES; 		}
+{T_DIV} 		{ PUT_TOKEN("T_DIV"); 			return T_DIV; 		 	}
+{T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 		return T_COMMA; 		}
+{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 		return T_SEMICOL; 		}
+{T_COLON} 		{ PUT_TOKEN("T_COLON"); 		return T_COLON; 		}
+{T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 		return T_ASSIGN; 		}
+{T_EQ} 			{ PUT_TOKEN("T_EQ"); 			return T_EQ; 		 	}
+{T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 			return T_NEQ; 		 	}
+{T_LTEQ} 		{ PUT_TOKEN("T_LTEQ"); 			return T_LTEQ; 		 	}
+{T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 			return T_GTEQ; 		 	}
+{T_LT} 			{ PUT_TOKEN("T_LT"); 			return T_LT; 		 	}
+{T_GT} 			{ PUT_TOKEN("T_GT"); 			return T_GT; 		 	}
+{T_SEP} 		{ PUT_TOKEN("T_SEP"); 			return T_SEP; 		 	}
+{T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");		return T_CONCAT; 		}
+{T_MOD} 		{ PUT_TOKEN("T_MOD");			return T_MOD; 		 	}
+{T_EXP} 		{ PUT_TOKEN("T_EXP");			return T_EXP; 		 	}
+{T_FLOOR} 		{ PUT_TOKEN("T_FLOOR");			return T_FLOOR; 		}
+{T_BIT_AND} 	{ PUT_TOKEN("T_BIT_AND");		return T_BIT_AND; 		}
+{T_BIT_OR} 		{ PUT_TOKEN("T_BIT_OR");		return T_BIT_OR; 		}
+{T_BIT_N_XOR} 	{ PUT_TOKEN("T_BIT_N_XOR");		return T_BIT_N_XOR; 	}
+{T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");		return T_BIT_RSH; 		}
+{T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");		return T_BIT_LSH; 		}
+{T_OPENBRACE} 	 { PUT_TOKEN("T_OPENBRACE");	return T_OPENBRACE; 	}
+{T_CLOSEBRACE} 	 { PUT_TOKEN("T_CLOSEBRACE");	return T_CLOSEBRACE; 	}
+{T_OPENBRACKET}  { PUT_TOKEN("T_OPENBRACKET");	return T_OPENBRACKET; 	}
+{T_CLOSEBRACKET} { PUT_TOKEN("T_CLOSEBRACKET");	return T_CLOSEBRACKET; 	}
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 	}
-{T_LITERAL}     { PUT_LITERAL("T_LITERAL"); }
+{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 		return T_NUMBER;		}
+{T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
 
-{T_AND}			{ PUT_TOKEN("T_AND"); 		}
-{T_DO}			{ PUT_TOKEN("T_DO"); 		}
-{T_ELSE}		{ PUT_TOKEN("T_ELSE"); 		}
-{T_ELSEIF}		{ PUT_TOKEN("T_ELSEIF"); 	}
-{T_END}			{ PUT_TOKEN("T_END"); 		}
-{T_FOR}			{ PUT_TOKEN("T_FOR"); 		}
-{T_FUNCTION}	{ PUT_TOKEN("T_FUNCTION");	}
-{T_IF}			{ PUT_TOKEN("T_IF"); 		}
-{T_LOCAL}		{ PUT_TOKEN("T_LOCAL"); 	}
-{T_NIL}			{ PUT_TOKEN("T_NIL"); 		}
-{T_NOT}			{ PUT_TOKEN("T_NOT"); 		}
-{T_OR}			{ PUT_TOKEN("T_OR"); 		}
-{T_RETURN}		{ PUT_TOKEN("T_RETURN"); 	}
-{T_THEN}		{ PUT_TOKEN("T_THEN"); 		}
-{T_WHILE}		{ PUT_TOKEN("T_WHILE"); 	}
+{T_AND}			{ PUT_TOKEN("T_AND"); 			return T_AND; 			}
+{T_DO}			{ PUT_TOKEN("T_DO"); 			return T_DO; 			}
+{T_ELSE}		{ PUT_TOKEN("T_ELSE"); 			return T_ELSE; 			}
+{T_ELSEIF}		{ PUT_TOKEN("T_ELSEIF"); 		return T_ELSEIF; 		}
+{T_END}			{ PUT_TOKEN("T_END"); 			return T_END; 			}
+{T_FOR}			{ PUT_TOKEN("T_FOR"); 			return T_FOR; 			}
+{T_FUNCTION}	{ PUT_TOKEN("T_FUNCTION");		return T_FUNCTION; 		}
+{T_IF}			{ PUT_TOKEN("T_IF"); 			return T_IF; 			}
+{T_LOCAL}		{ PUT_TOKEN("T_LOCAL"); 		return T_LOCAL; 		}
+{T_NIL}			{ PUT_TOKEN("T_NIL"); 			return T_NIL; 			}
+{T_NOT}			{ PUT_TOKEN("T_NOT"); 			return T_NOT; 			}
+{T_OR}			{ PUT_TOKEN("T_OR"); 			return T_OR; 			}
+{T_RETURN}		{ PUT_TOKEN("T_RETURN"); 		return T_RETURN; 		}
+{T_THEN}		{ PUT_TOKEN("T_THEN"); 			return T_THEN; 			}
+{T_WHILE}		{ PUT_TOKEN("T_WHILE"); 		return T_WHILE; 		}
 
 	/*** EXTRA RESERVED WORDS ***/
 
-{T_BREAK}		{ PUT_TOKEN("T_BREAK"); 	}
-{T_GLOBAL}		{ PUT_TOKEN("T_GLOBAL"); 	}
-{T_IN}			{ PUT_TOKEN("T_IN"); 		}
-{T_REPEAT}		{ PUT_TOKEN("T_REPEAT"); 	}
-{T_TRUE}		{ PUT_TOKEN("T_TRUE"); 		}
-{T_FALSE}		{ PUT_TOKEN("T_FALSE"); 	}
-{T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 	}
+{T_BREAK}		{ PUT_TOKEN("T_BREAK"); 		return T_BREAK; 		}
+{T_GLOBAL}		{ PUT_TOKEN("T_GLOBAL"); 		return T_GLOBAL; 		}
+{T_IN}			{ PUT_TOKEN("T_IN"); 			return T_IN; 			}
+{T_REPEAT}		{ PUT_TOKEN("T_REPEAT"); 		return T_REPEAT; 		}
+{T_TRUE}		{ PUT_TOKEN("T_TRUE"); 			return T_TRUE; 			}
+{T_FALSE}		{ PUT_TOKEN("T_FALSE"); 		return T_FALSE; 		}
+{T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 		return T_UNTIL; 		}
 
 	/*** VARIABLES, NAMES OR LABELS ***/
 
-{T_NAME}		{ PUT_TOKEN("T_NAME"); 		}
-{T_LABEL}		{ PUT_TOKEN("T_LABEL");		}
+{T_NAME}		{ PUT_TOKEN("T_NAME"); 			return T_NAME; 			}
+{T_LABEL}		{ PUT_TOKEN("T_LABEL");			return T_LABEL;			}
 
 	/*** WHITESPACES ***/
 
@@ -348,11 +348,11 @@ T_UNTIL		until
             remove(copy_tmp_filename);
             // Print Complete message
             printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n\n");
-            return EXIT_SUCCESS;
             #else
             /* Just tell that the program has ended */
             // TODO!
             #endif
+            return EXIT_SUCCESS;
 		}
 
 	/*** DEFAULT BEHAVIOR ***/
