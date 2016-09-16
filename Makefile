@@ -34,11 +34,9 @@ SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 all: main
 
 # Pega os dois arquivos
-#main: lex.yy.c y.tab.h y.tab.c
-#	$(CC)
 # TODO Constroi o compilador
 # Por enquanto o compilador vai ser o parser
-main: parser
+main: parser lexical
 	echo "TODO: Constroi compilador"
 
 # Compilação Analisador Sintático/Semântico

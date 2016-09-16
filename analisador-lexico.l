@@ -69,7 +69,6 @@
 
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
-char temp[MAX_TEMP_STRING];
 FILE *output_file;
 #else
 /* General Macros */
