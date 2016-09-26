@@ -51,6 +51,13 @@ char *string_addr;
 	char *string_variable_name;
 	/* Pointer to a token node */
 	// TokenNode *ptr_token_node;
+
+  struct ast_node * ast;
+
+  /* which operator to use (for relational and equality operators). */
+  int operator;
+
+  struct symbol_node * symbol;
 }
 
 /* Types imported from flex */
@@ -146,6 +153,57 @@ term        : number                {$$ = $1;}
             ;
 
 /* ################ Fim do Exemplo ################ */
+
+/* ################ Início do Exemplo AST ################ */
+
+%token <number> T_NUMBER
+%token <symbol> T_NAME
+/* alterar para os não-terminais da gramática */
+%type <ast> exp exp_list statement selection_statement iteration_statement
+
+exp
+  : exp RELATIONAL exp    { $$ = new_ast_relational_node ($2, $1, $3); }
+  | exp EQUALITY exp      { $$ = new_ast_equality_node ($2, $1, $3); }
+  | exp '+' exp           { $$ = new_ast_node ('+', $1, $3); }
+  | exp '-' exp           { $$ = new_ast_node ('-', $1, $3);}
+  | exp '*' exp           { $$ = new_ast_node ('*', $1, $3); }
+  | exp '/' exp           { $$ = new_ast_node ('/', $1, $3); }
+  | '(' exp ')'           { $$ = $2; }
+  | '-' exp %prec UMINUS  { $$ = new_ast_node ('M', $2, NULL); }
+  | NUMBER                { $$ = new_ast_number_node ($1); }
+  | NAME                  { $$ = new_ast_symbol_reference_node ($1); }
+  | NAME '=' exp          { $$ = new_ast_assignment_node ($1, $3); }
+  | NAME '(' ')'          { $$ = new_ast_function_node ($1, NULL); }
+  | NAME '(' exp_list ')' { $$ = new_ast_function_node ($1, $3); }
+;
+
+exp_list
+  : exp
+  | exp ',' exp_list { $$ = new_ast_node ('L', $1, $3); }
+;
+
+statement
+  : selection_statement
+  | iteration_statement
+  | ... other statements ...
+;
+
+selection_statement
+  : IF '(' expression ')' statement %prec NO_ELSE
+    {
+      $$ = new_ast_if_node ($3, $5, NULL);
+    }
+  | IF '(' expression ')' statement ELSE statement
+    {
+      $$ = new_ast_if_node ($3, $5, $7);
+    }
+;
+
+iteration_statement
+  : WHILE '(' expression ')' statement { $$ = new_ast_while_node ($3, $5); }
+;
+
+/* ################ Fim do Exemplo AST ################ */
 
 %%
 
