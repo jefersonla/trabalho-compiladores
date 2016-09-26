@@ -113,25 +113,30 @@ char *string_addr;
 %token T_NAME
 %token T_LITERAL
 
-/* ################ Começo do Exemplo ################ */
-//%union {
-//    int num;
-//    char id;
-//}
+/* Token de inicio */
+%start programa
 
-%start 	line
+/* ################ Começo do Exemplo ################ */
+/*%union {
+    int num;
+    char id;
+}*/
+
+/*%start 	line */
+/*
 %token 	print
 %token 	exit_command
 %token 	<integer_number> 		number
 %token 	<string_variable_name> 	identifier
 %type 	<integer_number> 		line exp term
 %type 	<string_variable_name> 	assingment
+*/
 
 %%
 
 /* Especificação da linguagem */
 
-line        : assingment ';'        {;}
+/*line        : assingment ';'        {;}
             | exit_command ';'      {;}
             ;
 
@@ -145,7 +150,81 @@ term        : number                {$$ = $1;}
             | identifier            {$$ = $1;}
             ;
 
+
 /* ################ Fim do Exemplo ################ */
+
+programa 	: bloco					        {;}
+			;
+
+bloco 		: comando comandoret            {;}
+            | comando                       {;}
+            | /* Empty */                   {;}
+            ;
+
+comando     : comando comando               {;}
+            | ','                           {;}
+            | listadenomes '=' listaexp     {;}
+            | chamadadefuncao               {;}
+            | T_DO bloco T_END              {;}
+            | T_WHILE exp T_DO bloco T_END  {;}
+            | T_FOR T_NAME '=' exp ',' exp ',' exp T_DO bloco T_END     {;}
+            | T_FOR T_NAME '=' exp ',' exp T_DO bloco T_END             {;}
+            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END      {;}
+            | T_IF exp T_THEN bloco term_elseif T_END                   {;}
+            | T_FUNCTION T_NAME '(' listadenomes ')' bloco T_END        {;}
+            | T_FUNCTION T_NAME '(' ')' bloco T_END                     {;}
+            | T_LOCAL listadenomes '=' listaexp                         {;}
+            | T_LOCAL listadenomes          {;}
+            ;
+
+term_elseif : /* Empty */                           {;}
+            | T_ELSEIF exp T_THEN bloco term_elseif {;}
+            ;
+
+comandoret  : T_RETURN listaexp ';'         {;}
+            | T_RETURN listaexp             {;}
+            | T_RETURN ';'                  {;}
+            | T_RETURN                      {;}
+            ;
+
+exp         : T_NUMBER                      {;}
+            | T_NAME                        {;}
+            | T_NIL                         {;}
+            | chamadadefuncao               {;}
+            | exp opbin exp                 {;}
+            | opunaria exp                  {;}
+            | '(' exp ')'                   {;}
+            ;
+
+chamadadefuncao : T_NAME '(' listaexp ')'   {;}
+                | T_NAME '(' ')'            {;}
+                ;
+
+listadenomes    : T_NAME ',' T_NAME         {;}
+                | T_NAME                    {;}
+                ;
+
+listaexp        : exp ',' exp               {;}
+                | exp                       {;}
+                ;
+
+opbin 		: T_PLUS                        {;}
+			| T_MINUS                       {;}
+			| T_TIMES                       {;}
+			| T_DIV                         {;}
+			| T_LT                          {;}
+			| T_LTEQ                        {;}
+			| T_GT                          {;}
+			| T_GTEQ                        {;}
+			| T_EQ                          {;}
+			| T_NEQ                         {;}
+			| T_AND                         {;}
+			| T_OR                          {;}
+			;
+
+opunaria 	: T_NOT                         {;}
+			| T_NOT                         {;}
+			;
 
 %%
 
