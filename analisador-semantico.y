@@ -200,12 +200,18 @@ chamadadefuncao : T_NAME '(' listaexp ')'   {;}
                 | T_NAME '(' ')'            {;}
                 ;
 
-listadenomes    : T_NAME ',' T_NAME         {;}
-                | T_NAME                    {;}
+listadenomes    : T_NAME listanomes         {;}
                 ;
 
-listaexp        : exp ',' exp               {;}
-                | exp                       {;}
+listanomes      : ',' T_NAME listanomes     {;}
+                |  /* Empty */              {;}
+                ;
+
+listaexp        : exp lista_expr            {;}
+                ;
+
+lista_expr      : ',' exp lista_expr        {;}
+                |  /* Empty */              {;}
                 ;
 
 opbin 		: T_PLUS                        {;}
