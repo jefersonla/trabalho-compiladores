@@ -83,6 +83,12 @@ debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
+# Realiza os testes nos executaveis
+test: lexical-test parser-test
+
+# Executa todos os testes
+all-tests: lexical-all-tests parser-all-tests
+
 # Executa o teste do analisador léxico
 lexical-test:
 	bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
