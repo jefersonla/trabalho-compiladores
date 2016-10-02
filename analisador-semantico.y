@@ -188,7 +188,14 @@ char *string_addr;
 
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
-programa        : bloco                                 { fprintf(output_file, "[programa%s]\n", $1); fprintf(stderr,"[programa%s]\n", $1);}
+programa        : bloco                                 {
+                                                            fprintf(output_file, "[programa%s]\n", $1);
+                                                            fprintf(stderr,
+                                                                    "::: SYNTATIC/SEMANTIC ANALYSER :::\n"
+                                                                    "[programa%s]\n\n"
+                                                                    "::: LEXICAL PARSER :::\n",
+                                                                    $1);
+                                                        }
                 ;
 
 /* -- Block are sections of code -- */
@@ -331,6 +338,7 @@ opunaria        : T_MINUS                               { allocateToken($$, "[T_
  */
 void yyerror(const char *s) {
     fprintf(stdout, "%s\n", s);
+    fclose(output_file);
     exit(EXIT_FAILURE);
 }
 
@@ -355,6 +363,12 @@ void showHelpUsage(){
 
 /* Main Execution Code */
 int main(int argc, char *argv[]){
+    /* Debug Configuration */
+#ifdef DEBUG
+    extern int yydebug;
+    yydebug = 1;
+#endif
+
     ++argv, --argc; /* skip over program name */
 
     /* Code Begin Message */
@@ -420,11 +434,10 @@ int main(int argc, char *argv[]){
     // Output File for Flex
     output_file = fopen(output_filename, "w");
 
-#ifdef DEBUG
-    extern int yydebug;
-    yydebug = 1;
-#endif
+    /* Parse entire file */
+    int yyparse_return = yyparse();
+    printf("\n\n::: COMPILATION END :::\n");
 
     // Process entire file
-    return yyparse();
+    return yyparse_return;
 }
