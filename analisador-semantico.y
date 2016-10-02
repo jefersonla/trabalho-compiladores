@@ -196,6 +196,7 @@ programa        : bloco                                 {
                                                                     "[programa%s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n",
                                                                     $1);
+                                                            fclose(output_file);
                                                         }
                 ;
 
