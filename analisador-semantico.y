@@ -1,4 +1,4 @@
-%{
+﻿%{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
@@ -271,7 +271,7 @@ comando         : comando comando                       { allocate2Tokens($$, "%
                 | T_LOCAL listadenomes                                                  { allocate1Token($$, "[comando [T_LOCAL local] %s]", $2);	}
                 ;
 
-term_elseif     : T_ELSEIF exp T_THEN bloco term_elseif { allocate3Tokens($$," [T_ELSEIF elseif] %s [T_THEN then]%s%s", $2, $4, $5);			}
+term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco { allocate3Tokens($$,"%s [T_ELSEIF elseif] %s [T_THEN then]%s%s", $2, $4, $5);			}
                 | /* Empty */                           { allocateToken($$, ""); 			}
                 ;
 
@@ -286,7 +286,7 @@ exp             : T_NIL                                 { allocateToken($$, "[ex
                 | T_NAME                                { allocate1Token($$, "[exp %s]", $1);			                    }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);			                    }
                 | exp opbin exp                         { allocate3Tokens($$, "[exp %s [opbin %s] %s]", $1, $2, $3);	        }
-                 |opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);			    }
+                | opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);			    }
                 | T_OPENPAR exp T_CLOSEPAR              { allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);	}
                 ;
 
@@ -294,32 +294,31 @@ chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{ allocate2Tokens($$,"[ch
                 | T_NAME T_OPENPAR T_CLOSEPAR           { allocate1Token($$,"[chamadadefuncao [T_NAME %s] [T_OPENPAR (] [T_CLOSEPAR )]]", $1);		    }
                 ;
 
-listadenomes    : T_NAME term_listanomes                { allocate2Tokens($$,"[listadenomes [T_NAME %s]%s]", $1, $2);		}
+listadenomes    : T_NAME				{;}
+		| listadenomes T_NAME                 { allocate2Tokens($$,"[listadenomes [T_NAME %s]%s]", $1, $2);		}
                 ;
 
-term_listanomes : T_COMMA T_NAME term_listanomes        { allocate2Tokens($$," [T_COMMA ,] [T_NAME %s]%s", $2, $3);			}
-                | /* Empty */              	            { allocateToken($$, ""); 			}
-                ;
+listaexp        : exp		            	        {;}
+                | listaexp T_COMMA exp			{;} 
+		;
 
-listaexp        : exp lista_expr            	        { allocate2Tokens($$,"[listaexp %s%s]", $1, $2);			            }
-                ;
-
-lista_expr      : T_COMMA exp lista_expr                { allocate2Tokens($$," [T_COMMA ,] %s%s", $2, $3);			        }
-                | /* Empty */                 	        { allocateToken($$, ""); 			}
-                ;
+listaexp        : exp					{;}
+		| lista_expr            	        { allocate2Tokens($$,"[listaexp %s%s]", $1, $2);			            }
+                | T_COMMA exp lista_expr                { allocate2Tokens($$," [T_COMMA ,] %s%s", $2, $3);			        }
+		;
 
 opbin 	        : T_PLUS                                { allocateToken($$, "[T_PLUS +]"); 	}
-		        | T_MINUS                               { allocateToken($$, "[T_MINUS -]"); }
-		        | T_TIMES                               { allocateToken($$, "[T_TIMES *]");	}
-		        | T_DIV                                 { allocateToken($$, "[T_DIV /]"); 	}
-		        | T_LT                                  { allocateToken($$, "[T_LT <]"); 	}
-		        | T_LTEQ                                { allocateToken($$, "[T_LTEQ <=]"); }
-		        | T_GT                                  { allocateToken($$, "[T_GT >]"); 	}
-		        | T_GTEQ                                { allocateToken($$, "[T_GTEQ >=]");	}
-		        | T_EQ                                  { allocateToken($$, "[T_EQ ==]"); 	}
-		        | T_NEQ                                 { allocateToken($$, "[T_NEQ ~=]"); 	}
-		        | T_AND                                 { allocateToken($$, "[T_AND and]");	}
-		        | T_OR                                  { allocateToken($$, "[T_OR or]"); 	}
+		        | T_MINUS                       { allocateToken($$, "[T_MINUS -]"); }
+		        | T_TIMES                       { allocateToken($$, "[T_TIMES *]");	}
+		        | T_DIV                         { allocateToken($$, "[T_DIV /]"); 	}
+		        | T_LT                          { allocateToken($$, "[T_LT <]"); 	}
+		        | T_LTEQ                        { allocateToken($$, "[T_LTEQ <=]"); }
+		        | T_GT                          { allocateToken($$, "[T_GT >]"); 	}
+		        | T_GTEQ                        { allocateToken($$, "[T_GTEQ >=]");	}
+		        | T_EQ                          { allocateToken($$, "[T_EQ ==]"); 	}
+		        | T_NEQ                         { allocateToken($$, "[T_NEQ ~=]"); 	}
+		        | T_AND                         { allocateToken($$, "[T_AND and]");	}
+		        | T_OR                          { allocateToken($$, "[T_OR or]"); 	}
 		        ;
 
 opunaria 	    : T_MINUS                               { allocateToken($$, "[T_MINUS -]");	}
@@ -337,6 +336,7 @@ opunaria 	    : T_MINUS                               { allocateToken($$, "[T_MI
  */
 void yyerror(const char *s) {
     fprintf(stdout, "%s\n", s);
+    exit(EXIT_ERROR);
 }
 
 /**
