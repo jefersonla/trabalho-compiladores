@@ -1,4 +1,4 @@
-%{
+﻿%{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
@@ -68,6 +68,9 @@ char *string_addr;
 %token T_MOD
 %token T_EXP
 %token T_FLOOR
+
+%left T_TIMES T_DIV
+%left T_PLUS T_MINUS
 /* Boolean Operators */
 %token T_EQ
 %token T_NEQ
@@ -75,6 +78,9 @@ char *string_addr;
 %token T_GTEQ
 %token T_LT
 %token T_GT
+%token T_SEP
+
+%left T_EQ T_NEQ T_LTEQ T_GTEQ T_LT T_GT
 /* Separators and assign */
 %token T_COMMA
 %token T_SEMICOL
@@ -115,6 +121,8 @@ char *string_addr;
 %token T_RETURN
 %token T_THEN
 %token T_WHILE
+
+%left T_AND T_OR
 
 /* Extra Reserved Words */
 
@@ -177,9 +185,9 @@ term_elseif : /* Empty */                           {;}
             | T_ELSEIF exp T_THEN bloco term_elseif {;}
             ;
 
-comandoret  : T_RETURN listaexp T_SEMICOL         {;}
+comandoret  : T_RETURN listaexp T_SEMICOL   {;}
             | T_RETURN listaexp             {;}
-            | T_RETURN T_SEMICOL                  {;}
+            | T_RETURN T_SEMICOL            {;}
             | T_RETURN                      {;}
             ;
 
@@ -189,44 +197,44 @@ exp         : T_NUMBER                      {;}
             | chamadadefuncao               {;}
             | exp opbin exp                 {;}
             | opunaria exp                  {;}
-            | T_OPENPAR exp T_CLOSEPAR                   {;}
+            | T_OPENPAR exp T_CLOSEPAR      {;}
             ;
 
-chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR   {;}
-                | T_NAME T_OPENPAR T_CLOSEPAR            {;}
+chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
+                | T_NAME T_OPENPAR T_CLOSEPAR           {;}
                 ;
 
 listadenomes    : T_NAME listanomes         {;}
                 ;
 
 listanomes      : T_COMMA T_NAME listanomes     {;}
-                |  /* Empty */              {;}
+                |  /* Empty */              	{;}
                 ;
 
-listaexp        : exp lista_expr            {;}
+listaexp        : exp lista_expr            	{;}
                 ;
 
 lista_expr      : T_COMMA exp lista_expr        {;}
-                |  /* Empty */              {;}
+                |  /* Empty */              	{;}
                 ;
 
 opbin 		: T_PLUS                        {;}
-			| T_MINUS                       {;}
-			| T_TIMES                       {;}
-			| T_DIV                         {;}
-			| T_LT                          {;}
-			| T_LTEQ                        {;}
-			| T_GT                          {;}
-			| T_GTEQ                        {;}
-			| T_EQ                          {;}
-			| T_NEQ                         {;}
-			| T_AND                         {;}
-			| T_OR                          {;}
-			;
+		| T_MINUS                       {;}
+		| T_TIMES                       {;}
+		| T_DIV                         {;}
+		| T_LT                          {;}
+		| T_LTEQ                        {;}
+		| T_GT                          {;}
+		| T_GTEQ                        {;}
+		| T_EQ                          {;}
+		| T_NEQ                         {;}
+		| T_AND                         {;}
+		| T_OR                          {;}
+		;
 
 opunaria 	: T_MINUS                       {;}
-			| T_NOT                         {;}
-			;
+		| T_NOT                         {;}
+		;
 
 %%
 
