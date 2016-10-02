@@ -105,33 +105,41 @@ char *string_addr;
 
 /* Reserved Words */
 
+/* Boolean Comparators */
 %token T_AND
-%token T_DO
-%token T_ELSE
-%token T_ELSEIF
-%token T_END
-%token T_FOR
-%token T_FUNCTION
-%token T_IF
-%token T_LOCAL
-%token T_NIL
-%token T_NOT
 %token T_OR
-%token T_RETURN
-%token T_THEN
-%token T_WHILE
+%token T_NOT
 /* -- Precendence -- */
 %left T_AND T_OR
+/* Conditional Expression */
+%token T_IF
+%token T_ELSEIF
+%token T_ELSE
+%token T_THEN
+/* Loop Expression */
+%token T_FOR
+%token T_WHILE
+%token T_DO
+/* Close Expression */
+%token T_END
+%token T_RETURN
+/* Variable and Functions Manipultion */
+%token T_FUNCTION
+%token T_LOCAL
+%token T_NIL
 
 /* Extra Reserved Words */
 
-%token T_BREAK
-%token T_GLOBAL
-%token T_IN
-%token T_REPEAT
+/* Boolean Names */
 %token T_TRUE
 %token T_FALSE
+/* Other Loop Expression */
+%token T_REPEAT
 %token T_UNTIL
+%token T_BREAK
+/* Other Reserved Words */
+%token T_GLOBAL
+%token T_IN
 
 /* Variable Types */
 
@@ -140,10 +148,14 @@ char *string_addr;
 %token T_NAME
 %token T_LITERAL
 
+/* Expression Types */
+
+
 /* Start Type */
 %start programa
 
 /*
+### Example of Type Definition for Token and Expressions ###
  -- TOKEN dá um tipo ao TOKEN
 %token 	<integer_number> 		number
 %token 	<string_variable_name> 	identifier
@@ -156,48 +168,48 @@ char *string_addr;
 
     /*** * Language Definitions * ***/
 
-programa 	: bloco					                    {;}
-			;
+programa 	    : bloco					                {;}
+			    ;
 
-bloco 		: comando comandoret                        {;}
-            | comando                                   {;}
-            | /* Empty */                               {;}
-            ;
+bloco 		    : comando comandoret                    {;}
+                | comando                               {;}
+                | /* Empty */                           {;}
+                ;
 
-comando     : comando comando                           {;}
-            | T_COMMA                                   {;}
-            | listadenomes T_ASSIGN listaexp            {;}
-            | chamadadefuncao                           {;}
-            | T_DO bloco T_END                          {;}
-            | T_WHILE exp T_DO bloco T_END              {;}
-            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {;}
-            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {;}
-            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {;}
-            | T_IF exp T_THEN bloco term_elseif T_END                               {;}
-            | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {;}
-            | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {;}
-            | T_LOCAL listadenomes T_ASSIGN listaexp                                {;}
-            | T_LOCAL listadenomes                                                  {;}
-            ;
+comando         : comando comando                       {;}
+                | T_COMMA                               {;}
+                | listadenomes T_ASSIGN listaexp        {;}
+                | chamadadefuncao                       {;}
+                | T_DO bloco T_END                      {;}
+                | T_WHILE exp T_DO bloco T_END          {;}
+                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {;}
+                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {;}
+                | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {;}
+                | T_IF exp T_THEN bloco term_elseif T_END                               {;}
+                | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {;}
+                | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {;}
+                | T_LOCAL listadenomes T_ASSIGN listaexp                                {;}
+                | T_LOCAL listadenomes                                                  {;}
+                ;
 
-term_elseif : /* Empty */                               {;}
-            | T_ELSEIF exp T_THEN bloco term_elseif     {;}
-            ;
+term_elseif     : /* Empty */                           {;}
+                | T_ELSEIF exp T_THEN bloco term_elseif {;}
+                ;
 
-comandoret  : T_RETURN listaexp T_SEMICOL               {;}
-            | T_RETURN listaexp                         {;}
-            | T_RETURN T_SEMICOL                        {;}
-            | T_RETURN                                  {;}
-            ;
+comandoret      : T_RETURN listaexp T_SEMICOL           {;}
+                | T_RETURN listaexp                     {;}
+                | T_RETURN T_SEMICOL                    {;}
+                | T_RETURN                              {;}
+                ;
 
-exp         : T_NUMBER                                  {;}
-            | T_NAME                                    {;}
-            | T_NIL                                     {;}
-            | chamadadefuncao                           {;}
-            | exp opbin exp                             {;}
-            | opunaria exp                              {;}
-            | T_OPENPAR exp T_CLOSEPAR                  {;}
-            ;
+exp             : T_NUMBER                              {;}
+                | T_NAME                                {;}
+                | T_NIL                                 {;}
+                | chamadadefuncao                       {;}
+                | exp opbin exp                         {;}
+                | opunaria exp                          {;}
+                | T_OPENPAR exp T_CLOSEPAR              {;}
+                ;
 
 chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
                 | T_NAME T_OPENPAR T_CLOSEPAR           {;}
