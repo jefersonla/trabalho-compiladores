@@ -1,4 +1,4 @@
-%{
+﻿%{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
@@ -64,6 +64,9 @@ char *string_addr;
 %token T_MOD
 %token T_EXP
 %token T_FLOOR
+
+%left T_TIMES T_DIV
+%left T_PLUS T_MINUS
 /* Boolean Operators */
 %token T_EQ
 %token T_NEQ
@@ -72,6 +75,8 @@ char *string_addr;
 %token T_LT
 %token T_GT
 %token T_SEP
+
+%left T_EQ T_NEQ T_LTEQ T_GTEQ T_LT T_GT
 /* Separators and assign */
 %token T_COMMA
 %token T_SEMICOL
