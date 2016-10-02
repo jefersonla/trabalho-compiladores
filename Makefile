@@ -90,24 +90,31 @@ test: lexical-test parser-test
 
 # Executa todos os testes
 all-tests: lexical-all-tests parser-all-tests
+	@printf "Finished All integration tests...\n"
 
 # Executa o teste do analisador léxico
 lexical-test:
-	@bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/lexical/test.lua
+	@printf "\n-- Finished Lexical Test --\n"
 
 # Executa diversos testes no analisador léxico
 lexical-all-tests:
-	@bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/lexical/test.lua
 	@printf "\n"
-	@bash test.sh $(LEXICAL_EXECUTABLE) tests/hello.lua
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/lexical/hello.lua
+	@printf "\n-- Finished Lexical All Tests --\n"
 
 # TODO Executa testes unitários no parser
 parser-test:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
+	@printf "\n-- Finished Parser Test --\n"
 
 # TODO Varios testes unitários para o parser
 parser-all-tests:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
+	@printf "\n"
+	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/globals.lua
+	@printf "\n-- Finished Parser All Tests-- \n"
 
 # Limpa o ambiente
 clean:
