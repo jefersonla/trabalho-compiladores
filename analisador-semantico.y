@@ -156,84 +156,84 @@ char *string_addr;
 
     /*** * Language Definitions * ***/
 
-programa 	: bloco					        {;}
+programa 	: bloco					                    {;}
 			;
 
-bloco 		: comando comandoret            {;}
-            | comando                       {;}
-            | /* Empty */                   {;}
+bloco 		: comando comandoret                        {;}
+            | comando                                   {;}
+            | /* Empty */                               {;}
             ;
 
-comando     : comando comando               {;}
-            | T_COMMA                           {;}
-            | listadenomes T_ASSIGN listaexp     {;}
-            | chamadadefuncao               {;}
-            | T_DO bloco T_END              {;}
-            | T_WHILE exp T_DO bloco T_END  {;}
-            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END     {;}
-            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END             {;}
-            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END      {;}
-            | T_IF exp T_THEN bloco term_elseif T_END                   {;}
-            | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END        {;}
-            | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                     {;}
-            | T_LOCAL listadenomes T_ASSIGN listaexp                         {;}
-            | T_LOCAL listadenomes          {;}
+comando     : comando comando                           {;}
+            | T_COMMA                                   {;}
+            | listadenomes T_ASSIGN listaexp            {;}
+            | chamadadefuncao                           {;}
+            | T_DO bloco T_END                          {;}
+            | T_WHILE exp T_DO bloco T_END              {;}
+            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {;}
+            | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {;}
+            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {;}
+            | T_IF exp T_THEN bloco term_elseif T_END                               {;}
+            | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {;}
+            | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {;}
+            | T_LOCAL listadenomes T_ASSIGN listaexp                                {;}
+            | T_LOCAL listadenomes                                                  {;}
             ;
 
-term_elseif : /* Empty */                           {;}
-            | T_ELSEIF exp T_THEN bloco term_elseif {;}
+term_elseif : /* Empty */                               {;}
+            | T_ELSEIF exp T_THEN bloco term_elseif     {;}
             ;
 
-comandoret  : T_RETURN listaexp T_SEMICOL   {;}
-            | T_RETURN listaexp             {;}
-            | T_RETURN T_SEMICOL            {;}
-            | T_RETURN                      {;}
+comandoret  : T_RETURN listaexp T_SEMICOL               {;}
+            | T_RETURN listaexp                         {;}
+            | T_RETURN T_SEMICOL                        {;}
+            | T_RETURN                                  {;}
             ;
 
-exp         : T_NUMBER                      {;}
-            | T_NAME                        {;}
-            | T_NIL                         {;}
-            | chamadadefuncao               {;}
-            | exp opbin exp                 {;}
-            | opunaria exp                  {;}
-            | T_OPENPAR exp T_CLOSEPAR      {;}
+exp         : T_NUMBER                                  {;}
+            | T_NAME                                    {;}
+            | T_NIL                                     {;}
+            | chamadadefuncao                           {;}
+            | exp opbin exp                             {;}
+            | opunaria exp                              {;}
+            | T_OPENPAR exp T_CLOSEPAR                  {;}
             ;
 
 chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
                 | T_NAME T_OPENPAR T_CLOSEPAR           {;}
                 ;
 
-listadenomes    : T_NAME listanomes         {;}
+listadenomes    : T_NAME listanomes                     {;}
                 ;
 
-listanomes      : T_COMMA T_NAME listanomes     {;}
-                |  /* Empty */              	{;}
+listanomes      : T_COMMA T_NAME listanomes             {;}
+                |  /* Empty */              	        {;}
                 ;
 
-listaexp        : exp lista_expr            	{;}
+listaexp        : exp lista_expr            	        {;}
                 ;
 
-lista_expr      : T_COMMA exp lista_expr        {;}
-                |  /* Empty */              	{;}
+lista_expr      : T_COMMA exp lista_expr                {;}
+                |  /* Empty */              	        {;}
                 ;
 
-opbin 		: T_PLUS                        {;}
-		| T_MINUS                       {;}
-		| T_TIMES                       {;}
-		| T_DIV                         {;}
-		| T_LT                          {;}
-		| T_LTEQ                        {;}
-		| T_GT                          {;}
-		| T_GTEQ                        {;}
-		| T_EQ                          {;}
-		| T_NEQ                         {;}
-		| T_AND                         {;}
-		| T_OR                          {;}
-		;
+opbin 	        : T_PLUS                                {;}
+		        | T_MINUS                               {;}
+		        | T_TIMES                               {;}
+		        | T_DIV                                 {;}
+		        | T_LT                                  {;}
+		        | T_LTEQ                                {;}
+		        | T_GT                                  {;}
+		        | T_GTEQ                                {;}
+		        | T_EQ                                  {;}
+		        | T_NEQ                                 {;}
+		        | T_AND                                 {;}
+		        | T_OR                                  {;}
+		        ;
 
-opunaria 	: T_MINUS                       {;}
-		| T_NOT                         {;}
-		;
+opunaria 	    : T_MINUS                               {;}
+		        | T_NOT                                 {;}
+		        ;
 
 %%
 
