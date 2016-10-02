@@ -228,7 +228,7 @@ opbin 		: T_PLUS                        {;}
 			| T_OR                          {;}
 			;
 
-opunaria 	: T_NOT                         {;}
+opunaria 	: T_MINUS                       {;}
 			| T_NOT                         {;}
 			;
 
