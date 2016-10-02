@@ -175,18 +175,18 @@ bloco 		: comando comandoret            {;}
             ;
 
 comando     : comando comando               {;}
-            | ','                           {;}
-            | listadenomes '=' listaexp     {;}
+            | T_SEMICOL                     {;}
+            | listadenomes T_ASSIGN listaexp{;}
             | chamadadefuncao               {;}
             | T_DO bloco T_END              {;}
             | T_WHILE exp T_DO bloco T_END  {;}
-            | T_FOR T_NAME '=' exp ',' exp ',' exp T_DO bloco T_END     {;}
-            | T_FOR T_NAME '=' exp ',' exp T_DO bloco T_END             {;}
-            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END      {;}
-            | T_IF exp T_THEN bloco term_elseif T_END                   {;}
-            | T_FUNCTION T_NAME '(' listadenomes ')' bloco T_END        {;}
-            | T_FUNCTION T_NAME '(' ')' bloco T_END                     {;}
-            | T_LOCAL listadenomes '=' listaexp                         {;}
+            | T_FOR T_NAME T_ASSIGN exp T_SEMICOL exp T_SEMICOL exp T_DO bloco T_END     {;}
+            | T_FOR T_NAME T_ASSIGN exp T_SEMICOL exp T_DO bloco T_END             	 {;}
+            | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END      		 {;}
+            | T_IF exp T_THEN bloco term_elseif T_END                   		 {;}
+            | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END  		 {;}
+            | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END               		 {;}
+            | T_LOCAL listadenomes T_ASSIGN listaexp                         		 {;}
             | T_LOCAL listadenomes          {;}
             ;
 
@@ -194,9 +194,9 @@ term_elseif : /* Empty */                           {;}
             | T_ELSEIF exp T_THEN bloco term_elseif {;}
             ;
 
-comandoret  : T_RETURN listaexp ';'         {;}
+comandoret  : T_RETURN listaexp T_SEMICOL   {;}
             | T_RETURN listaexp             {;}
-            | T_RETURN ';'                  {;}
+            | T_RETURN T_SEMICOL            {;}
             | T_RETURN                      {;}
             ;
 
@@ -206,44 +206,44 @@ exp         : T_NUMBER                      {;}
             | chamadadefuncao               {;}
             | exp opbin exp                 {;}
             | opunaria exp                  {;}
-            | '(' exp ')'                   {;}
+            | T_OPENPAR exp T_CLOSEPAR      {;}
             ;
 
-chamadadefuncao : T_NAME '(' listaexp ')'   {;}
-                | T_NAME '(' ')'            {;}
+chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
+                | T_NAME T_OPENPAR T_CLOSEPAR           {;}
                 ;
 
 listadenomes    : T_NAME listanomes         {;}
                 ;
 
-listanomes      : ',' T_NAME listanomes     {;}
-                |  /* Empty */              {;}
+listanomes      : T_COMMA T_NAME listanomes     {;}
+                |  /* Empty */              	{;}
                 ;
 
-listaexp        : exp lista_expr            {;}
+listaexp        : exp lista_expr            	{;}
                 ;
 
-lista_expr      : ',' exp lista_expr        {;}
-                |  /* Empty */              {;}
+lista_expr      : T_COMMA exp lista_expr        {;}
+                |  /* Empty */              	{;}
                 ;
 
 opbin 		: T_PLUS                        {;}
-			| T_MINUS                       {;}
-			| T_TIMES                       {;}
-			| T_DIV                         {;}
-			| T_LT                          {;}
-			| T_LTEQ                        {;}
-			| T_GT                          {;}
-			| T_GTEQ                        {;}
-			| T_EQ                          {;}
-			| T_NEQ                         {;}
-			| T_AND                         {;}
-			| T_OR                          {;}
-			;
+		| T_MINUS                       {;}
+		| T_TIMES                       {;}
+		| T_DIV                         {;}
+		| T_LT                          {;}
+		| T_LTEQ                        {;}
+		| T_GT                          {;}
+		| T_GTEQ                        {;}
+		| T_EQ                          {;}
+		| T_NEQ                         {;}
+		| T_AND                         {;}
+		| T_OR                          {;}
+		;
 
 opunaria 	: T_MINUS                       {;}
-			| T_NOT                         {;}
-			;
+		| T_NOT                         {;}
+		;
 
 %%
 
