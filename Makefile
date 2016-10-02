@@ -1,7 +1,7 @@
 ﻿# Compilador a ser usado
 CC=gcc
 # Flags para o compilador
-CFLAGS=-Wall
+CFLAGS=-Wall -Wextra -Wno-unused-function -Wno-sign-compare
 CFLAGS_LEXICAL=-lfl
 CFLAGS_PARSER=-lm
 # Flags para o Linker
@@ -38,7 +38,8 @@ all: main
 # TODO Constroi o compilador
 # Por enquanto o compilador vai ser o parser
 main: parser lexical
-	echo "TODO: Constroi compilador"
+	@printf "TODO: Constroi ultima parte do compilador\n"
+	@printf "Compilation Finished With Success!\n"
 
 # Compilação Analisador Sintático/Semântico
 parser: lex.yy.c y.tab.c $(PARSER_EXECUTABLE)

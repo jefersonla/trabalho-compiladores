@@ -429,7 +429,7 @@ int main(int argc, char *argv[]){
 
     // Message of starting compilation
     printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
-            "::: STARTING LEX PARSER PROCESS :::\n\n", argv[0]);
+            "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n\n", argv[0]);
 
     // Output File for Flex
     output_file = fopen(output_filename, "w");
