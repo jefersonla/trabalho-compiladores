@@ -188,18 +188,19 @@ char *string_addr;
 
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
-programa        : bloco                                 { fprintf(output_file, "[program%s]\n", $1); fprintf(stderr,"[program%s]\n", $1);}
+programa        : bloco                                 { fprintf(output_file, "[programa%s]\n", $1); fprintf(stderr,"[programa%s]\n", $1);}
                 ;
 
 /* -- Block are sections of code -- */
 bloco           : comando comandoret                    { allocate2Tokens($$, " [bloco %s %s]", $1, $2);                }
+                | comandoret                            { allocate1Token($$, " [bloco %s]", $1);                        }    
                 | comando                               { allocate1Token($$, " [bloco %s]", $1);                        }
-                | /* Empty */                           { allocateToken($$, "");                                                }
+                | /* Empty */                           { allocateToken($$, "");                                        }
                 ;
 
 /* -- Commands belong to program, and represent all the actions that can occur -- */
 comando         : comando comando                       { allocate2Tokens($$, "%s %s", $1, $2);                         }
-                | T_SEMICOL                             { allocateToken($$, "[comando [T_SEMICOL ;]]");                         }
+                | T_SEMICOL                             { allocateToken($$, "[comando [T_SEMICOL ;]]");                 }
                 | chamadadefuncao                       { allocate1Token($$, "[comando %s]", $1);                       }
                 | listadenomes T_ASSIGN listaexp        { allocate2Tokens($$, "[comando [listadenomes %s] [T_ASSIGN =] [listaexp %s]]", $1, $3);  }
                 | T_DO bloco T_END                                                      {
@@ -281,8 +282,8 @@ comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[c
                 ;
 
 exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");                           }
-                | T_NUMBER                              { allocateTokenNum($$, "[exp %d]", $1);                             }
-                | T_NAME                                { allocate1Token($$, "[exp %s]", $1);                               }
+                | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                             }
+                | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                               }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                               }
                 | exp opbin exp                         { allocate3Tokens($$, "[exp %s [opbin %s] %s]", $1, $2, $3);        }
                 | opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);            }

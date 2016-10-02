@@ -109,5 +109,5 @@ parser-all-tests:
 
 # Limpa o ambiente
 clean:
-	\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out
+	\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out *.output
 
