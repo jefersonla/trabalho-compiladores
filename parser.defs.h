@@ -53,10 +53,12 @@
                                                         while(0)
 */
 #define allocateTokenNum(place, token_str, token) 	do{ \
- 														place = malloc(sizeof(char) * + sizeof(token_str) + 13); \
+ 														place = malloc(sizeof(char) * sizeof(token_str) + 13); \
                                                         sprintf(place, token_str, token); \
 													}while(0)                                                      	
 #define allocate1Token(place, token_str, token1) 	do{ \
+														fprintf(stderr, "X1\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \
@@ -64,6 +66,9 @@
                                                         sprintf(place, token_str, token1); \
 													}while(0)
 #define allocate2Tokens(place, token_str, token1, token2) do{ \
+														fprintf(stderr, "X2\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
+														fprintf(stderr, "VAR2 -- %s\n", token2); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \
@@ -73,6 +78,10 @@
                                                         		token2); \
 													}while(0)
 #define allocate3Tokens(place, token_str, token1, token2, token3) do{ \
+														fprintf(stderr, "X3\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
+														fprintf(stderr, "VAR2 -- %s\n", token2); \
+														fprintf(stderr, "VAR3 -- %s\n", token3); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \
@@ -83,6 +92,11 @@
                                                         		token2, token3); \
 													}while(0)
 #define allocate4Tokens(place, token_str, token1, token2, token3, token4) do{ \
+														fprintf(stderr, "X4\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
+														fprintf(stderr, "VAR2 -- %s\n", token2); \
+														fprintf(stderr, "VAR3 -- %s\n", token3); \
+														fprintf(stderr, "VAR4 -- %s\n", token4); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \
@@ -94,6 +108,12 @@
                                                         		token2, token3, token4); \
 													}while(0)
 #define allocate5Tokens(place, token_str, token1, token2, token3, token4, token5) do{ \
+														fprintf(stderr, "X5\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
+														fprintf(stderr, "VAR2 -- %s\n", token2); \
+														fprintf(stderr, "VAR3 -- %s\n", token3); \
+														fprintf(stderr, "VAR4 -- %s\n", token4); \
+														fprintf(stderr, "VAR5 -- %s\n", token5); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \
@@ -107,6 +127,13 @@
                                                         		token5); \
 													}while(0)
 #define allocate6Tokens(place, token_str, token1, token2, token3, token4, token5, token6) do{ \
+														fprintf(stderr, "X6\n"); \
+														fprintf(stderr, "VAR1 -- %s\n", token1); \
+														fprintf(stderr, "VAR2 -- %s\n", token2); \
+														fprintf(stderr, "VAR3 -- %s\n", token3); \
+														fprintf(stderr, "VAR4 -- %s\n", token4); \
+														fprintf(stderr, "VAR5 -- %s\n", token5); \
+														fprintf(stderr, "VAR6 -- %s\n", token6); \
  														place = malloc(sizeof(char) * \
  																		(	strlen(token_str) + \
  																			parameterLen(token1) + \

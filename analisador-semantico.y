@@ -387,8 +387,7 @@ int main(int argc, char *argv[]){
             yyin = fopen(argv[0], "r");
 
             // Print specified format
-            printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n"
-                    ":: OUTPUT FILE WILL BE %s.out ::", argv[0]);
+            printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n");
 
             // Output filename will be input_name+.out
             strcpy(output_filename, argv[0]);
@@ -414,7 +413,8 @@ int main(int argc, char *argv[]){
     }
 
     // Message of starting compilation
-    printf("::: STARTING LEX PARSER PROCESS :::\n\n");
+    printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
+            "::: STARTING LEX PARSER PROCESS :::\n\n", argv[0]);
 
     // Output File for Flex
     output_file = fopen(output_filename, "w");

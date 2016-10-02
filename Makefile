@@ -56,7 +56,7 @@ debug.y.tab.c:
 
 # Executavel com debug habilitado
 debug_parser_executable: debug.lex.yy.c debug.y.tab.c
-	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) debug.y.tab.c debug.lex.yy.c $(CFLAGS_PARSER) -D DEBUG_MODE -g
+	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(CFLAGS_PARSER) -D DEBUG_MODE
 
 # Executavel Analisador Semantico/Sintatico
 $(PARSER_EXECUTABLE): lex.yy.c y.tab.c
