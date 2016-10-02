@@ -268,7 +268,13 @@ T_UNTIL		until
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); yylval.integer_number = atoi(yytext); return T_NUMBER; }
+{T_NUMBER}		{ 
+                    PUT_TOKEN("T_NUMBER"); 
+                    #ifndef LEXICAL_ANALYSER
+                    yylval.integer_number = atoi(yytext);
+                    #endif
+                    return T_NUMBER;
+                }
 {T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
