@@ -78,15 +78,11 @@ debug.lex.yy.c: $(FLEX_SRC)
 
 # Executavel de Debug Analisador Lexico
 debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
-	$(CC) $(CFLAGS) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
+	$(CC) $(CFLAGS) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Executavel Analisador Lexico
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
-
-# Executavel Parser
-$(PARSER_EXECUTABLE): y.tab.c lex.yy.c
-	$(CC) lex.yy.c -o $(PARSER_EXECUTABLE) $(CFLAGS_PARSER) -D PARSER
 
 # Realiza os testes nos executaveis
 test: lexical-test parser-test
@@ -114,3 +110,4 @@ parser-all-tests:
 # Limpa o ambiente
 clean:
 	\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out
+

@@ -419,6 +419,11 @@ int main(int argc, char *argv[]){
     // Output File for Flex
     output_file = fopen(output_filename, "w");
 
+#ifdef DEBUG
+    extern int yydebug;
+    yydebug = 1;
+#endif
+
     // Process entire file
     return yyparse();
 }
