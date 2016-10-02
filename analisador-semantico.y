@@ -1,4 +1,4 @@
-%{
+﻿%{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
@@ -168,10 +168,10 @@ char *string_addr;
 
     /*** * Language Definitions * ***/
 
-programa 	    : bloco					                {;}
-			    ;
+programa 	: bloco					               			{;}
+		;
 
-bloco 		    : comando comandoret                    {;}
+bloco		: comando comandoret                    {;}
                 | comando                               {;}
                 | /* Empty */                           {;}
                 ;
@@ -192,7 +192,7 @@ comando         : T_SEMICOL                             {;}
                 | T_LOCAL listadenomes                                                  {;}
                 ;
 
-term_elseif     : T_ELSEIF exp T_THEN bloco term_elseif {;}
+term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {;}
                 | /* Empty */                           {;}
                 ;
 
@@ -206,7 +206,7 @@ exp             : T_NUMBER                              {;}
                 | T_NAME                                {;}
                 | T_NIL                                 {;}
                 | chamadadefuncao                       {;}
-                | exp opbin exp                         {;}
+                | exp opbin exp				{;}
                 | opunaria exp                          {;}
                 | T_OPENPAR exp T_CLOSEPAR              {;}
                 ;
@@ -215,19 +215,13 @@ chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
                 | T_NAME T_OPENPAR T_CLOSEPAR           {;}
                 ;
 
-listadenomes    : T_NAME listanomes                     {;}
+listadenomes    : T_NAME		                {;}
+		| listadenomes T_COMMA T_NAME		{;}
                 ;
 
-listanomes      : T_COMMA T_NAME listanomes             {;}
-                | /* Empty */              	            {;}
-                ;
-
-listaexp        : exp lista_expr            	        {;}
-                ;
-
-lista_expr      : T_COMMA exp lista_expr                {;}
-                | /* Empty */                 	        {;}
-                ;
+listaexp        : exp		            	        {;}
+                | listaexp T_COMMA exp			{;} 
+		;
 
 opbin 	        : T_PLUS                                {;}
 		        | T_MINUS                               {;}
@@ -243,9 +237,9 @@ opbin 	        : T_PLUS                                {;}
 		        | T_OR                                  {;}
 		        ;
 
-opunaria 	    : T_MINUS                               {;}
-		        | T_NOT                                 {;}
-		        ;
+opunaria    	: T_MINUS                               {;}
+	    	| T_NOT                                 {;}
+	    	;
 
 %%
 
