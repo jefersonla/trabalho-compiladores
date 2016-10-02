@@ -1,3 +1,4 @@
+%expect 20 
 %{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
@@ -289,10 +290,10 @@ comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[c
                 ;
 
 exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");                           }
-                | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                             }
-                | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                               }
+                | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                  }
+                | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                      }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                               }
-                | exp opbin exp                         { allocate3Tokens($$, "[exp %s [opbin %s] %s]", $1, $2, $3);        }
+                | opbin                                 { allocate1Token($$, "[exp %s]", $1);                               }
                 | opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);            }
                 | T_OPENPAR exp T_CLOSEPAR              { allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);  }
                 ;
@@ -309,18 +310,18 @@ listaexp        : exp                                   { allocate1Token($$, "%s
                 | listaexp T_COMMA exp                  { allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);                 } 
                 ;
 
-opbin           : T_PLUS                                { allocateToken($$, "[T_PLUS +]");  }
-                | T_MINUS                               { allocateToken($$, "[T_MINUS -]"); }
-                | T_TIMES                               { allocateToken($$, "[T_TIMES *]"); }
-                | T_DIV                                 { allocateToken($$, "[T_DIV /]");   }
-                | T_LT                                  { allocateToken($$, "[T_LT <]");    }
-                | T_LTEQ                                { allocateToken($$, "[T_LTEQ <=]"); }
-                | T_GT                                  { allocateToken($$, "[T_GT >]");    }
-                | T_GTEQ                                { allocateToken($$, "[T_GTEQ >=]"); }
-                | T_EQ                                  { allocateToken($$, "[T_EQ ==]");   }
-                | T_NEQ                                 { allocateToken($$, "[T_NEQ ~=]");  }
-                | T_AND                                 { allocateToken($$, "[T_AND and]"); }
-                | T_OR                                  { allocateToken($$, "[T_OR or]");   }
+opbin           : exp T_PLUS exp                        { allocate2Tokens($$, "%s [opbin [T_PLUS +]] %s", $1, $3);  }
+                | exp T_MINUS exp                       { allocate2Tokens($$, "%s [opbin [T_MINUS -]] %s", $1, $3); }
+                | exp T_TIMES exp                       { allocate2Tokens($$, "%s [opbin [T_TIMES *]] %s", $1, $3); }
+                | exp T_DIV exp                         { allocate2Tokens($$, "%s [opbin [T_DIV /]] %s", $1, $3);   }
+                | exp T_LT exp                          { allocate2Tokens($$, "%s [opbin [T_LT <]] %s", $1, $3);    }
+                | exp T_LTEQ exp                        { allocate2Tokens($$, "%s [opbin [T_LTEQ <=]] %s", $1, $3); }
+                | exp T_GT exp                          { allocate2Tokens($$, "%s [opbin [T_GT >]] %s", $1, $3);    }
+                | exp T_GTEQ exp                        { allocate2Tokens($$, "%s [opbin [T_GTEQ >=]] %s", $1, $3); }
+                | exp T_EQ exp                          { allocate2Tokens($$, "%s [opbin [T_EQ ==]] %s", $1, $3);   }
+                | exp T_NEQ exp                         { allocate2Tokens($$, "%s [opbin [T_NEQ ~=]] %s", $1, $3);  }
+                | exp T_AND exp                         { allocate2Tokens($$, "%s [opbin [T_AND and]] %s", $1, $3); }
+                | exp T_OR exp                          { allocate2Tokens($$, "%s [opbin [T_OR or]] %s", $1, $3);   }
                 ;
 
 opunaria        : T_MINUS                               { allocateToken($$, "[T_MINUS -]"); }

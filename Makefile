@@ -114,6 +114,8 @@ parser-test:
 parser-all-tests:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 	@printf "\n"
+	#@bash test.sh $(PARSER_EXECUTABLE) tests/parser/globals.lua
+	#@printf "\n"
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/simple.lua
 	@printf "\n-- Finished Parser All Tests-- \n"
 
