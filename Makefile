@@ -93,22 +93,24 @@ all-tests: lexical-all-tests parser-all-tests
 
 # Executa o teste do analisador léxico
 lexical-test:
-	bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
 
 # Executa diversos testes no analisador léxico
 lexical-all-tests:
-	bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
-	bash test.sh $(LEXICAL_EXECUTABLE) tests/hello.lua
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/test.lua
+	@printf "\n"
+	@bash test.sh $(LEXICAL_EXECUTABLE) tests/hello.lua
 
 # TODO Executa testes unitários no parser
 parser-test:
-	bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
+	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 
 # TODO Varios testes unitários para o parser
 parser-all-tests:
-	bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
+	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 
 # Limpa o ambiente
 clean:
-	\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out *.output
+	@printf "Cleaning project folder...\n"
+	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out *.output
 
