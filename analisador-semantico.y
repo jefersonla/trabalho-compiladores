@@ -66,92 +66,92 @@ char *string_addr;
 /* Symbols */
 
 /* Math Operators */
-%token T_PLUS
-%token T_MINUS
-%token T_TIMES
-%token T_DIV
-%token T_MOD
-%token T_EXP
-%token T_FLOOR
+%token <string_content> T_PLUS
+%token <string_content> T_MINUS
+%token <string_content> T_TIMES
+%token <string_content> T_DIV
+%token <string_content> T_MOD
+%token <string_content> T_EXP
+%token <string_content> T_FLOOR
 /* -- Precendence -- */
 %left T_TIMES T_DIV
 %left T_PLUS T_MINUS
 /* Boolean Operators */
-%token T_EQ
-%token T_NEQ
-%token T_LTEQ
-%token T_GTEQ
-%token T_LT
-%token T_GT
+%token <string_content> T_EQ
+%token <string_content> T_NEQ
+%token <string_content> T_LTEQ
+%token <string_content> T_GTEQ
+%token <string_content> T_LT
+%token <string_content> T_GT
 /* -- Precendence -- */
 %left T_EQ T_NEQ T_LTEQ T_GTEQ T_LT T_GT
 /* Separators and assign */
-%token T_COMMA
-%token T_SEMICOL
-%token T_ASSIGN
+%token <string_content> T_COMMA
+%token <string_content> T_SEMICOL
+%token <string_content> T_ASSIGN
 /* Bit-a-Bit Operators */
-%token T_BIT_AND
-%token T_BIT_OR
-%token T_BIT_N_XOR
-%token T_BIT_RSH
-%token T_BIT_LSH
+%token <string_content> T_BIT_AND
+%token <string_content> T_BIT_OR
+%token <string_content> T_BIT_N_XOR
+%token <string_content> T_BIT_RSH
+%token <string_content> T_BIT_LSH
 /* Encapsulation Symbols */
-%token T_OPENPAR
-%token T_CLOSEPAR
-%token T_OPENBRACE
-%token T_CLOSEBRACE
-%token T_OPENBRACKET
-%token T_CLOSEBRACKET
+%token <string_content> T_OPENPAR
+%token <string_content> T_CLOSEPAR
+%token <string_content> T_OPENBRACE
+%token <string_content> T_CLOSEBRACE
+%token <string_content> T_OPENBRACKET
+%token <string_content> T_CLOSEBRACKET
 /* Other Symbols */
-%token T_CONCAT
-%token T_LIST
-%token T_SEP
-%token T_COLON
+%token <string_content> T_CONCAT
+%token <string_content> T_LIST
+%token <string_content> T_SEP
+%token <string_content> T_COLON
 
 /* Reserved Words */
 
 /* Boolean Comparators */
-%token T_AND
-%token T_OR
-%token T_NOT
+%token <string_content> T_AND
+%token <string_content> T_OR
+%token <string_content> T_NOT
 /* -- Precendence -- */
 %left T_AND T_OR
 /* Conditional Expression */
-%token T_IF
-%token T_ELSEIF
-%token T_ELSE
-%token T_THEN
+%token <string_content> T_IF
+%token <string_content> T_ELSEIF
+%token <string_content> T_ELSE
+%token <string_content> T_THEN
 /* Loop Expression */
-%token T_FOR
-%token T_WHILE
-%token T_DO
+%token <string_content> T_FOR
+%token <string_content> T_WHILE
+%token <string_content> T_DO
 /* Close Expression */
-%token T_END
-%token T_RETURN
+%token <string_content> T_END
+%token <string_content> T_RETURN
 /* Variable and Functions Manipultion */
-%token T_FUNCTION
-%token T_LOCAL
-%token T_NIL
+%token <string_content> T_FUNCTION
+%token <string_content> T_LOCAL
+%token <string_content> T_NIL
 
 /* Extra Reserved Words */
 
 /* Boolean Names */
-%token T_TRUE
-%token T_FALSE
+%token <string_content> T_TRUE
+%token <string_content> T_FALSE
 /* Other Loop Expression */
-%token T_REPEAT
-%token T_UNTIL
-%token T_BREAK
+%token <string_content> T_REPEAT
+%token <string_content> T_UNTIL
+%token <string_content> T_BREAK
 /* Other Reserved Words */
-%token T_GLOBAL
-%token T_IN
+%token <string_content> T_GLOBAL
+%token <string_content> T_IN
 
 /* Variable Types */
 
-%token <integer_number>         T_NUMBER
-%token <string_label>           T_LABEL
-%token <string_literal>         T_LITERAL
-%token <string_variable_name>   T_NAME
+%token <integer_number> T_NUMBER
+%token <string_label>   T_LABEL
+%token <string_literal> T_LITERAL
+%token <string_content> T_NAME
 
 /* Expression Types */
 %type <string_content> programa
@@ -188,7 +188,7 @@ char *string_addr;
 
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
-programa        : bloco                                 { fprintf(output_file, "[program%s]\n", $1); }
+programa        : bloco                                 { fprintf(output_file, "[program%s]\n", $1); fprintf(stderr,"[program%s]\n", $1);}
                 ;
 
 /* -- Block are sections of code -- */

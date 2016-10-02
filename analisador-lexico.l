@@ -73,6 +73,8 @@ FILE *output_file;
 #else
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
+                                            yylval.string_content = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.string_content, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
@@ -266,7 +268,7 @@ T_UNTIL		until
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); 		return T_NUMBER;		}
+{T_NUMBER}		{ PUT_TOKEN("T_NUMBER"); yylval.integer_number = atoi(yytext); return T_NUMBER; }
 {T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
