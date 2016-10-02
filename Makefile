@@ -86,6 +86,7 @@ $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Realiza os testes nos executaveis
+check: lexical-test parser-test 
 test: lexical-test parser-test
 
 # Executa todos os testes
@@ -113,11 +114,11 @@ parser-test:
 parser-all-tests:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 	@printf "\n"
-	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/globals.lua
+	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/simple.lua
 	@printf "\n-- Finished Parser All Tests-- \n"
 
 # Limpa o ambiente
 clean:
 	@printf "Cleaning project folder...\n"
-	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/*.out *.output
+	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output
 
