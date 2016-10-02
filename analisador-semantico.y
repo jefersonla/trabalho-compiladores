@@ -116,6 +116,8 @@ char *string_addr;
 %token T_THEN
 %token T_WHILE
 
+%left T_AND T_OR
+
 /* Extra Reserved Words */
 
 %token T_BREAK
