@@ -1,4 +1,4 @@
-# Compilador a ser usado
+﻿# Compilador a ser usado
 CC=gcc
 # Flags para o compilador
 CFLAGS=-Wall
@@ -84,6 +84,10 @@ debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
+# Executavel Parser
+$(PARSER_EXECUTABLE): y.tab.c lex.yy.c
+	$(CC) lex.yy.c -o $(PARSER_EXECUTABLE) $(CFLAGS_PARSER) -D PARSER
+
 # Realiza os testes nos executaveis
 test: lexical-test parser-test
 
@@ -101,11 +105,11 @@ lexical-all-tests:
 
 # TODO Executa testes unitários no parser
 parser-test:
-	echo "TODO:Unit tests for parser"
+	bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 
 # TODO Varios testes unitários para o parser
 parser-all-tests:
-	echo "TODO: All Unit tests for parser"
+	bash test.sh $(PARSER_EXECUTABLE) tests/parser/test.lua
 
 # Limpa o ambiente
 clean:
