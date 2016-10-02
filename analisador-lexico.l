@@ -107,13 +107,13 @@ DONE
  */
 #ifdef LEXICAL_ANALYSER
 #define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
-									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
+									fprintf(stderr,"[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
                                     fclose(output_file); 							        \
 									remove(output_filename); 						        \
 								}while(0)
 #else
 #define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
-									printf("[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
+									fprintf(stderr,"[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
 								}while(0)
 #endif
 %}
@@ -304,7 +304,7 @@ T_UNTIL		until
 
 	/*** WHITESPACES ***/
 
-{WS}			{ printf(""); 				}
+{WS}			{ ; }
 
 	/*** END OF FILE ***/
     /** ROUTINES TO CLOSE AND FINISH FILE **/

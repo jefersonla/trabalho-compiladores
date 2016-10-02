@@ -1,6 +1,7 @@
 # Compilador a ser usado
 CC=gcc
 # Flags para o compilador
+CFLAGS=-Wall
 CFLAGS_LEXICAL=-lfl
 CFLAGS_PARSER=-lm
 # Flags para o Linker
@@ -55,11 +56,11 @@ debug.y.tab.c:
 
 # Executavel com debug habilitado
 debug_parser_executable: debug.lex.yy.c debug.y.tab.c
-	$(CC) -o $(PARSER_EXECUTABLE) debug.y.tab.c debug.lex.yy.c $(CFLAGS_PARSER) -D DEBUG_MODE
+	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) debug.y.tab.c debug.lex.yy.c $(CFLAGS_PARSER) -D DEBUG_MODE
 
 # Executavel Analisador Semantico/Sintatico
 $(PARSER_EXECUTABLE): lex.yy.c y.tab.c
-	$(CC) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(CFLAGS_PARSER)
+	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(CFLAGS_PARSER)
 
 # Compilação Analisador Léxico
 lexical: lex.yy.c $(LEXICAL_EXECUTABLE)
@@ -77,11 +78,11 @@ debug.lex.yy.c: $(FLEX_SRC)
 
 # Executavel de Debug Analisador Lexico
 debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
-	$(CC) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
+	$(CC) $(CFLAGS) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Executavel Analisador Lexico
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
-	$(CC) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
+	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Realiza os testes nos executaveis
 test: lexical-test parser-test

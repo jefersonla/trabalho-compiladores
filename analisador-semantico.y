@@ -33,7 +33,7 @@
 #include "parser.defs.h"
 
 /* Needed by bison */
-void yyerror(char *);
+void yyerror(const char *);
 
 /* Variables for File Manipulation */
 char output_filename[MAX_OUTPUT_FILENAME];
@@ -148,10 +148,10 @@ char *string_addr;
 
 /* Variable Types */
 
-%token T_NUMBER
-%token T_LABEL
-%token T_NAME
-%token T_LITERAL
+%token <integer_number>         T_NUMBER
+%token <string_label>           T_LABEL
+%token <string_literal>         T_LITERAL
+%token <string_variable_name>   T_NAME
 
 /* Expression Types */
 %type <string_content> programa
@@ -164,9 +164,15 @@ char *string_addr;
 %type <string_content> listaexp
 %type <string_content> opbin
 %type <string_content> opunaria
+%type <string_content> term_elseif
+%type <string_content> term_listanomes
+%type <string_content> lista_expr
 
 /* Start Type */
 %start programa
+
+/* Enable Verbose Errors */
+%error-verbose
 
 /*
 ### Example of Type Definition for Token and Expressions ###
@@ -183,85 +189,141 @@ char *string_addr;
     /*** * Language Definitions * ***/
 
 /* -- Program Section  -- */
-programa 	    : bloco					                {;}
+/*  > Store Application if success parsing */
+programa 	    : bloco					                { fprintf(output_file, "[program%s]\n", $1); }
 			    ;
 
 /* -- Block are sections of code -- */
-bloco 		    : comando comandoret                    {;}
-                | comando                               {;}
-                | /* Empty */                           { allocateToken(""); 			}
+bloco 		    : comando comandoret                    { allocate2Tokens($$, " [bloco %s %s]", $1, $2);	                }
+                | comando                               { allocate1Token($$, " [bloco %s]", $1);			            }
+                | /* Empty */                           { allocateToken($$, ""); 			                                    }
                 ;
 
 /* -- Commands belong to program, and represent all the actions that can occur -- */
-comando         : T_SEMICOL                             {;}
-                | comando comando                       {;}
-                | chamadadefuncao                       {;}
-                | listadenomes T_ASSIGN listaexp        {;}
-                | T_DO bloco T_END                                                      {;}
-                | T_WHILE exp T_DO bloco T_END                                          {;}
-                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {;}
-                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {;}
-                | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {;}
-                | T_IF exp T_THEN bloco term_elseif T_END                               {;}
-                | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {;}
-                | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {;}
-                | T_LOCAL listadenomes T_ASSIGN listaexp                                {;}
-                | T_LOCAL listadenomes                                                  {;}
+comando         : comando comando                       { allocate2Tokens($$, "%s %s", $1, $2);			                }
+                | T_SEMICOL                             { allocateToken($$, "[comando [T_SEMICOL ;]]");           	            }
+                | chamadadefuncao                       { allocate1Token($$, "[comando %s]", $1);			            }
+                | listadenomes T_ASSIGN listaexp        { allocate2Tokens($$, "[comando %s [T_ASSIGN =] %s]", $1, $3);   }
+                | T_DO bloco T_END                                                      {
+                                                                                            allocate1Token( $$,
+                                                                                                            "[comando [T_DO do]%s "
+                                                                                                            "[T_END end]]",
+                                                                                                            $2);
+                                                                                        }
+                | T_WHILE exp T_DO bloco T_END                                          {
+                                                                                            allocate2Tokens($$,
+                                                                                                            "[comando [T_WHILE while] %s "
+                                                                                                            "[T_DO do]%s [T_END end]]",
+                                                                                                            $2, $4);
+                                                                                        }
+                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {
+                                                                                            allocate5Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_FOR for] [T_NAME %s] [T_ASSIGN =] %s "
+                                                                                                            "[T_COMMA ,] %s [T_COMMA ,] %s "
+                                                                                                            "[T_DO do]%s [T_END end]]",
+                                                                                                            $2, $4, $6, $8, $10);
+                                                                                        }
+                | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {
+                                                                                            allocate4Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_FOR for] [T_NAME %s] "
+                                                                                                            "[T_ASSIGN =] %s [T_COMMA ,] %s "
+                                                                                                            "[T_DO do]%s [T_END end]]",
+                                                                                                            $2, $4, $6, $8);
+                                                                                        }
+                | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {
+                                                                                            allocate4Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_IF if] %s [T_THEN then]%s%s "
+                                                                                                            "[T_ELSE else]%s [T_END end]]",
+                                                                                                            $2, $4, $5, $7);
+                                                                                        }
+                | T_IF exp T_THEN bloco term_elseif T_END                               {
+                                                                                            allocate3Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_IF if] %s [T_THEN then]%s%s "
+                                                                                                            "[T_END end]]",
+                                                                                                            $2, $4, $5);
+                                                                                        }
+                | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {
+                                                                                            allocate3Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_FUNCTION function] [T_NAME %s] "
+                                                                                                            "[T_OPENPAR (] %s [T_CLOSEPAR )]%s "
+                                                                                                            "[T_END end]]",
+                                                                                                            $2, $4, $6);
+                                                                                        }
+                | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {
+                                                                                            allocate2Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_FUNCTION function] [T_NAME %s] "
+                                                                                                            "[T_OPENPAR (] [T_CLOSEPAR )]%s "
+                                                                                                            "[T_END end]]",
+                                                                                                            $2, $5);
+                                                                                        }
+                | T_LOCAL listadenomes T_ASSIGN listaexp                                {
+                                                                                            allocate2Tokens($$,
+                                                                                                            "[comando "
+                                                                                                            "[T_LOCAL local] %s [T_ASSIGN =] %s]",
+                                                                                                            $2, $4);
+                                                                                        }
+                | T_LOCAL listadenomes                                                  { allocate1Token($$, "[comando [T_LOCAL local] %s]", $2);	}
                 ;
 
-term_elseif     : T_ELSEIF exp T_THEN bloco term_elseif {;}
-                | /* Empty */                           { allocateToken(""); 			}
+term_elseif     : T_ELSEIF exp T_THEN bloco term_elseif { allocate3Tokens($$," [T_ELSEIF elseif] %s [T_THEN then]%s%s", $2, $4, $5);			}
+                | /* Empty */                           { allocateToken($$, ""); 			}
                 ;
 
-comandoret      : T_RETURN listaexp T_SEMICOL           {;}
-                | T_RETURN listaexp                     {;}
-                | T_RETURN T_SEMICOL                    {;}
-                | T_RETURN                              {;}
+comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[comandoret [T_RETURN return] %s [T_SEMICOL ;]]", $2);	    }
+                | T_RETURN listaexp                     { allocate1Token($$, "[comandoret [T_RETURN return] %s]", $2);                    }
+                | T_RETURN T_SEMICOL                    { allocateToken($$, "[comandoret [T_RETURN return] [T_SEMICOL ;]]");                        }
+                | T_RETURN                              { allocateToken($$, "[comandoret [T_RETURN return]]");                                      }
                 ;
 
-exp             : T_NUMBER                              {;}
-                | T_NAME                                {;}
-                | T_NIL                                 {;}
-                | chamadadefuncao                       {;}
-                | exp opbin exp                         {;}
-                | opunaria exp                          {;}
-                | T_OPENPAR exp T_CLOSEPAR              {;}
+exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");			                        }
+                | T_NUMBER                              { allocateTokenNum($$, "[exp %d]", $1);	                            }
+                | T_NAME                                { allocate1Token($$, "[exp %s]", $1);			                    }
+                | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);			                    }
+                | exp opbin exp                         { allocate3Tokens($$, "[exp %s [opbin %s] %s]", $1, $2, $3);	        }
+                 |opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);			    }
+                | T_OPENPAR exp T_CLOSEPAR              { allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);	}
                 ;
 
-chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{;}
-                | T_NAME T_OPENPAR T_CLOSEPAR           {;}
+chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR	{ allocate2Tokens($$,"[chamadadefuncao [T_NAME %s] [T_OPENPAR (] %s [T_CLOSEPAR )]]", $1, $3);   }
+                | T_NAME T_OPENPAR T_CLOSEPAR           { allocate1Token($$,"[chamadadefuncao [T_NAME %s] [T_OPENPAR (] [T_CLOSEPAR )]]", $1);		    }
                 ;
 
-listadenomes    : T_NAME listanomes                     {;}
+listadenomes    : T_NAME term_listanomes                { allocate2Tokens($$,"[listadenomes [T_NAME %s]%s]", $1, $2);		}
                 ;
 
-listanomes      : T_COMMA T_NAME listanomes             {;}
-                | /* Empty */              	            { allocateToken(""); 			}
+term_listanomes : T_COMMA T_NAME term_listanomes        { allocate2Tokens($$," [T_COMMA ,] [T_NAME %s]%s", $2, $3);			}
+                | /* Empty */              	            { allocateToken($$, ""); 			}
                 ;
 
-listaexp        : exp lista_expr            	        {;}
+listaexp        : exp lista_expr            	        { allocate2Tokens($$,"[listaexp %s%s]", $1, $2);			            }
                 ;
 
-lista_expr      : T_COMMA exp lista_expr                {;}
-                | /* Empty */                 	        { allocateToken(""); 			}
+lista_expr      : T_COMMA exp lista_expr                { allocate2Tokens($$," [T_COMMA ,] %s%s", $2, $3);			        }
+                | /* Empty */                 	        { allocateToken($$, ""); 			}
                 ;
 
-opbin 	        : T_PLUS                                { allocateToken("[T_PLUS +]"); 	}
-		        | T_MINUS                               { allocateToken("[T_MINUS -]"); }
-		        | T_TIMES                               { allocateToken("[T_TIMES *]");	}
-		        | T_DIV                                 { allocateToken("[T_DIV /]"); 	}
-		        | T_LT                                  { allocateToken("[T_LT <]"); 	}
-		        | T_LTEQ                                { allocateToken("[T_LTEQ <=]"); }
-		        | T_GT                                  { allocateToken("[T_GT >]"); 	}
-		        | T_GTEQ                                { allocateToken("[T_GTEQ >=]");	}
-		        | T_EQ                                  { allocateToken("[T_EQ ==]"); 	}
-		        | T_NEQ                                 { allocateToken("[T_NEQ ~=]"); 	}
-		        | T_AND                                 { allocateToken("[T_AND and]");	}
-		        | T_OR                                  { allocateToken("[T_OR or]"); 	}
+opbin 	        : T_PLUS                                { allocateToken($$, "[T_PLUS +]"); 	}
+		        | T_MINUS                               { allocateToken($$, "[T_MINUS -]"); }
+		        | T_TIMES                               { allocateToken($$, "[T_TIMES *]");	}
+		        | T_DIV                                 { allocateToken($$, "[T_DIV /]"); 	}
+		        | T_LT                                  { allocateToken($$, "[T_LT <]"); 	}
+		        | T_LTEQ                                { allocateToken($$, "[T_LTEQ <=]"); }
+		        | T_GT                                  { allocateToken($$, "[T_GT >]"); 	}
+		        | T_GTEQ                                { allocateToken($$, "[T_GTEQ >=]");	}
+		        | T_EQ                                  { allocateToken($$, "[T_EQ ==]"); 	}
+		        | T_NEQ                                 { allocateToken($$, "[T_NEQ ~=]"); 	}
+		        | T_AND                                 { allocateToken($$, "[T_AND and]");	}
+		        | T_OR                                  { allocateToken($$, "[T_OR or]"); 	}
 		        ;
 
-opunaria 	    : T_MINUS                               { allocateToken("[T_MINUS -]");	}
-		        | T_NOT                                 { allocateToken("[T_NOT !]"); 	}
+opunaria 	    : T_MINUS                               { allocateToken($$, "[T_MINUS -]");	}
+		        | T_NOT                                 { allocateToken($$, "[T_NOT not]"); }
 		        ;
 
 %%
@@ -273,7 +335,7 @@ opunaria 	    : T_MINUS                               { allocateToken("[T_MINUS 
  *
  * @param s String with error informated.
  */
-void yyerror(char *s) {
+void yyerror(const char *s) {
     fprintf(stdout, "%s\n", s);
 }
 
