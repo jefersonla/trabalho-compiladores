@@ -176,12 +176,12 @@ bloco 		    : comando comandoret                    {;}
                 | /* Empty */                           {;}
                 ;
 
-comando         : comando comando                       {;}
-                | T_COMMA                               {;}
-                | listadenomes T_ASSIGN listaexp        {;}
+comando         : T_SEMICOL                             {;}
+                | comando comando                       {;}
                 | chamadadefuncao                       {;}
-                | T_DO bloco T_END                      {;}
-                | T_WHILE exp T_DO bloco T_END          {;}
+                | listadenomes T_ASSIGN listaexp        {;}
+                | T_DO bloco T_END                                                      {;}
+                | T_WHILE exp T_DO bloco T_END                                          {;}
                 | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {;}
                 | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {;}
                 | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {;}
@@ -192,8 +192,8 @@ comando         : comando comando                       {;}
                 | T_LOCAL listadenomes                                                  {;}
                 ;
 
-term_elseif     : /* Empty */                           {;}
-                | T_ELSEIF exp T_THEN bloco term_elseif {;}
+term_elseif     : T_ELSEIF exp T_THEN bloco term_elseif {;}
+                | /* Empty */                           {;}
                 ;
 
 comandoret      : T_RETURN listaexp T_SEMICOL           {;}
@@ -219,14 +219,14 @@ listadenomes    : T_NAME listanomes                     {;}
                 ;
 
 listanomes      : T_COMMA T_NAME listanomes             {;}
-                |  /* Empty */              	        {;}
+                | /* Empty */              	            {;}
                 ;
 
 listaexp        : exp lista_expr            	        {;}
                 ;
 
 lista_expr      : T_COMMA exp lista_expr                {;}
-                |  /* Empty */              	        {;}
+                | /* Empty */                 	        {;}
                 ;
 
 opbin 	        : T_PLUS                                {;}
@@ -259,6 +259,25 @@ void yyerror(char *s) {
     fprintf(stdout, "%s\n", s);
 }
 
+/**
+ * Print Help Usage
+ */
+void showHelpUsage(){
+    printf( "Help usage!\n"                                                              \
+            "\n"                                                                         \
+            "usage:\tcompilador [<input_file>] [<output_file>]\n"                        \
+            "\t<input_file>\tFile to be compiled\n"                                      \
+            "\t<output_file>\tCompiled file result\n"                                    \
+            "\n"                                                                         \
+            "Both <input_file> and <output_file> parameters are optional if no\n"        \
+            "parameter is specified input file will be stdin and the result content\n"   \
+            "will be available both in stdout and file 'stdout.out'. The default\n"      \
+            "behavior when there's no <output_file> is create a file in the following\n" \
+            "form: '<input_file>.out'. Code generated is printed in stdout by default.\n"\
+            "\n"                                                                         \
+    );
+}
+
 /* Main Execution Code */
 int main(int argc, char *argv[]){
     ++argv, --argc; /* skip over program name */
@@ -271,19 +290,8 @@ int main(int argc, char *argv[]){
 
     // If you have one or more arguments and they start with --
     if((argc == 1) && (argv[0][0] == '-' && argv[0][1] == '-')){
-        printf( "Help usage!\n"                                                             \
-                "\n"                                                                        \
-                "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
-                "\t<input_file>\tFile to be compiled\n"                                     \
-                "\t<output_file>\tCompiled file result\n"                                   \
-                "\n"                                                                        \
-                "Both <input_file> and <output_file> parameters are optional if no\n"       \
-                "parameter is specified input file will be stdin and the result content\n"  \
-                "will be available both in stdout and file 'stdout.out'. The default\n"     \
-                "behavior when there's no <output_file> is create a file in the following\n"\
-                "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
-
-		return EXIT_SUCCESS;
+        showHelpUsage();
+        return EXIT_SUCCESS;
     }
 
 	// Verify number of parameters
@@ -323,17 +331,10 @@ int main(int argc, char *argv[]){
 
 			break;
 		default:
-            printf( "Incorrect number of parrameters used!\n"                                   \
-                    "\n"                                                                        \
-                    "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
-                    "\t<input_file>\tFile to be compiled\n"                                     \
-                    "\t<output_file>\tCompiled file result\n"                                   \
-                    "\n"                                                                        \
-                    "Both <input_file> and <output_file> parameters are optional if no\n"       \
-                    "parameter is specified input file will be stdin and the result content\n"  \
-                    "will be availabyyerror_le both in stdout and file 'stdout.out'. The default\n"     \
-                    "behavior when there's no <output_file> is create a file in the following\n"\
-                    "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
+            printf( "Incorrect number of parrameters used!\n"   \
+                    "\n"                                        \
+            );
+            showHelpUsage();
 
 			return EXIT_FAILURE;
 	}
