@@ -37,7 +37,6 @@ char *string_addr;
 
 %}
 
-
 /* Definition of token iterator */
 %union{
 	/* Number Value */
@@ -53,18 +52,19 @@ char *string_addr;
 	// TokenNode *ptr_token_node;
 }
 
-/* Types imported from flex */
-/* Need to organize precende and values */
-%token T_OPENPAR
-%token T_CLOSEPAR
+    /*** * Definitions Section * ***/
+
+/* Symbols */
+
+/* Math Operators */
 %token T_PLUS
 %token T_MINUS
 %token T_TIMES
 %token T_DIV
-%token T_COMMA
-%token T_SEMICOL
-%token T_COLON
-%token T_ASSIGN
+%token T_MOD
+%token T_EXP
+%token T_FLOOR
+/* Boolean Operators */
 %token T_EQ
 %token T_NEQ
 %token T_LTEQ
@@ -72,20 +72,29 @@ char *string_addr;
 %token T_LT
 %token T_GT
 %token T_SEP
-%token T_CONCAT
-%token T_MOD
-%token T_EXP
-%token T_FLOOR
+/* Separators and assign */
+%token T_COMMA
+%token T_SEMICOL
+%token T_COLON
+%token T_ASSIGN
+/* Bit-a-Bit Operators */
 %token T_BIT_AND
 %token T_BIT_OR
 %token T_BIT_N_XOR
 %token T_BIT_RSH
 %token T_BIT_LSH
+/* Encapsulation Symbols */
+%token T_OPENPAR
+%token T_CLOSEPAR
 %token T_OPENBRACE
 %token T_CLOSEBRACE
 %token T_OPENBRACKET
 %token T_CLOSEBRACKET
-%token T_NUMBER
+/* Other Symbols */
+%token T_CONCAT
+
+/* Reserved Words */
+
 %token T_AND
 %token T_DO
 %token T_ELSE
@@ -101,6 +110,9 @@ char *string_addr;
 %token T_RETURN
 %token T_THEN
 %token T_WHILE
+
+/* Extra Reserved Words */
+
 %token T_BREAK
 %token T_GLOBAL
 %token T_IN
@@ -109,23 +121,17 @@ char *string_addr;
 %token T_FALSE
 %token T_UNTIL
 
+/* Variable Types */
+
+%token T_NUMBER
 %token T_LABEL
 %token T_NAME
 %token T_LITERAL
 
-/* Token de inicio */
+/* Start Type */
 %start programa
 
-/* ################ Começo do Exemplo ################ */
-/*%union {
-    int num;
-    char id;
-}*/
-
-/*%start 	line */
 /*
-%token 	print
-%token 	exit_command
 %token 	<integer_number> 		number
 %token 	<string_variable_name> 	identifier
 %type 	<integer_number> 		line exp term
@@ -149,7 +155,7 @@ exp         : term
 term        : number                {$$ = $1;}
             | identifier            {$$ = $1;}
             ;
-
+*/
 
 /* ################ Fim do Exemplo ################ */
 
