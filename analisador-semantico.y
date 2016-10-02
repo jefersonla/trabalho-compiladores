@@ -68,7 +68,7 @@ char *string_addr;
 %token T_MOD
 %token T_EXP
 %token T_FLOOR
-
+/* -- Precendence -- */
 %left T_TIMES T_DIV
 %left T_PLUS T_MINUS
 /* Boolean Operators */
@@ -78,8 +78,7 @@ char *string_addr;
 %token T_GTEQ
 %token T_LT
 %token T_GT
-%token T_SEP
-
+/* -- Precendence -- */
 %left T_EQ T_NEQ T_LTEQ T_GTEQ T_LT T_GT
 /* Separators and assign */
 %token T_COMMA
@@ -121,7 +120,7 @@ char *string_addr;
 %token T_RETURN
 %token T_THEN
 %token T_WHILE
-
+/* -- Precendence -- */
 %left T_AND T_OR
 
 /* Extra Reserved Words */
