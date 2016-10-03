@@ -446,6 +446,20 @@ T_UNTIL		until
 
 /* Main is only necessary when lexical analyser is being compiled */
 #ifdef LEXICAL_ANALYSER
+void showHelpUsage(){
+    printf( "Help usage!\n"                                                             \
+            "\n"                                                                        \
+            "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
+            "\t<input_file>\tFile to be compiled\n"                                     \
+            "\t<output_file>\tCompiled file result\n"                                   \
+            "\n"                                                                        \
+            "Both <input_file> and <output_file> parameters are optional if no\n"       \
+            "parameter is specified input file will be stdin and the result content\n"  \
+            "will be available both in stdout and file 'stdout.out'. The default\n"     \
+            "behavior when there's no <output_file> is create a file in the following\n"\
+            "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
+}
+
 int main( int argc, char **argv ) {
 	++argv, --argc; /* skip over program name */
 
@@ -457,19 +471,8 @@ int main( int argc, char **argv ) {
 
     // If you have one or more arguments and they start with --
     if((argc == 1) && (argv[0][0] == '-' && argv[0][1] == '-')){
-        printf( "Help usage!\n"                                                             \
-                "\n"                                                                        \
-                "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
-                "\t<input_file>\tFile to be compiled\n"                                     \
-                "\t<output_file>\tCompiled file result\n"                                   \
-                "\n"                                                                        \
-                "Both <input_file> and <output_file> parameters are optional if no\n"       \
-                "parameter is specified input file will be stdin and the result content\n"  \
-                "will be available both in stdout and file 'stdout.out'. The default\n"     \
-                "behavior when there's no <output_file> is create a file in the following\n"\
-                "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
-
-		return EXIT_SUCCESS;
+        showHelpUsage();
+        return EXIT_SUCCESS;
     }
 
 	// Verify number of parameters
@@ -509,18 +512,8 @@ int main( int argc, char **argv ) {
 
 			break;
 		default:
-            printf( "Incorrect number of parrameters used!\n"                                   \
-                    "\n"                                                                        \
-                    "usage:\tcompilador [<input_file>] [<output_file>]\n"                       \
-                    "\t<input_file>\tFile to be compiled\n"                                     \
-                    "\t<output_file>\tCompiled file result\n"                                   \
-                    "\n"                                                                        \
-                    "Both <input_file> and <output_file> parameters are optional if no\n"       \
-                    "parameter is specified input file will be stdin and the result content\n"  \
-                    "will be availabyyerror_le both in stdout and file 'stdout.out'. The default\n"     \
-                    "behavior when there's no <output_file> is create a file in the following\n"\
-                    "form: '<input_file>.out'. Code generated is printed in stdout by default.\n\n");
-
+            printf( "Incorrect number of parrameters used!\n\n");
+            showHelpUsage();
 			return EXIT_FAILURE;
 	}
 

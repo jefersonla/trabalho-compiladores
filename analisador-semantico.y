@@ -1,4 +1,3 @@
-%expect 52
 %{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
@@ -173,15 +172,8 @@ int last_char;
 /* Enable Verbose Errors */
 %error-verbose
 
-/*
-### Example of Type Definition for Token and Expressions ###
- -- TOKEN dá um tipo ao TOKEN
-%token  <integer_number>        number
-%token  <string_variable_name>  identifier
- -- TYPE dá um tipo a EXPRESSÃO
-%type   <integer_number>        line exp term
-%type   <string_variable_name>  assingment
-*/
+/* Number of Shift Reducions */
+%expect 52
 
 %%
 
@@ -388,13 +380,13 @@ void showHelpUsage(){
 
 /* Main Execution Code */
 int main(int argc, char *argv[]){
-    /* Debug Configuration */
+    ++argv, --argc; /* skip over program name */
+
 #ifdef DEBUG
+    /* Debug Configuration */
     extern int yydebug;
     yydebug = 1;
 #endif
-
-    ++argv, --argc; /* skip over program name */
 
     /* Code Begin Message */
     printf( " ::: LUA MIPS Compiler - Sintatical and Semantic Analyser ::: \n"  \
@@ -467,6 +459,9 @@ int main(int argc, char *argv[]){
     /* Parse entire file */
     int yyparse_return = yyparse();
     printf("\n\n::: COMPILATION END :::\n");
+
+    /* Free List of tokens since, it's not necessary anymore */
+    free(all_tokens);
 
     // Process entire file
     return yyparse_return;
