@@ -63,7 +63,13 @@
 /* General Macros */
 #define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
 #define PUT_TOKEN(TOKEN) 				do{FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);}while(0)
-#define PUT_LITERAL(TOKEN) 				do{yytext[strlen(yytext)-1]=0;FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", &yytext[1]);}while(0)
+#define PUT_LITERAL(TOKEN) 				do{\
+                                            yytext++; \
+                                            yytext[strlen(yytext)-1] = 0;\
+                                            FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);\
+                                        }while(0)
+#define PUT_NUMBER(TOKEN)               PUT_TOKEN(TOKEN)
+#define PUT_SYMBOL(TOKEN)               PUT_TOKEN(TOKEN)
 #define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 
@@ -77,9 +83,19 @@ FILE *output_file;
                                             strcpy(yylval.string_content, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
                                         }while(0)
+#define PUT_SYMBOL(TOKEN)               do{ \
+                                            printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                        }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
-                                            yytext[strlen(yytext)-1]=0; \
-                                            printf("[" TOKEN ", \"%s\"], ", &yytext[1]); \
+                                            yytext++; \
+                                            yytext[strlen(yytext)-1] = 0; \
+                                            yylval.string_literal = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.string_literal, yytext); \
+                                            printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                        }while(0)
+#define PUT_NUMBER(TOKEN)               do{ \
+                                            yylval.integer_number = atoi(yytext); \
+                                            printf("[" TOKEN ", \"%s\"], ", yytext); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 #endif
@@ -142,7 +158,7 @@ T_LT 		\<
 T_GT 		\>
 T_SEP 		\.
 T_CONCAT	\.\.
-T_LIST 		\.\.\.
+T_VARARG    \.\.\.
 T_MOD		\%
 T_EXP 		\^
 T_FLOOR		\/\/
@@ -155,23 +171,20 @@ T_OPENBRACE  	\{
 T_CLOSEBRACE 	\}
 T_OPENBRACKET 	\[
 T_CLOSEBRACKET  \]
+T_LABEL 	\:\:
 
-	/*** MATCHES FOR NUMBERS ***/
+    /*** MATCHES FOR NUMBERS ***/
 
-D			[0-9]
-E			[{E}e][+-]?{D}+
+D           [0-9]
+E           [{E}e][+-]?{D}+
 
-T_NUMBER	((?:{D}*\.)?{D}+)
+T_NUMBER    ((?:{D}*\.)?{D}+)
 
-	/*** MATCHS FOR NAMES ***/
+    /*** MATCHS FOR NAMES ***/
 
-L 			[a-zA-Z_]
+L           [a-zA-Z_]
 
-T_NAME		{L}({L}|{D})*
-
-	/*** MATCHES FOR LABELS ***/
-
-T_LABEL 	\:\:{L}+\:\:
+T_NAME      {L}({L}|{D})*
 
 	/*** MATCHES FOR WHITESPACES ***/
 
@@ -231,50 +244,46 @@ T_UNTIL		until
 
 	/*** COMENTARIOS ***/
 
-{WS_COMMENT}	{ PRINT_COMMENT_DEBUG();		}
+{WS_COMMENT}	{ PRINT_COMMENT_DEBUG();		                         }
 
 	/*** SYMBOLS ***/
 
-{T_OPENPAR}		{ PUT_TOKEN("T_OPENPAR"); 		return T_OPENPAR; 		}
-{T_CLOSEPAR}	{ PUT_TOKEN("T_CLOSEPAR"); 		return T_CLOSEPAR; 		}
-{T_PLUS} 		{ PUT_TOKEN("T_PLUS"); 			return T_PLUS; 		 	}
-{T_MINUS} 		{ PUT_TOKEN("T_MINUS"); 		return T_MINUS; 		}
-{T_TIMES} 		{ PUT_TOKEN("T_TIMES"); 		return T_TIMES; 		}
-{T_DIV} 		{ PUT_TOKEN("T_DIV"); 			return T_DIV; 		 	}
-{T_COMMA} 		{ PUT_TOKEN("T_COMMA"); 		return T_COMMA; 		}
-{T_SEMICOL} 	{ PUT_TOKEN("T_SEMICOL"); 		return T_SEMICOL; 		}
-{T_COLON} 		{ PUT_TOKEN("T_COLON"); 		return T_COLON; 		}
-{T_ASSIGN} 		{ PUT_TOKEN("T_ASSIGN"); 		return T_ASSIGN; 		}
-{T_EQ} 			{ PUT_TOKEN("T_EQ"); 			return T_EQ; 		 	}
-{T_NEQ} 		{ PUT_TOKEN("T_NEQ"); 			return T_NEQ; 		 	}
-{T_LTEQ} 		{ PUT_TOKEN("T_LTEQ"); 			return T_LTEQ; 		 	}
-{T_GTEQ} 		{ PUT_TOKEN("T_GTEQ"); 			return T_GTEQ; 		 	}
-{T_LT} 			{ PUT_TOKEN("T_LT"); 			return T_LT; 		 	}
-{T_GT} 			{ PUT_TOKEN("T_GT"); 			return T_GT; 		 	}
-{T_SEP} 		{ PUT_TOKEN("T_SEP"); 			return T_SEP; 		 	}
-{T_CONCAT} 		{ PUT_TOKEN("T_CONCAT");		return T_CONCAT; 		}
-{T_MOD} 		{ PUT_TOKEN("T_MOD");			return T_MOD; 		 	}
-{T_EXP} 		{ PUT_TOKEN("T_EXP");			return T_EXP; 		 	}
-{T_FLOOR} 		{ PUT_TOKEN("T_FLOOR");			return T_FLOOR; 		}
-{T_BIT_AND} 	{ PUT_TOKEN("T_BIT_AND");		return T_BIT_AND; 		}
-{T_BIT_OR} 		{ PUT_TOKEN("T_BIT_OR");		return T_BIT_OR; 		}
-{T_BIT_N_XOR} 	{ PUT_TOKEN("T_BIT_N_XOR");		return T_BIT_N_XOR; 	}
-{T_BIT_RSH} 	{ PUT_TOKEN("T_BIT_RSH");		return T_BIT_RSH; 		}
-{T_BIT_LSH} 	{ PUT_TOKEN("T_BIT_LSH");		return T_BIT_LSH; 		}
-{T_OPENBRACE} 	 { PUT_TOKEN("T_OPENBRACE");	return T_OPENBRACE; 	}
-{T_CLOSEBRACE} 	 { PUT_TOKEN("T_CLOSEBRACE");	return T_CLOSEBRACE; 	}
-{T_OPENBRACKET}  { PUT_TOKEN("T_OPENBRACKET");	return T_OPENBRACKET; 	}
-{T_CLOSEBRACKET} { PUT_TOKEN("T_CLOSEBRACKET");	return T_CLOSEBRACKET; 	}
+{T_OPENPAR}		{ PUT_SYMBOL("T_OPENPAR"); 		 return T_OPENPAR;		}
+{T_CLOSEPAR}    { PUT_SYMBOL("T_CLOSEPAR");      return T_CLOSEPAR;     }
+{T_PLUS} 		{ PUT_SYMBOL("T_PLUS"); 		 return T_PLUS;		 	}
+{T_MINUS} 		{ PUT_SYMBOL("T_MINUS"); 		 return T_MINUS;		}
+{T_TIMES} 		{ PUT_SYMBOL("T_TIMES"); 		 return T_TIMES;		}
+{T_DIV} 		{ PUT_SYMBOL("T_DIV"); 			 return T_DIV;		 	}
+{T_COMMA} 		{ PUT_SYMBOL("T_COMMA"); 		 return T_COMMA;		}
+{T_SEMICOL} 	{ PUT_SYMBOL("T_SEMICOL"); 		 return T_SEMICOL;		}
+{T_COLON} 		{ PUT_SYMBOL("T_COLON"); 		 return T_COLON;		}
+{T_ASSIGN} 		{ PUT_SYMBOL("T_ASSIGN"); 		 return T_ASSIGN;		}
+{T_EQ} 			{ PUT_SYMBOL("T_EQ"); 			 return T_EQ;		 	}
+{T_NEQ} 		{ PUT_SYMBOL("T_NEQ"); 			 return T_NEQ;		 	}
+{T_LTEQ} 		{ PUT_SYMBOL("T_LTEQ"); 		 return T_LTEQ;		 	}
+{T_GTEQ} 		{ PUT_SYMBOL("T_GTEQ"); 		 return T_GTEQ;		 	}
+{T_LT} 			{ PUT_SYMBOL("T_LT"); 			 return T_LT;		 	}
+{T_GT} 			{ PUT_SYMBOL("T_GT"); 			 return T_GT;		 	}
+{T_SEP} 		{ PUT_SYMBOL("T_SEP"); 			 return T_SEP;		 	}
+{T_CONCAT} 		{ PUT_SYMBOL("T_CONCAT");		 return T_CONCAT;		}
+{T_MOD} 		{ PUT_SYMBOL("T_MOD");			 return T_MOD;		 	}
+{T_EXP} 		{ PUT_SYMBOL("T_EXP");			 return T_EXP;		 	}
+{T_FLOOR} 		{ PUT_SYMBOL("T_FLOOR");		 return T_FLOOR;		}
+{T_BIT_AND} 	{ PUT_SYMBOL("T_BIT_AND");		 return T_BIT_AND;		}
+{T_BIT_OR} 		{ PUT_SYMBOL("T_BIT_OR");		 return T_BIT_OR;		}
+{T_BIT_N_XOR} 	{ PUT_SYMBOL("T_BIT_N_XOR");	 return T_BIT_N_XOR;	}
+{T_BIT_RSH} 	{ PUT_SYMBOL("T_BIT_RSH");		 return T_BIT_RSH;		}
+{T_BIT_LSH} 	{ PUT_SYMBOL("T_BIT_LSH");		 return T_BIT_LSH;		}
+{T_LABEL}       { PUT_SYMBOL("T_LABEL");         return T_LABEL;        }
+{T_VARARG}      { PUT_SYMBOL("T_VARARG");        return T_VARARG;       }
+{T_OPENBRACE}    { PUT_SYMBOL("T_OPENBRACE");    return T_OPENBRACE;    }
+{T_CLOSEBRACE}   { PUT_SYMBOL("T_CLOSEBRACE");   return T_CLOSEBRACE;   }
+{T_OPENBRACKET}  { PUT_SYMBOL("T_OPENBRACKET");  return T_OPENBRACKET;  }
+{T_CLOSEBRACKET} { PUT_SYMBOL("T_CLOSEBRACKET"); return T_CLOSEBRACKET; }
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ 
-                    PUT_TOKEN("T_NUMBER"); 
-                    #ifndef LEXICAL_ANALYSER
-                    yylval.integer_number = atoi(yytext);
-                    #endif
-                    return T_NUMBER;
-                }
+{T_NUMBER}		{ PUT_NUMBER("T_NUMBER");       return T_NUMBER;        }
 {T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
@@ -305,10 +314,9 @@ T_UNTIL		until
 {T_FALSE}		{ PUT_TOKEN("T_FALSE"); 		return T_FALSE; 		}
 {T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 		return T_UNTIL; 		}
 
-	/*** VARIABLES, NAMES OR LABELS ***/
+	/*** VARIABLES AND NAMES ***/
 
 {T_NAME}		{ PUT_TOKEN("T_NAME"); 			return T_NAME; 			}
-{T_LABEL}		{ PUT_TOKEN("T_LABEL");			return T_LABEL;			}
 
 	/*** WHITESPACES ***/
 

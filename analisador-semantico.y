@@ -1,4 +1,4 @@
-%expect 20 
+%expect 22
 %{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
@@ -52,10 +52,6 @@ char *string_addr;
     float float_number;
     /* Literal Value */
     char *string_literal;
-    /* Label Definition */
-    char *string_label;
-    /* Variable Name */
-    char *string_variable_name;
     /* String Content */
     char *string_content;
     /* Pointer to a token node */
@@ -67,47 +63,48 @@ char *string_addr;
 /* Symbols */
 
 /* Math Operators */
-%token <string_content> T_PLUS
-%token <string_content> T_MINUS
-%token <string_content> T_TIMES
-%token <string_content> T_DIV
-%token <string_content> T_MOD
-%token <string_content> T_EXP
-%token <string_content> T_FLOOR
+%token T_PLUS
+%token T_MINUS
+%token T_TIMES
+%token T_DIV
+%token T_MOD
+%token T_EXP
+%token T_FLOOR
 /* -- Precendence -- */
 %left T_TIMES T_DIV
 %left T_PLUS T_MINUS
 /* Boolean Operators */
-%token <string_content> T_EQ
-%token <string_content> T_NEQ
-%token <string_content> T_LTEQ
-%token <string_content> T_GTEQ
-%token <string_content> T_LT
-%token <string_content> T_GT
+%token T_EQ
+%token T_NEQ
+%token T_LTEQ
+%token T_GTEQ
+%token T_LT
+%token T_GT
 /* -- Precendence -- */
 %left T_EQ T_NEQ T_LTEQ T_GTEQ T_LT T_GT
 /* Separators and assign */
-%token <string_content> T_COMMA
-%token <string_content> T_SEMICOL
-%token <string_content> T_ASSIGN
+%token T_COMMA
+%token T_SEMICOL
+%token T_ASSIGN
 /* Bit-a-Bit Operators */
-%token <string_content> T_BIT_AND
-%token <string_content> T_BIT_OR
-%token <string_content> T_BIT_N_XOR
-%token <string_content> T_BIT_RSH
-%token <string_content> T_BIT_LSH
+%token T_BIT_AND
+%token T_BIT_OR
+%token T_BIT_N_XOR
+%token T_BIT_RSH
+%token T_BIT_LSH
 /* Encapsulation Symbols */
-%token <string_content> T_OPENPAR
-%token <string_content> T_CLOSEPAR
-%token <string_content> T_OPENBRACE
-%token <string_content> T_CLOSEBRACE
-%token <string_content> T_OPENBRACKET
-%token <string_content> T_CLOSEBRACKET
+%token T_OPENPAR
+%token T_CLOSEPAR
+%token T_OPENBRACE
+%token T_CLOSEBRACE
+%token T_OPENBRACKET
+%token T_CLOSEBRACKET
 /* Other Symbols */
-%token <string_content> T_CONCAT
-%token <string_content> T_LIST
-%token <string_content> T_SEP
-%token <string_content> T_COLON
+%token T_CONCAT
+%token T_VARARG
+%token T_SEP
+%token T_COLON
+%token T_LABEL
 
 /* Reserved Words */
 
@@ -148,9 +145,7 @@ char *string_addr;
 %token <string_content> T_IN
 
 /* Variable Types */
-
 %token <integer_number> T_NUMBER
-%token <string_label>   T_LABEL
 %token <string_literal> T_LITERAL
 %token <string_content> T_NAME
 
@@ -166,6 +161,7 @@ char *string_addr;
 %type <string_content> opbin
 %type <string_content> opunaria
 %type <string_content> term_elseif
+%type <string_content> label
 
 /* Start Type */
 %start programa
@@ -190,12 +186,15 @@ char *string_addr;
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
 programa        : bloco                                 {
+                                                            /* Store output file result */
                                                             fprintf(output_file, "[programa%s]\n", $1);
+                                                            /* Print Finished Result */
                                                             fprintf(stderr,
                                                                     "::: SYNTATIC/SEMANTIC ANALYSER :::\n"
                                                                     "[programa%s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n",
                                                                     $1);
+                                                            /* Close Output File */
                                                             fclose(output_file);
                                                         }
                 ;
@@ -210,6 +209,8 @@ bloco           : comando comandoret                    { allocate2Tokens($$, " 
 /* -- Commands belong to program, and represent all the actions that can occur -- */
 comando         : comando comando                       { allocate2Tokens($$, "%s %s", $1, $2);                         }
                 | T_SEMICOL                             { allocateToken($$, "[comando [T_SEMICOL ;]]");                 }
+                | label                                 { allocate1Token($$, "[comando %s]", $1);                       }
+                | T_BREAK                               { allocateToken($$, "[comando [T_BREAK break]]");               }
                 | chamadadefuncao                       { allocate1Token($$, "[comando %s]", $1);                       }
                 | listadenomes T_ASSIGN listaexp        { allocate2Tokens($$, "[comando [listadenomes %s] [T_ASSIGN =] [listaexp %s]]", $1, $3);  }
                 | T_DO bloco T_END                                                      {
@@ -280,17 +281,24 @@ comando         : comando comando                       { allocate2Tokens($$, "%
                 | T_LOCAL listadenomes                                                  { allocate1Token($$, "[comando [T_LOCAL local] [listadenomes %s]]", $2);   }
                 ;
 
+
+label           : T_LABEL T_NAME T_LABEL                { allocate1Token($$, "[T_LABEL ::] [T_NAME %s] [T_LABEL ::]", $2);  }
+
+
+
 term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco { allocate3Tokens($$,"%s [T_ELSEIF elseif] %s [T_THEN then]%s", $1, $3, $5);          }
-                | /* Empty */                           { allocateToken($$, "");            }
+                | /* Empty */                           { allocateToken($$, "");                                            }
                 ;
 
-comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[comandoret [T_RETURN return] [listaexp %s] [T_SEMICOL ;]]", $2);        }
-                | T_RETURN listaexp                     { allocate1Token($$, "[comandoret [T_RETURN return] [listaexp %s]]", $2);                    }
+comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[comandoret [T_RETURN return] [listaexp %s] [T_SEMICOL ;]]", $2);     }
+                | T_RETURN listaexp                     { allocate1Token($$, "[comandoret [T_RETURN return] [listaexp %s]]", $2);                   }
                 | T_RETURN T_SEMICOL                    { allocateToken($$, "[comandoret [T_RETURN return] [T_SEMICOL ;]]");                        }
                 | T_RETURN                              { allocateToken($$, "[comandoret [T_RETURN return]]");                                      }
                 ;
 
 exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");                           }
+                | T_TRUE                                { allocateToken($$, "[exp [T_TRUE true]]");                         }
+                | T_FALSE                               { allocateToken($$, "[exp [T_FALSE false]]");                       }
                 | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                  }
                 | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                      }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                               }
