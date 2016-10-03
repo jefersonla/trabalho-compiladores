@@ -43,6 +43,10 @@ FILE *output_file;
 /* Contain actual token */
 char *string_addr;
 
+/* Token Data */
+char *all_tokens;
+int last_char;
+
 %}
 
 /* Definition of token iterator */
@@ -192,8 +196,9 @@ programa        : bloco                                 {
                                                             fprintf(stderr,
                                                                     "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
                                                                     "[programa%s]\n\n"
-                                                                    "::: LEXICAL PARSER :::\n",
-                                                                    $1);
+                                                                    "::: LEXICAL PARSER :::\n"
+                                                                    "%s",
+                                                                    $1, all_tokens);
                                                             /* Close Output File */
                                                             fclose(output_file);
                                                         }
@@ -201,7 +206,7 @@ programa        : bloco                                 {
 
 /* -- Block are sections of code -- */
 bloco           : comando comandoret                    { allocate2Tokens($$, " [bloco %s %s]", $1, $2);                }
-                | comandoret                            { allocate1Token($$, " [bloco %s]", $1);                        }    
+                | comandoret                            { allocate1Token($$, " [bloco %s]", $1);                        }
                 | comando                               { allocate1Token($$, " [bloco %s]", $1);                        }
                 | /* Empty */                           { allocateToken($$, "");                                        }
                 ;
@@ -316,7 +321,7 @@ listadenomes    : T_NAME                                { allocate1Token($$, "[T
                 ;
 
 listaexp        : exp                                   { allocate1Token($$, "%s", $1);                                     }
-                | listaexp T_COMMA exp                  { allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);                 } 
+                | listaexp T_COMMA exp                  { allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);                 }
                 ;
 
 opbin           : T_PLUS                                { allocateToken($$, "[opbin [T_PLUS +]]");           }
@@ -453,6 +458,11 @@ int main(int argc, char *argv[]){
 
     // Output File for Flex
     output_file = fopen(output_filename, "w");
+
+    /* Token Data Initialization */
+    last_char = 0;
+    all_tokens = calloc(sizeof(char), 1);
+    all_tokens[0] = '\0';
 
     /* Parse entire file */
     int yyparse_return = yyparse();

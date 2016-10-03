@@ -76,15 +76,24 @@
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
 FILE *output_file;
-#else
+#elif DEBUG
+/* Store a list of all tokens */
+extern char *all_tokens;
+extern int last_char;
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
                                             yylval.string_content = malloc(strlen(yytext)+1); \
                                             strcpy(yylval.string_content, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_SYMBOL(TOKEN)               do{ \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
                                             yytext++; \
@@ -92,12 +101,52 @@ FILE *output_file;
                                             yylval.string_literal = malloc(strlen(yytext)+1); \
                                             strcpy(yylval.string_literal, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
+
                                         }while(0)
 #define PUT_NUMBER(TOKEN)               do{ \
                                             yylval.integer_number = atoi(yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
+#else
+/* Store a list of all tokens */
+extern char *all_tokens;
+extern int last_char;
+/* General Macros */
+#define PUT_TOKEN(TOKEN) 				do{ \
+                                            yylval.string_content = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.string_content, yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
+                                        }while(0)
+#define PUT_SYMBOL(TOKEN)               do{ \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
+                                        }while(0)
+#define PUT_LITERAL(TOKEN) 				do{ \
+                                            yytext++; \
+                                            yytext[strlen(yytext)-1] = 0; \
+                                            yylval.string_literal = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.string_literal, yytext); \
+                                            all_tokens = realloc(&all_tokens[last_char], (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(all_tokens,"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
+                                        }while(0)
+#define PUT_NUMBER(TOKEN)               do{ \
+                                            yylval.integer_number = atoi(yytext); \
+                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
+                                            last_char = strlen(all_tokens); \
+                                        }while(0)
+#define PRINT_COMMENT_DEBUG()
 #endif
 
 /*
@@ -365,7 +414,7 @@ T_UNTIL		until
             printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n");
             #else
             /* Just tell that the program has ended */
-            // TODO!
+            all_tokens[last_char - 2] = 0;
             #endif
             return EXIT_SUCCESS;
 		}
