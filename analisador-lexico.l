@@ -362,7 +362,7 @@ T_UNTIL		until
             fclose(copy_tmp_file);
             remove(copy_tmp_filename);
             // Print Complete message
-            printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n\n");
+            printf("\n::: LEX PARSER PROCESS END WITHOUT ERRORS! :::\n");
             #else
             /* Just tell that the program has ended */
             // TODO!

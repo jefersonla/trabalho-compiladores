@@ -1,4 +1,4 @@
-%expect 22
+%expect 52
 %{
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
@@ -190,7 +190,7 @@ programa        : bloco                                 {
                                                             fprintf(output_file, "[programa%s]\n", $1);
                                                             /* Print Finished Result */
                                                             fprintf(stderr,
-                                                                    "::: SYNTATIC/SEMANTIC ANALYSER :::\n"
+                                                                    "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
                                                                     "[programa%s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n",
                                                                     $1);
@@ -284,8 +284,6 @@ comando         : comando comando                       { allocate2Tokens($$, "%
 
 label           : T_LABEL T_NAME T_LABEL                { allocate1Token($$, "[T_LABEL ::] [T_NAME %s] [T_LABEL ::]", $2);  }
 
-
-
 term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco { allocate3Tokens($$,"%s [T_ELSEIF elseif] %s [T_THEN then]%s", $1, $3, $5);          }
                 | /* Empty */                           { allocateToken($$, "");                                            }
                 ;
@@ -297,13 +295,15 @@ comandoret      : T_RETURN listaexp T_SEMICOL           { allocate1Token($$, "[c
                 ;
 
 exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");                           }
+                | T_VARARG                              { allocateToken($$, "[exp [T_VARARG ...]]");                        }
                 | T_TRUE                                { allocateToken($$, "[exp [T_TRUE true]]");                         }
                 | T_FALSE                               { allocateToken($$, "[exp [T_FALSE false]]");                       }
                 | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                  }
+                | T_LITERAL                             { allocateTokenNum($$, "[exp [T_LITERAL %s]]", $1);                 }
                 | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                      }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                               }
-                | opbin                                 { allocate1Token($$, "[exp %s]", $1);                               }
-                | opunaria exp                          { allocate2Tokens($$, "[exp [opunaria %s] %s]", $1, $2);            }
+                | exp opbin exp                         { allocate3Tokens($$, "[exp %s %s %s]", $1, $2, $3);                }
+                | opunaria exp                          { allocate2Tokens($$, "[exp %s %s]", $1, $2);            }
                 | T_OPENPAR exp T_CLOSEPAR              { allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);  }
                 ;
 
@@ -319,22 +319,32 @@ listaexp        : exp                                   { allocate1Token($$, "%s
                 | listaexp T_COMMA exp                  { allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);                 } 
                 ;
 
-opbin           : exp T_PLUS exp                        { allocate2Tokens($$, "%s [opbin [T_PLUS +]] %s", $1, $3);  }
-                | exp T_MINUS exp                       { allocate2Tokens($$, "%s [opbin [T_MINUS -]] %s", $1, $3); }
-                | exp T_TIMES exp                       { allocate2Tokens($$, "%s [opbin [T_TIMES *]] %s", $1, $3); }
-                | exp T_DIV exp                         { allocate2Tokens($$, "%s [opbin [T_DIV /]] %s", $1, $3);   }
-                | exp T_LT exp                          { allocate2Tokens($$, "%s [opbin [T_LT <]] %s", $1, $3);    }
-                | exp T_LTEQ exp                        { allocate2Tokens($$, "%s [opbin [T_LTEQ <=]] %s", $1, $3); }
-                | exp T_GT exp                          { allocate2Tokens($$, "%s [opbin [T_GT >]] %s", $1, $3);    }
-                | exp T_GTEQ exp                        { allocate2Tokens($$, "%s [opbin [T_GTEQ >=]] %s", $1, $3); }
-                | exp T_EQ exp                          { allocate2Tokens($$, "%s [opbin [T_EQ ==]] %s", $1, $3);   }
-                | exp T_NEQ exp                         { allocate2Tokens($$, "%s [opbin [T_NEQ ~=]] %s", $1, $3);  }
-                | exp T_AND exp                         { allocate2Tokens($$, "%s [opbin [T_AND and]] %s", $1, $3); }
-                | exp T_OR exp                          { allocate2Tokens($$, "%s [opbin [T_OR or]] %s", $1, $3);   }
+opbin           : T_PLUS                                { allocateToken($$, "[opbin [T_PLUS +]]");           }
+                | T_MINUS                               { allocateToken($$, "[opbin [T_MINUS -]]");          }
+                | T_TIMES                               { allocateToken($$, "[opbin [T_TIMES *]]");          }
+                | T_DIV                                 { allocateToken($$, "[opbin [T_DIV /]]");            }
+                | T_FLOOR                               { allocateToken($$, "[opbin [T_FLOOR //]]");         }
+                | T_EXP                                 { allocateToken($$, "[opbin [T_EXP ^]]");            }
+                | T_MOD                                 { allocateToken($$, "[opbin [T_MOD %%]]");           }
+                | T_BIT_AND                             { allocateToken($$, "[opbin [T_BIT_AND &]]");        }
+                | T_BIT_OR                              { allocateToken($$, "[opbin [T_BIT_OR |]]");         }
+                | T_BIT_N_XOR                           { allocateToken($$, "[opbin [T_BIT_XOR ~]]");        }
+                | T_BIT_LSH                             { allocateToken($$, "[opbin [T_BIT_LSH <<]]");       }
+                | T_BIT_RSH                             { allocateToken($$, "[opbin [T_BIT_RSH >>]]");       }
+                | T_CONCAT                              { allocateToken($$, "[opbin [T_CONCAT ..]]");        }
+                | T_LT                                  { allocateToken($$, "[opbin [T_LT <]]");             }
+                | T_LTEQ                                { allocateToken($$, "[opbin [T_LTEQ <=]]");          }
+                | T_GT                                  { allocateToken($$, "[opbin [T_GT >]]");             }
+                | T_GTEQ                                { allocateToken($$, "[opbin [T_GTEQ >=]]");          }
+                | T_EQ                                  { allocateToken($$, "[opbin [T_EQ ==]]");            }
+                | T_NEQ                                 { allocateToken($$, "[opbin [T_NEQ ~=]]");           }
+                | T_AND                                 { allocateToken($$, "[opbin [T_AND and]]");          }
+                | T_OR                                  { allocateToken($$, "[opbin [T_OR or]]");            }
                 ;
 
-opunaria        : T_MINUS                               { allocateToken($$, "[T_MINUS -]"); }
-                | T_NOT                                 { allocateToken($$, "[T_NOT not]"); }
+opunaria        : T_MINUS                               { allocateToken($$, "[opunaria [T_MINUS -]]");     }
+                | T_NOT                                 { allocateToken($$, "[opunaria [T_NOT not]]");     }
+                | T_BIT_N_XOR                           { allocateToken($$, "[opunaria [T_BIT_NOT ~]]");   }
                 ;
 
 %%
@@ -439,7 +449,7 @@ int main(int argc, char *argv[]){
 
     // Message of starting compilation
     printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
-            "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n\n", argv[0]);
+            "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n", argv[0]);
 
     // Output File for Flex
     output_file = fopen(output_filename, "w");
