@@ -2,7 +2,7 @@
 /** **** Analisador  Semantico **** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
-/** Versão      1.0                 **/
+/** Versão      0.2                 **/
 /** Linguagem   LUA                 **/
 /** Licença     MIT                 **/
 /** Descrição:  Analisador          **/
@@ -354,8 +354,10 @@ opunaria        : T_MINUS                               { allocateToken($$, "[op
  * @param s String with error informated.
  */
 void yyerror(const char *s) {
-    fprintf(stdout, "%s\n", s);
+    fprintf(stderr, "\nFailled to compile this file. An error has occurred.\n");
+    fprintf(stderr, "%s\n", s);
     fclose(output_file);
+    free(all_tokens);
     exit(EXIT_FAILURE);
 }
 
@@ -446,7 +448,7 @@ int main(int argc, char *argv[]){
 
     // Message of starting compilation
     printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
-            "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n", argv[0]);
+            "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n", output_filename);
 
     // Output File for Flex
     output_file = fopen(output_filename, "w");

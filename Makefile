@@ -41,6 +41,9 @@ main: parser lexical
 	@printf "TODO: Constroi ultima parte do compilador\n"
 	@printf "Compilation Finished With Success!\n"
 
+# Compilação Analisador Léxico e Sintático/Semântico com flags de DEBUG
+debug: parser-debug lexical-debug
+
 # Compilação Analisador Sintático/Semântico
 parser: lex.yy.c y.tab.c $(PARSER_EXECUTABLE)
 
@@ -49,7 +52,7 @@ y.tab.c: $(BISON_SRC)
 	bison $(BISON_SRC) -d -o y.tab.c
 
 # Compilação Bison em modo Debug
-parser_debug: debug.lex.yy.c debug.y.tab.c debug_parser_executable
+parser-debug: debug.lex.yy.c debug.y.tab.c debug_parser_executable
 
 # Compilação Bison Debug
 debug.y.tab.c:
@@ -71,7 +74,7 @@ lex.yy.c: $(FLEX_SRC)
 	flex $(FLEX_FLAGS) $(FLEX_SRC)
 
 # Compilação Flex em modo Debug
-lexical_debug: debug.lex.yy.c debug_lexical_executable
+lexical-debug: debug.lex.yy.c debug_lexical_executable
 
 # Compilação Flex Debug
 debug.lex.yy.c: $(FLEX_SRC)
@@ -86,8 +89,8 @@ $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
 	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
 
 # Realiza os testes nos executaveis
-check: lexical-test parser-test 
-test: lexical-test parser-test
+check: lexical-test parser-test
+#test: lexical-test parser-test
 
 # Executa todos os testes
 all-tests: lexical-all-tests parser-all-tests

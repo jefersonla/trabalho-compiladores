@@ -14,7 +14,7 @@
 /** ****** Analisador Léxico ****** **/
 /** Desenvolvido por Jeferson Lima  **/
 /**              e   Jefferson Renê **/
-/** Versão      1.0                 **/
+/** Versão      0.2                 **/
 /** Linguagem   LUA                 **/
 /** Licença     MIT                 **/
 /** Descrição:  Analisador léxico   **/
@@ -465,7 +465,7 @@ int main( int argc, char **argv ) {
 
     /* Code Begin Message */
 	printf( " ::: LUA MIPS Compiler - Lexical Analyser ::: \n"  \
-            "Version 0.1 - Pre Alpha - LUA 5.3 Compilant\n"     \
+            "Version 0.2 - Pre Alpha - LUA 5.3 Compilant\n"     \
             "Developed by Jeferson Lima and Jefferson Rene\n"   \
             "\n");
 
@@ -494,8 +494,7 @@ int main( int argc, char **argv ) {
 			yyin = fopen(argv[0], "r");
 
             // Print specified format
-            printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n"
-                    ":: OUTPUT FILE WILL BE %s.out ::", argv[0]);
+            printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n");
 
 			// Output filename will be input_name+.out
 			strcpy(output_filename, argv[0]);
@@ -518,7 +517,8 @@ int main( int argc, char **argv ) {
 	}
 
     // Message of starting compilation
-    printf("::: STARTING LEX PARSER PROCESS :::\n\n");
+    printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
+            "::: STARTING LEX PARSER PROCESS :::\n", output_filename);
 
 	// Output File for Flex
 	output_file = fopen(output_filename, "w");
