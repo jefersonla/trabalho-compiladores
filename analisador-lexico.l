@@ -57,7 +57,7 @@
 
 /* Common define */
 #define yyerrorfound -1
-#define yycheckstate(VAR) (VAR != yyerrorfound)
+#define yycheckstate(VAR) (VAR == yyerrorfound ? 1 : 0)
 
 #ifdef LEXICAL_ANALYSER
 /* General Macros */
