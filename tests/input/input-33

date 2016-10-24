@@ -1,0 +1,1 @@
+q = 42 if 2 + 2 == 4 then local q = 54 print(q) end print(q)

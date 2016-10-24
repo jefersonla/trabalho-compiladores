@@ -31,26 +31,26 @@ else
 fi
 
 # Give the default name for out file
-OUPUT_FILE=$2.out
+OUTPUT_FILE="$2.out"
 
 # If there are a third parameter
 if [ ! -z "$3" ]
 then
-	OUPUT_FILE=$3
+	OUTPUT_FILE="$3"
 fi
 
 # Expected file
-EXPECTED_FILE=$2.exp
+EXPECTED_FILE="$2.exp"
 
 # If there are a fourth parameter
 if [ ! -z "$4" ]
 then
-	EXPECTED_FILE=$4
+	EXPECTED_FILE="$4"
 fi
 
 # Check if the other file exist
 # Check if file exists and can be executed
-if [ -e "$OUPUT_FILE" ]
+if [ -e "$OUTPUT_FILE" ]
 then
 	# File EXIST
 	echo ">> TESTING $2 WITH BINARY $1" 
@@ -60,7 +60,7 @@ else
 fi
 
 # Compara os resultados
-DIFF=$(diff -q "$OUPUT_FILE" "$EXPECTED_FILE")
+DIFF=$(diff -q "$OUTPUT_FILE" "$EXPECTED_FILE")
 
 if [ "$DIFF" != "" ]
 then
@@ -71,7 +71,7 @@ then
 		# Use the following command to make it more faster
 		# It will disable open browser after create diff
 		# cat "$(whereis diffchecker | cut -d ":" -f 2 | cut -d " " -f 2- | rev | cut -d "/" -f 2- | rev)/$(readlink -- $(whereis diffchecker) | rev | cut -d "/" -f 2- | rev)/transmit.js" | tr '\n' '\f' | sed -e 's/(0, _opener2.default)(url, function () {\f        process.exit();\f      });/\/\/(0, _opener2.default)(url, function () {\f        \/\/process.exit();\f      \/\/});/' | tr '\f' '\n' > transmit.js && sudo mv transmit.js "$(whereis diffchecker | cut -d ":" -f 2 | cut -d " " -f 2- | rev | cut -d "/" -f 2- | rev)/$(readlink -- $(whereis diffchecker) | rev | cut -d "/" -f 2- | rev)/transmit.js"
-		diffchecker --expires day "$OUPUT_FILE" "$EXPECTED_FILE"
+		diffchecker --expires day "$OUTPUT_FILE" "$EXPECTED_FILE"
 		#vimdiff "$2.out" "$2.exp"
 	else
 		#echo "vimdiff isn't installed"

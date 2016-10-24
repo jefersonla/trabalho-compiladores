@@ -1,0 +1,1 @@
+answer = 42 print(answer) x = 0400 + 00000128 print(x) print(x * 42)

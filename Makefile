@@ -124,6 +124,28 @@ parser-all-tests:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/simple.lua
 	@printf "\n-- Finished Parser All Tests-- \n"
 
+# Parser extra
+check-extra:
+	rm -r tests/testing
+	mkdir tests/testing
+	ls tests/input | \
+	sort |\
+	grep -v '^$$' |\
+	awk '{ \
+			for(i = 1; i <= NF; i++) { \
+				split($$0,a,"-"); \
+				param2="testing-"a[2] ;\
+				param3="output-"a[2] ; \
+				command="./test.sh $(PARSER_EXECUTABLE) tests/input/"$$1" tests/testing/"param2" tests/output/"param3; \
+				system(command); \
+				print param3, param2, $$1 ; \
+				print command; \
+			} \
+		}'
+	
+#./test.sh "$(PARSER_EXECUTABLE)" "tests/input/$$x" "tests/testing/testing-$$y" "tests/output/output-$$y"; \
+# dessa saque só, meu problema é que eu tenho que quebrar aquele ls em varias linhas
+
 # Cria pacote para enviar trabalho
 package:
 	@printf "Creating pkg zip with source code and base files ...\n"
@@ -136,5 +158,5 @@ package:
 # Limpa o ambiente
 clean:
 	@printf "Cleaning project folder...\n"
-	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output pkg pkg.zip
+	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output pkg pkg.zip
 

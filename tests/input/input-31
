@@ -1,0 +1,3 @@
+function intlimit() local step = 2 local condition = 1 while condition do local nextstep = step * 2 if nextstep - (nextstep - 1) == 1 and nextstep > 0 then step = nextstep else condition = 0 end end local limit = step step = step / 2 while step > 0 do local nextlimit = limit + step if nextlimit - (nextlimit - 1) == 1 and nextlimit > 0 then limit = nextlimit end step = step / 2 end return limit end
+
+print(intlimit())

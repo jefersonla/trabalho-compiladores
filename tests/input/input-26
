@@ -1,0 +1,3 @@
+function teste(x) if x >= 40 then return end print(x) teste(x + 3) teste(x + 10) teste(x * 2 + 5) end
+
+teste(0)

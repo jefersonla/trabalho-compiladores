@@ -1,0 +1,1 @@
+true = 1 false = 0 if nil then print(1) else print(0) end if false then print(1) else print(0) end if true then print(1) else print(0) end if 1 then print(1) else print(0) end if 42 then print(1) else print(0) end if 0 then print(1) else print(0) end

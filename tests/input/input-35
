@@ -1,0 +1,1 @@
+print(1 and 2 and 3 or 4 and 5 and 6 or 7 and 8 and 9)
