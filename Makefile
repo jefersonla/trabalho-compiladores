@@ -158,5 +158,5 @@ package:
 # Limpa o ambiente
 clean:
 	@printf "Cleaning project folder...\n"
-	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output pkg pkg.zip
+	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h tests/testing/* *.o $(EXECUTABLES) *.out tests/lexical/*.out tests/parser/*.out *.output pkg pkg.zip
 

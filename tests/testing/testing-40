@@ -1,1 +1,0 @@
-[programa [bloco [comando [T_IF if] [exp [exp [T_NUMBER 5]] [opbin [T_EQ ==]] [exp [exp [T_NUMBER 2]] [opbin [T_PLUS +]] [exp [T_NUMBER 2]]]] [T_THEN then] [T_ELSE else] [T_END end]] [comando [chamadadefuncao [T_NAME print] [T_OPENPAR (] [listaexp [exp [T_NUMBER 10]]] [T_CLOSEPAR )]]]]]
