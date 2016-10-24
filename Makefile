@@ -142,9 +142,6 @@ check-extra:
 				print command; \
 			} \
 		}'
-	
-#./test.sh "$(PARSER_EXECUTABLE)" "tests/input/$$x" "tests/testing/testing-$$y" "tests/output/output-$$y"; \
-# dessa saque só, meu problema é que eu tenho que quebrar aquele ls em varias linhas
 
 # Cria pacote para enviar trabalho
 package:
