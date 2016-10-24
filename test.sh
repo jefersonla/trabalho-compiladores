@@ -20,16 +20,6 @@ then
     exit 1
 fi
 
-# Check if file exists and can be executed
-if [ -e "$1" ] && [ -s "$1" ] && [ -x "$1" ]
-then
-	# Execute compiled code and save the result in a test file
-	"./$1" "$2" > /dev/null 2>&1
-else
-	echo "[ERROR] FILE NOT EXIST, IS EMPTY OR CAN'T BE EXECUTABLE!"
-	exit 1
-fi
-
 # Give the default name for out file
 OUTPUT_FILE="$2.out"
 
@@ -37,6 +27,16 @@ OUTPUT_FILE="$2.out"
 if [ ! -z "$3" ]
 then
 	OUTPUT_FILE="$3"
+fi
+
+# Check if file exists and can be executed
+if [ -e "$1" ] && [ -s "$1" ] && [ -x "$1" ]
+then
+	# Execute compiled code and save the result in a test file
+	"./$1" "$2" "$OUTPUT_FILE" > /dev/null 2>&1
+else
+	echo "[ERROR] FILE NOT EXIST, IS EMPTY OR CAN'T BE EXECUTABLE!"
+	exit 1
 fi
 
 # Expected file

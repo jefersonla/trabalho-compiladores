@@ -370,7 +370,7 @@ exp             : T_NIL                                 { allocateToken($$, "[ex
                 | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                              }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                                       }
                 | exp opbin exp                         { allocate3Tokens($$, "[exp %s %s %s]", $1, $2, $3);                        }
-                | opunaria exp                          { allocate2Tokens($$, "[exp %s %s]", $1, $2);            }
+                | opunaria exp                          { allocate2Tokens($$, "[exp %s %s]", $1, $2);                               }
                 | T_OPENPAR exp T_CLOSEPAR              { allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);          }
                 ;
 

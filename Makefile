@@ -133,7 +133,7 @@ check-extra:
 	grep -v '^$$' |\
 	awk '{ \
 			for(i = 1; i <= NF; i++) { \
-				split($$0,a,"-"); \
+				split($$1,a,"-"); \
 				param2="testing-"a[2] ;\
 				param3="output-"a[2] ; \
 				command="./test.sh $(PARSER_EXECUTABLE) tests/input/"$$1" tests/testing/"param2" tests/output/"param3; \
