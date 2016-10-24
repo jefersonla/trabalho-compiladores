@@ -1,0 +1,6 @@
+# PKG Makefile 
+# Trabalho de Compiladores Jeferson Lima e Jefferson Rene
+all:
+	bison analisador-semantico.y -d -o y.tab.c
+	flex analisador-lexico.l
+	gcc -o compilador y.tab.c lex.yy.c -lm

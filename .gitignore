@@ -4,6 +4,10 @@
 *.o
 *.obj
 
+# Dist Files
+pkg/*
+pkg.zip
+
 # Precompiled Headers
 *.gch
 *.pch

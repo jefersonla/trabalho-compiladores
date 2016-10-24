@@ -1,4 +1,4 @@
-﻿# Compilador a ser usado
+# Compilador a ser usado
 CC=gcc
 # Flags para o compilador
 CFLAGS=-Wall -Wextra -Wno-unused-function -Wno-sign-compare
@@ -30,6 +30,8 @@ FLEX_HEADER_FILE=lex.yy.h
 BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
+# Package files
+PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h
 
 # Rota padrão
 all: main
@@ -122,8 +124,17 @@ parser-all-tests:
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/simple.lua
 	@printf "\n-- Finished Parser All Tests-- \n"
 
+# Cria pacote para enviar trabalho
+package:
+	@printf "Creating pkg zip with source code and base files ...\n"
+	@\rm -rf pkg pkg.zip
+	mkdir pkg
+	cp $(PKG_FILES) pkg/
+	cp pkgMakefile pkg/Makefile
+	zip -j pkg.zip pkg/*
+
 # Limpa o ambiente
 clean:
 	@printf "Cleaning project folder...\n"
-	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output
+	@\rm -f *.yy.c *.yy.h *.tab.c *.tab.h *.o $(EXECUTABLES) *.out tests/parser/*.out tests/lexical/*.out *.output pkg pkg.zip
 

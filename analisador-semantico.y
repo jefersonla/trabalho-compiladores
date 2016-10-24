@@ -148,7 +148,7 @@ int last_char;
 %token <string_content> T_IN
 
 /* Variable Types */
-%token <integer_number> T_NUMBER
+%token <string_content> T_NUMBER
 %token <string_literal> T_LITERAL
 %token <string_content> T_NAME
 
@@ -365,8 +365,8 @@ exp             : T_NIL                                 { allocateToken($$, "[ex
                 | T_VARARG                              { allocateToken($$, "[exp [T_VARARG ...]]");                                }
                 | T_TRUE                                { allocateToken($$, "[exp [T_TRUE true]]");                                 }
                 | T_FALSE                               { allocateToken($$, "[exp [T_FALSE false]]");                               }
-                | T_NUMBER                              { allocateTokenNum($$, "[exp [T_NUMBER %d]]", $1);                          }
-                | T_LITERAL                             { allocateTokenNum($$, "[exp [T_LITERAL %s]]", $1);                         }
+                | T_NUMBER                              { allocate1Token($$, "[exp [T_NUMBER %s]]", $1);                            }
+                | T_LITERAL                             { allocate1Token($$, "[exp [T_LITERAL %s]]", $1);                           }
                 | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1);                              }
                 | chamadadefuncao                       { allocate1Token($$, "[exp %s]", $1);                                       }
                 | exp opbin exp                         { allocate3Tokens($$, "[exp %s %s %s]", $1, $2, $3);                        }

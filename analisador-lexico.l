@@ -332,7 +332,7 @@ T_UNTIL		until
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ PUT_NUMBER("T_NUMBER");       return T_NUMBER;        }
+{T_NUMBER}		{ PUT_TOKEN("T_NUMBER");       return T_NUMBER;         }
 {T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
