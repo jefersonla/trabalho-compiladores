@@ -362,8 +362,8 @@ T_UNTIL		until
 {T_GLOBAL}		{ PUT_TOKEN("T_GLOBAL"); 		return T_GLOBAL; 		}
 {T_IN}			{ PUT_TOKEN("T_IN"); 			return T_IN; 			}
 {T_REPEAT}		{ PUT_TOKEN("T_REPEAT"); 		return T_REPEAT; 		}
-{T_TRUE}		{ PUT_TOKEN("T_TRUE"); 			return T_TRUE; 			}
-{T_FALSE}		{ PUT_TOKEN("T_FALSE"); 		return T_FALSE; 		}
+    /*** {T_TRUE}		{ PUT_TOKEN("T_TRUE"); 			return T_TRUE; 			} ***/
+    /*** {T_FALSE}		{ PUT_TOKEN("T_FALSE"); 		return T_FALSE; 		} ***/
 {T_UNTIL}		{ PUT_TOKEN("T_UNTIL"); 		return T_UNTIL; 		}
 
 	/*** VARIABLES AND NAMES ***/

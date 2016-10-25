@@ -161,8 +161,8 @@ int last_char;
 /* Extra Reserved Words */
 
 /* Boolean Names */
-%token <token_node> T_TRUE
-%token <token_node> T_FALSE
+/*%token <token_node> T_TRUE*/
+/*%token <token_node> T_FALSE*/
 /* Other Loop Expression */
 %token <token_node> T_REPEAT
 %token <token_node> T_UNTIL
@@ -390,8 +390,8 @@ comandoret      : T_RETURN listaexp T_SEMICOL           {
 
 exp             : T_NIL                                 { allocateToken($$, "[exp [T_NIL nil]]");                                   }
                 | T_VARARG                              { allocateToken($$, "[exp [T_VARARG ...]]");                                }
-                | T_TRUE                                { allocateToken($$, "[exp [T_TRUE true]]");                                 }
-                | T_FALSE                               { allocateToken($$, "[exp [T_FALSE false]]");                               }
+                /*| T_TRUE                                { allocateToken($$, "[exp [T_TRUE true]]");                                 }*/
+                /*| T_FALSE                               { allocateToken($$, "[exp [T_FALSE false]]");                               }*/
                 | T_NUMBER                              { allocate1Token($$, "[exp [T_NUMBER %s]]", $1.str_val);                            }
                 | T_LITERAL                             { allocate1Token($$, "[exp [T_LITERAL %s]]", $1);                           }
                 | T_NAME                                { allocate1Token($$, "[exp [T_NAME %s]]", $1.str_val);                              }
