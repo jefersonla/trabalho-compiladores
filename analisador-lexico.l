@@ -47,6 +47,9 @@
 /* Language definitions and types */
 #include "lexical.defs.h"
 
+/* Estruturas de Token */
+#include "token_struct.h"
+
 /* Change name of the import if debug mode is enabled */
 #ifdef DEBUG_MODE
 #include "debug.y.tab.h"
@@ -82,8 +85,8 @@ extern char *all_tokens;
 extern int last_char;
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.string_content = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.string_content, yytext); \
+                                            yylval.token_node.str_val = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.token_node.str_val, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
                                             all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
@@ -120,8 +123,8 @@ extern char *all_tokens;
 extern int last_char;
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.string_content = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.string_content, yytext); \
+                                            yylval.token_node.str_val = malloc(strlen(yytext)+1); \
+                                            strcpy(yylval.token_node.str_val, yytext); \
                                             all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
@@ -332,7 +335,7 @@ T_UNTIL		until
 
 	/*** SOME TYPES OF VALUES ***/
 
-{T_NUMBER}		{ PUT_TOKEN("T_NUMBER");       return T_NUMBER;         }
+{T_NUMBER}		{ PUT_TOKEN("T_NUMBER");        return T_NUMBER;        }
 {T_LITERAL}     { PUT_LITERAL("T_LITERAL"); 	return T_LITERAL; 		}
 
 	/*** RESERVED WORDS ***/
