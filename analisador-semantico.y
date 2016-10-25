@@ -611,7 +611,7 @@ int main(int argc, char *argv[]){
                             ".text\n.globl  main\n"
                             "%sli $v0, 10\n"
                             "syscall\n";
-    code_gen = (char *) calloc(sizeof(char), strlen(mips_header));
+    code_gen = (char *) calloc(strlen(mips_header), sizeof(char));
     strcpy(code_gen, mips_header);
 
     // Message of starting compilation
@@ -623,7 +623,7 @@ int main(int argc, char *argv[]){
 
     /* Token Data Initialization */
     last_char = 0;
-    all_tokens = calloc(sizeof(char), 1);
+    all_tokens = calloc(1, sizeof(char));
     all_tokens[0] = '\0';
 
     /* Parse entire file */
