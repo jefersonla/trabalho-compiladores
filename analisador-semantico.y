@@ -49,6 +49,9 @@ char *string_addr;
 char *all_tokens;
 int last_char;
 
+/* Generated Code */
+char *code_gen;
+
 %}
 
 /* Definition of token iterator */
@@ -207,15 +210,29 @@ int last_char;
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
 programa        : bloco                                 {
+                                                            #ifdef SEMANTIC_ANALYSER
                                                             /* Store output file result */
                                                             fprintf(output_file, "[programa %s]\n", $1.str_val);
                                                             /* Print Finished Result */
                                                             fprintf(stderr,
                                                                     "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
-                                                                    "[programa%s]\n\n"
+                                                                    "[programa %s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n"
                                                                     "%s",
                                                                     $1.str_val, all_tokens);
+                                                            #else 
+                                                            /* Store output file result */
+                                                            fprintf(output_file, "%s", code_gen);
+                                                            /* Print Finished Result */
+                                                            fprintf(stderr,
+                                                                    "\n::: CODE GENERATOR :::\n"
+                                                                    "%s"
+                                                                    "::: SYNTATIC/SEMANTIC ANALYSER :::\n"
+                                                                    "[programa %s]\n\n"
+                                                                    "::: LEXICAL PARSER :::\n"
+                                                                    "%s",
+                                                                    code_gen, $1.str_val, all_tokens);
+                                                            #endif
                                                             /* Close Output File */
                                                             fclose(output_file);
                                                         }
@@ -587,6 +604,15 @@ int main(int argc, char *argv[]){
 
             return EXIT_FAILURE;
     }
+
+    /* Allocate generated code header */
+    char mips_header[] =    ".data\n"
+                            "_newline: .asciiz \"\\n\"\n"
+                            ".text\n.globl  main\n"
+                            "%sli $v0, 10\n"
+                            "syscall\n";
+    code_gen = (char *) calloc(sizeof(char), strlen(mips_header));
+    strcpy(code_gen, mips_header);
 
     // Message of starting compilation
     printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"

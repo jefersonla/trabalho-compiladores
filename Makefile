@@ -31,7 +31,7 @@ BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
-PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h
+PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.h
 
 # Rota padrão
 all: main
