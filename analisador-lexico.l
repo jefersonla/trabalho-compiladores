@@ -71,7 +71,9 @@
                                             yytext[strlen(yytext)-1] = 0;\
                                             FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);\
                                         }while(0)
+// #### DEPRECATED ####
 #define PUT_NUMBER(TOKEN)               PUT_TOKEN(TOKEN)
+// ####################
 #define PUT_SYMBOL(TOKEN)               PUT_TOKEN(TOKEN)
 #define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
@@ -85,36 +87,33 @@ extern char *all_tokens;
 extern int last_char;
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.token_node.str_val = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.token_node.str_val, yytext); \
+                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.lex_str, yytext); \
+                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.token_str, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_SYMBOL(TOKEN)               do{ \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
                                             yytext++; \
                                             yytext[strlen(yytext)-1] = 0; \
-                                            yylval.string_literal = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.string_literal, yytext); \
+                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.lex_str, yytext); \
+                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.token_str, yytext); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
 
-                                        }while(0)
-#define PUT_NUMBER(TOKEN)               do{ \
-                                            yylval.integer_number = atoi(yytext); \
-                                            printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
 #else
@@ -123,30 +122,28 @@ extern char *all_tokens;
 extern int last_char;
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.token_node.str_val = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.token_node.str_val, yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.lex_str, yytext); \
+                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.token_str, yytext); \
+                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_SYMBOL(TOKEN)               do{ \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
                                             yytext++; \
                                             yytext[strlen(yytext)-1] = 0; \
-                                            yylval.string_literal = malloc(strlen(yytext)+1); \
-                                            strcpy(yylval.string_literal, yytext); \
-                                            all_tokens = realloc(&all_tokens[last_char], (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
+                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.lex_str, yytext); \
+                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
+                                            strcpy(yylval.token_node.token_str, yytext); \
+                                            all_tokens = (char *) realloc(&all_tokens[last_char], (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
                                             sprintf(all_tokens,"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
-                                        }while(0)
-#define PUT_NUMBER(TOKEN)               do{ \
-                                            yylval.integer_number = atoi(yytext); \
-                                            all_tokens = realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
                                             last_char = strlen(all_tokens); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()
@@ -176,13 +173,13 @@ DONE
  * @param error_msg	Message that will represent the error
  */
 #ifdef LEXICAL_ANALYSER
-#define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
+#define PARSE_ERRO(ERROR_MSG) 	do{ 												                \
 									fprintf(stderr,"[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
-                                    fclose(output_file); 							        \
-									remove(output_filename); 						        \
+                                    fclose(output_file);         							        \
+									remove(output_filename);         						        \
 								}while(0)
 #else
-#define PARSE_ERRO(ERROR_MSG) 	do{ 												        \
+#define PARSE_ERRO(ERROR_MSG) 	do{ 												                \
 									fprintf(stderr,"[ERROR] %s at line %d\n", ERROR_MSG, yylineno);	\
 								}while(0)
 #endif

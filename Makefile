@@ -31,7 +31,9 @@ BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
-PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.h
+PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.c token_struct.h $(LIBS_SRC) utils.h
+# Libs sources
+LIBS_SRC=utils.c token_struct.c
 
 # Rota padrão
 all: main
@@ -39,13 +41,27 @@ all: main
 # Pega os dois arquivos
 # TODO Constroi o compilador
 # Por enquanto o compilador vai ser o parser
-main: parser lexical
+main: codegen parser lexical
 	@printf "TODO: Constroi ultima parte do compilador\n"
 	@printf "Compilation Finished With Success!\n"
 
 # Compilação Analisador Léxico e Sintático/Semântico com flags de DEBUG
-debug: parser-debug lexical-debug
+debug: codegen-debug parser-debug lexical-debug
 
+# Compilação Gerador de código
+codegen: lex.yy.c y.tab.c $(EXECUTABLE)
+
+# Compilação Bison em modo Debug
+codegen-debug: debug.lex.yy.c debug.y.tab.c debug_codegen_executable
+
+# Executavel com debug habilitado
+debug_codegen_executable: debug.lex.yy.c debug.y.tab.c
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER) -D DEBUG_MODE 
+
+# Executavel Gerador de código
+$(EXECUTABLE): lex.yy.c y.tab.c
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER) 
+	
 # Compilação Analisador Sintático/Semântico
 parser: lex.yy.c y.tab.c $(PARSER_EXECUTABLE)
 
@@ -62,11 +78,11 @@ debug.y.tab.c:
 
 # Executavel com debug habilitado
 debug_parser_executable: debug.lex.yy.c debug.y.tab.c
-	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(CFLAGS_PARSER) -D DEBUG_MODE
+	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER) -D DEBUG_MODE -D SEMANTIC_ANALYSER 
 
 # Executavel Analisador Semantico/Sintatico
 $(PARSER_EXECUTABLE): lex.yy.c y.tab.c
-	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(CFLAGS_PARSER)
+	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER) -D SEMANTIC_ANALYSER 
 
 # Compilação Analisador Léxico
 lexical: lex.yy.c $(LEXICAL_EXECUTABLE)
@@ -84,11 +100,11 @@ debug.lex.yy.c: $(FLEX_SRC)
 
 # Executavel de Debug Analisador Lexico
 debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
-	$(CC) $(CFLAGS) debug.lex.yy.c -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
+	$(CC) $(CFLAGS) debug.lex.yy.c $(LIBS_SRC) -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER 
 
 # Executavel Analisador Lexico
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
-	$(CC) $(CFLAGS) lex.yy.c -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER
+	$(CC) $(CFLAGS) lex.yy.c $(LIBS_SRC) -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER 
 
 # Realiza os testes nos executaveis
 check: lexical-test parser-test
@@ -128,7 +144,7 @@ parser-all-tests:
 check-extra:
 	rm -r tests/testing
 	mkdir tests/testing
-	ls tests/input | \
+	@ls tests/input | \
 	sort |\
 	grep -v '^$$' |\
 	awk '{ \
@@ -156,4 +172,3 @@ package:
 clean:
 	@printf "Cleaning project folder...\n"
 	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h tests/testing/* *.o $(EXECUTABLES) *.out tests/lexical/*.out tests/parser/*.out *.output pkg pkg.zip
-

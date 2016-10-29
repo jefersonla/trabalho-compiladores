@@ -3,4 +3,4 @@
 all:
 	bison analisador-semantico.y -d -o y.tab.c
 	flex analisador-lexico.l
-	gcc -o compilador y.tab.c lex.yy.c -lm
+	gcc -o compilador y.tab.c lex.yy.c token_struct.c utils.c -lm
