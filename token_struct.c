@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 #include "token_struct.h"
 
 /*------------ Token Structure Methods ------------ */
@@ -20,7 +21,7 @@ TokenNode* newTokenNode(TokenNode *root_token, int token_type){
     
     /* Give a falta error if malloc has errors */
     if(_new_token_node == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T ALLOCATE A NEW TOKEN!\n");
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE A NEW TOKEN!\n");
         exit(EXIT_FAILURE);
     }
     
@@ -50,7 +51,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if malloc has succeed */
     if(_new_token_str == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T ALLOCATE STRING FOR TOKEN!\n");
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
         return false;
     }
     
@@ -79,7 +80,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if malloc has succeed */
     if(_new_lex_str == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T ALLOCATE STRING FOR TOKEN!\n");
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
         return false;
     }
     
@@ -109,21 +110,22 @@ TokenList* newTokenList(){
     
     /* Give a falta error if malloc has errors */
     if(_new_token_node == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T ALLOCATE TOKEN LIST!\n");
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE TOKEN LIST!\n");
         exit(EXIT_FAILURE);
     }
     
     /* Try to allocate an array of tokens */
-    _items_list = (TokenNode**) malloc(sizeof(TokenNode*) * 1);
+    _items_list = (TokenNode**) malloc(sizeof(TokenNode*) * DEFAULT_BLOCK_SIZE);
     
     /* Give a falta error if malloc has errors */
     if(_items_list == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T ALLOCATE ITEMS OF THE TOKEN LIST!\n");
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ITEMS OF THE TOKEN LIST!\n");
         exit(EXIT_FAILURE);
     }
     
     /* Initialize token list */
     _new_token_list->length = 0;
+    _new_token_list->size = DEFAULT_BLOCK_SIZE;
     _new_token_list->items = _items_list;
     
     /* Return the new token list */
@@ -146,20 +148,28 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
         return false;
     }
     
-    /* Try reallocate array of token_list items */
-    _reallocated_items = (TokenNode**) realloc(token_list->items, (token_list->length + 1) * sizeof(TokenNode *));
-    
-    /* Give a falta error if malloc has errors */
-    if(_reallocated_items == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNO'T REALLOCATE TOKEN LIST ITEMS!\n");
-        exit(EXIT_FAILURE);
+    /* If array is full, add more empty spaces */
+    if(token_list->length == token_list->size){
+        /* Increase structure size */
+        token_list->size += DEFAULT_BLOCK_SIZE;
+        
+        /* Try reallocate array of token_list items */
+        _reallocated_items = (TokenNode**) realloc( token_list->items,
+                                                    (token_list->size)
+                                                        * sizeof(TokenNode *));
+        
+        /* Give a falta error if malloc has errors */
+        if(_reallocated_items == NULL){
+            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE TOKEN LIST ITEMS!\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Store the pointer to the new items list array */
+        token_list->items = _reallocated_items;
     }
     
     /* Store pointer of the new token on items list */
-    _reallocated_items[token_list->length] = token;
-    
-    /* Store the pointer to the new items list array */
-    token_list->items = _reallocated_items;
+    token_list->items[token_list->length] = token;
     
     /* Increment list length */
     token_list->length += 1;
@@ -227,6 +237,447 @@ TokenList* listGetTokensByType(TokenList *token_list, int token_type){
     
     /* Return token founds */
     return _tokens_found;
+}
+
+/* -------------- Symbol Node Methods ------------- */
+
+/**
+ * Create a new symbol node, if symbol value it's null the symbol is of type nil.
+ * 
+ * @param symbol_name Name of the given symbol.
+ * @param symbol_value Value of the symbol, use NULL to store nil value.
+ * @return A new symbol, or fatal erro cause it fails.
+ */
+SymbolNode* newSymbolNode(char *symbol_name, char *symbol_value){
+    SymbolNode *_new_symbol_node;
+    char *_new_symbol_name;
+    char *_new_symbol_value;
+    
+    /* Try allocate this new symbol */
+    _new_symbol_node = (SymbolNode*) malloc(sizeof(SymbolNode));
+    
+    /* Give a falta error if malloc has errors */
+    if(_new_symbol_node == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Try allocate the name of the new symbol */
+    _new_symbol_name = (char*) malloc(sizeof(char) * (strlen(symbol_name) + 1));
+    
+    /* Give a falta error if malloc has errors */
+    if(_new_symbol_name == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Copy contents of symbol_value if it's not null */
+    if(symbol_value != NULL){
+        _new_symbol_value = (char *) malloc(sizeof(char) * (strlen(symbol_value) + 1));
+        
+        /* Give a falta error if malloc has errors */
+        if(_new_symbol_value == NULL){
+            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL VALUE!\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Copy contents of symbol_value to the new symbol_value */
+        strcpy(_new_symbol_value, symbol_value);
+    }
+    
+    /* Copy content of the symbol name to this new structure */
+    strcpy(_new_symbol_name, symbol_name);
+
+    /* Set the new symbol node */
+    _new_symbol_node->symbol_name = _new_symbol_name;
+    _new_symbol_node->symbol_value = (symbol_value == NULL) ? NULL : _new_symbol_value;
+    _new_symbol_node->isNull = (symbol_value == NULL);
+    
+    /* Return pointer to this new node */
+    return _new_symbol_node;
+}
+
+/**
+ * Compare symbol with a symbol name.
+ * 
+ * @param symbol Symbol which will be compared.
+ * @param symbol_name Name of the symbol to check.
+ * @return true if symbol's are equal and false otherwise.
+ */
+bool symbolEqualsName(SymbolNode *symbol, char *symbol_name){
+    /* Check if symbol is not NULL */
+    if(symbol == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if symbol_name is not NULL */
+    if(symbol_name == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        return false;
+    }
+    
+    /* Compare symbol name of symbol with symbol_name */
+    return (strcmp(symbol->symbol_name, symbol_name) == 0);
+}
+
+
+/**
+ * Set value of symbol.
+ * 
+ * @param symbol symbol which is being seted.
+ * @param symbol_value new symbol value.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool setSymbolValue(SymbolNode *symbol, char *symbol_value){
+    char *_new_symbol_value;
+    
+    /* Check if symbol is not NULL */
+    if(symbol == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL IS NULL!\n");
+        return false;
+    }
+    
+    /* Copy contents of symbol_value if it's not null */
+    if(symbol_value != NULL){
+        _new_symbol_value = (char *) malloc(sizeof(char) * (strlen(symbol_value) + 1));
+        
+        /* Give a falta error if malloc has errors */
+        if(_new_symbol_value == NULL){
+            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL VALUE!\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Copy contents of the symbol_value to the new symbol value */
+        strcpy(_new_symbol_value, symbol_value);
+    }
+    
+    /* Free last symbol value */
+    if(symbol->symbol_value != NULL){
+        free(symbol->symbol_value);
+    }
+    
+    /* Store the new symbol_value */
+    symbol->symbol_value = _new_symbol_value;
+    
+    /* Check the new value is null or not */
+    symbol->isNull = (symbol_value == NULL);
+    
+    /* Return success */
+    return true;
+}
+
+/* ------------- Symbol Table Methods ------------- */
+
+/**
+ * Create a new SymbolTable.
+ * 
+ * @return An empty symbol table.
+ */
+SymbolTable* newSymbolTable(int start_address){
+    SymbolTable *_new_symbol_table;
+    SymbolNode **_items_table;
+    
+    /* Allocate a new symbol table */
+    _new_symbol_table = (SymbolTable*) malloc(sizeof(SymbolTable));
+    
+    /* Give a fatal error if cannot allocate new symbol table */
+    if(_new_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL TABLE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Allocate item symbols */
+    _items_table = (SymbolNode **) malloc(sizeof(SymbolNode *) * DEFAULT_BLOCK_SIZE);
+    
+     /* Give a fatal error if cannot allocate items of the table */
+    if(_items_table == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ARRAY OF SYMBOLS!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Set the new symbol table */
+    _new_symbol_table->length = 0;
+    _new_symbol_table->size = DEFAULT_BLOCK_SIZE;
+    _new_symbol_table->items = _items_table;
+    _new_symbol_table->start_address = start_address;
+    
+    /* Return pointer of the new symbol table */
+    return _new_symbol_table;
+}
+
+/**
+ * Add a new symbol to symbol table.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param symbol Symbol which will be appended to symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol){
+    SymbolNode **_reallocated_items;
+    
+    /* Check if the symbol is already on symbol table */
+    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol->symbol_name){
+        return false;
+    }
+    
+    /* Check if there are space on symbol table */
+    if(symbol_table->length == symbol_table->size){
+        /* Increase structure size */
+        symbol_table->size += DEFAULT_BLOCK_SIZE;
+        
+        /* Try reallocate array of symbol_table items */
+        _reallocated_items = (SymbolNode**) realloc( symbol_table->items,
+                                                    (symbol_table->size)
+                                                        * sizeof(SymbolNode *));
+        
+        /* Give a falta error if malloc has errors */
+        if(_reallocated_items == NULL){
+            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE SYMBOL TABLE ITEMS!\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Store the pointer to the new items list array */
+        symbol_table->items = _reallocated_items;
+    }
+    
+    /* Add the new symbol */
+    symbol_table->items[symbol_table->length] = symbol;
+    
+    /* Increase number of symbols */
+    symbol_table->length += 1;
+    
+    /* Return success */
+    return true;
+}
+
+/**
+ * Check if a symbol of a given name is present on the table.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param symbol_name symbol which is being searched.
+ * @return Return true if symbol name exist on table and false otherwise.
+ */
+bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
+    /* Check if symbol table is not NULL */
+    if(symbol_table == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if symbol_name is not NULL */
+    if(symbol_name == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if the symbol table have elements and them search for */ 
+    if(symbol_table->length != 0){
+        int i;
+        
+        /* Check if symbol table already has a symbol with this name */
+        for(i = 0; i < symbol_table->length; i++){
+            if(symbolEqualsName(symbol_table->items[i], symbol->symbol_name){
+                return true;
+            }
+        }
+    }
+    
+    /* The element is not on symbol table */
+    return false;
+}
+
+/**
+ * Get symbol node by name.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param symbol_name Name of the symbol wanted.
+ * @return A pointer to the symbol with the given name
+ */
+SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symbol_name){
+    /* Check if symbol table is not NULL */
+    if(symbol_table == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if symbol_name is not NULL */
+    if(symbol_name == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if the symbol table have elements and them search for */ 
+    if(symbol_table->length != 0){
+        int i;
+        
+        /* Check if symbol table already has a symbol with this name */
+        for(i = 0; i < symbol_table->length; i++){
+            if(symbolEqualsName(symbol_table->items[i], symbol->symbol_name){
+                return symbol_table->items[i];
+            }
+        }
+    }
+    
+    /* The element is not on symbol table */
+    return NULL;
+}
+
+/**
+ * Set symbol value using symbol name, and symbol value, if symbol value is null.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param symbol_name Name of the symbol that will receive the new value.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTableSetSymbolNodeValue(SymbolTable *symbol_table, char *symbol_name, char *symbol_value){
+    SymbolNode *_symbol_found;
+    
+    /* Check if symbol table is not NULL */
+    if(symbol_table == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if symbol_name is not NULL */
+    if(symbol_name == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        return false;
+    }
+    
+    /* Get Symbol */
+    _symbol_found = symbolTableGetSymbolNodeByName(symbol_table, symbol_name);
+    
+    /* Check if _symbol_found is not NULL */
+    if(_symbol_found == NULL){
+        fprintf(stderr, "[ERROR] CAN'T FIND SYMBOL OR SYMBOL IS NULL!\n");
+        return false;
+    }
+        
+    /* Return success */
+    return setSymbolValue(_symbol_found, symbol_value);
+}
+
+/**
+ * Get a symbol node index by symbol name.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param symbol_name Name of the wanted symbol node index.
+ * @return index of the symbol name or -1 if symbol is not present on table.
+ */
+int symbolTableGetSymbolNodeIndex(SymbolTable *symbol_table, char *symbol_name){
+    /* Check if symbol table is not NULL */
+    if(symbol_table == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if symbol_name is not NULL */
+    if(symbol_name == NULL){
+        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if the symbol table have elements and them search for it */ 
+    if(symbol_table->length != 0){
+        int i;
+        
+        /* Check if symbol table already has a symbol with this name */
+        for(i = 0; i < symbol_table->length; i++){
+            if(symbolEqualsName(symbol_table->items[i], symbol_name){
+                return i + 1;
+            }
+        }
+    }
+    
+    /* The element is not on symbol table */
+    return -1;
+}
+
+/* ---------- Instruction Node Methods ----------- */
+
+/**
+ * Return a new Instruction Node.
+ * 
+ * @param instruction_string string of the instruction.
+ * @param useTab Flag that define if this instruction starts or not with tab or '\t' char.
+ * @param copyInstruction Flag that ask if the user want to copy new instruction or just store the pointer
+ * @return a newly created instruction node.
+ */
+InstructionNode *newInstructionNode(char* instruction_string, bool useTab, bool copyInstruction){
+    InstructionNode *_new_instruction_node;
+    char *_new_instruction_string;
+    
+    /* Try allocate this new instruction */
+    _new_instruction_node = (InstructionNode*) malloc(sizeof(InstructionNode));
+    
+    /* Give a falta error if malloc has errors */
+    if(_new_instruction_node == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Check if the user wants to copy the instruction or use old pointer */
+    if(copyInstruction){
+        /* Try allocate the name of the new instruction */
+        _new_instruction_string = (char*) malloc(sizeof(char) * (strlen(instruction_string) + 1));
+        
+        /* Give a falta error if malloc has errors */
+        if(_new_instruction_string == NULL){
+            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+            exit(EXIT_FAILURE);
+        }
+        
+        /* Copy content to the new instruction */
+        strcopy(_new_instruction_string, instruction_string);
+    }
+    else{
+        /* Store the new pointer into parameter */
+        _new_instruction_string = instruction_string;
+    }
+    
+    /* Set the new instrunction */
+    _new_instruction_node->instruction = _new_instruction_string;
+    _new_instruction_node->useTab = useTab;
+    _new_instruction_node->length = (int) strlen(_new_instruction_string);
+
+    /* Return pointer to the new instruction node */
+    return _new_instruction_node;
+}
+
+/**
+ * Print a instruction node.
+ * 
+ * @param _output_file Output stream file.
+ * @param instruction The instruction that will be printed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool printInstructionNode(FILE *_output_file, InstructionNode *instruction_node){
+    int _fprintf_status;
+    
+    /* Check if instruction node is not NULL */
+    if(instruction_node == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if _output_file is not NULL */
+    if(_output_file == NULL){
+        fprintf(stderr, "[ERROR] OUTPUT FILE IS NULL!\n");
+        return false;
+    }
+    
+    /* Print the instruction */
+    _fprintf_status = fprintf(_output_file, (instruction_node->useTab ? TAB_CHAR : EMPTY_STRING) instruction_node->instruction NEWLINE_CHAR);
+    
+    /* Check if fprintf has worked */
+    if(_fprintf_status < 0){
+        fprintf(stderr, "[ERROR] CANNOT WRITE TO OUTPUT FILE, ERROR %d!\n", _fprintf_status);
+        return false;
+    }
+    
+    /* Sucess */
+    return true;
 }
 
 /* ------------------------------------------------ */
