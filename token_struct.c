@@ -112,18 +112,20 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
  * @param token_root Token root pointer value to be copied to TokenNode.
  * @return true if there's no error on execution and false otherwise.
  */
-bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
-    /* Check if malloc has succeed */
-    if(_new_token_str == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
+bool nodeAddRootToken(TokenNode *token_node, TokenNode *root_token){
+    /* Check if token_node isn't null */
+    if(token_node == NULL){
+        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
         return false;
     }
     
-    /* Store the new token_str array pointer */
-    token_node->token_str = _new_token_str;
+    /* Check if token_node isn't null */
+    if(root_token == NULL){
+        fprintf(stderr, "[INFO] ROOT TOKEN IS NULL!\n");
+    }
     
-    /* Copy content from token_str to the new token */
-    strcpy(token_node->token_str, token_str);
+    /* Store the new token_str array pointer */
+    token_node->root_token = root_token;
     
     /* Return success */
     return true;
@@ -138,13 +140,13 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
  */
 TokenList* newTokenList(){
     TokenList *_new_token_list;
-    TokenNode *_items_list;
+    TokenNode **_items_list;
     
     /* Try allocate a new token list */
     _new_token_list = (TokenList*) malloc(sizeof(TokenList));
     
     /* Give a falta error if malloc has errors */
-    if(_new_token_node == NULL){
+    if(_new_token_list == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE TOKEN LIST!\n");
         exit(EXIT_FAILURE);
     }
@@ -227,8 +229,6 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
  * @return Pointer to the token at the given index.
  */
 TokenNode* listGetTokenByIndex(TokenList *token_list, int index){
-    int i;
-    
     /* Check if either token or token_list isn't null */
     if(token_list == NULL){
         fprintf(stderr, "[ERROR] TOKEN LIST IS NULL!\n");
@@ -259,6 +259,7 @@ TokenNode* listGetTokenByIndex(TokenList *token_list, int index){
  * @return Pointer to a generated list of tokens of a given type.
  */
 TokenList* listGetTokensByType(TokenList *token_list, int token_type){
+    int i;
     TokenList *_tokens_found;
     TokenNode *_token_i;
     
@@ -458,7 +459,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol){
     SymbolNode **_reallocated_items;
     
     /* Check if the symbol is already on symbol table */
-    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol->symbol_name){
+    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol->symbol_name)){
         return false;
     }
     
@@ -518,7 +519,7 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
         
         /* Check if symbol table already has a symbol with this name */
         for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol->symbol_name){
+            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
                 return true;
             }
         }
@@ -554,7 +555,7 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
         
         /* Check if symbol table already has a symbol with this name */
         for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol->symbol_name){
+            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
                 return symbol_table->items[i];
             }
         }
@@ -625,7 +626,7 @@ int symbolTableGetSymbolNodeIndex(SymbolTable *symbol_table, char *symbol_name){
         
         /* Check if symbol table already has a symbol with this name */
         for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol_name){
+            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
                 return i + 1;
             }
         }
@@ -670,7 +671,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool useTab, bool 
         }
         
         /* Copy content to the new instruction */
-        strcopy(_new_instruction_string, instruction_string);
+        strcpy(_new_instruction_string, instruction_string);
     }
     else{
         /* Store the new pointer into parameter */
@@ -709,7 +710,12 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
     }
     
     /* Print the instruction */
-    _fprintf_status = fprintf(_output_file, (instruction_node->useTab ? TAB_CHAR : EMPTY_STRING) instruction_node->instruction NEWLINE_CHAR);
+    if(instruction_node->useTab){
+        _fprintf_status = fprintf(_output_file, "%s" NEWLINE_CHAR, instruction_node->instruction);
+    }
+    else{
+        _fprintf_status = fprintf(_output_file, "%s" NEWLINE_CHAR, instruction_node->instruction);
+    }
     
     /* Check if fprintf has worked */
     if(_fprintf_status < 0){
@@ -850,7 +856,7 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
     }
     
     /* Print all instructions in instruction queue to _output_file */
-    for(i = 0; i < instruction->queue; i++){
+    for(i = 0; i < instruction_queue->length; i++){
         /* Execute fprintf, and return ex */
         if(!instructionNodeFilePrint(_output_file, instruction_queue->instructions[i])){
             return false;

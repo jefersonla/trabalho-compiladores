@@ -1,7 +1,30 @@
 #ifndef TOKEN_STRUCT_H
 #define TOKEN_STRUCT_H
 
+#include <stdio.h>
 #include <stdbool.h>
+
+/* ------------------------------------------------ */
+/*                Prototype definitions             */
+/* ------------------------------------------------ */
+
+/* Token Node */
+typedef struct strToken TokenNode;
+
+/* TokenList */
+typedef struct strTokenList TokenList;
+
+/* Symbol Node */
+typedef struct strSymbolNode SymbolNode;
+
+/* Symbol Table */
+typedef struct strSymbolTable SymbolTable;
+
+/* Instruction Node */
+typedef struct strInstructionNode InstructionNode;
+
+/* Instruction Queue */
+typedef struct strInstructionQueue InstructionQueue;
 
 /* ------------------------------------------------ */
 /*                 Token Node Structure             */
@@ -73,12 +96,12 @@ TokenList* listGetTokensByType(TokenList *token_list, int token_type);
 /*               Symbol Node Structure              */
 /* ------------------------------------------------ */
 
-typedef struct SymbolNode{
+typedef struct strSymbolNode{
     /* Name of the symbol */
     char *symbol_name;
     
     /* Value of the symbol */
-    char *symbol_value
+    char *symbol_value;
     
     /* Check if symbol is null */
     bool isNull;
@@ -99,7 +122,7 @@ bool setSymbolValue(SymbolNode *symbol, char *symbol_value);
 /*               Symbol Table Structure             */
 /* ------------------------------------------------ */
 
-typedef struct SymbolTable{
+typedef struct strSymbolTable{
     /* Size of the structure */
     int size;
     
@@ -148,7 +171,7 @@ typedef struct strInstructionNode{
     
     /* Length of the instruction string */
     int length;
-} InstructionNode, *ptrInstructionQueue;
+} InstructionNode, *ptrInstructionNode;
 
 /* ---------- Instruction Node Methods ----------- */
 

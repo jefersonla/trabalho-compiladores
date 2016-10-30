@@ -57,7 +57,7 @@ char *code_gen;
 /* Definition of token iterator */
 %union{
     /* Pointer to a token node */
-    TokenNode token_node;
+    TokenNode *token_node;
 }
 
     /*** * Definitions Section * ***/
