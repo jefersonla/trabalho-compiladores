@@ -56,13 +56,6 @@ char *code_gen;
 
 /* Definition of token iterator */
 %union{
-    /* Number Value */
-    int integer_number;
-    float float_number;
-    /* Literal Value */
-    char *string_literal;
-    /* String Content */
-    char *string_content;
     /* Pointer to a token node */
     TokenNode token_node;
 }

@@ -9,11 +9,10 @@
 /**
  * Creates a new token node.
  * 
- * @param root_token Father Token.
  * @param token_type Type of the Token;
  * @return A new token node.
  */
-TokenNode* newTokenNode(TokenNode *root_token, int token_type){
+TokenNode* newTokenNode(int token_type){
     TokenNode *_new_token_node;
     
     /* Malloc new token node */
@@ -26,7 +25,7 @@ TokenNode* newTokenNode(TokenNode *root_token, int token_type){
     }
     
     /* Initialize new token node */
-    _new_token_node->root_token = root_token;
+    _new_token_node->root_token = NULL;
     _new_token_node->token_type = token_type;
     _new_token_node->token_str = NULL;
     _new_token_node->lex_str = NULL;
@@ -45,6 +44,12 @@ TokenNode* newTokenNode(TokenNode *root_token, int token_type){
  */
 bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     char *_new_token_str;
+    
+    /* Check if token_node isn't null */
+    if(token_node == NULL){
+        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        return false;
+    }
     
     /* Allocate new token_str */
     _new_token_str = (char *) malloc(sizeof(char) * (strlen(token_str) + 1));
@@ -75,6 +80,12 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
 bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     char *_new_lex_str;
     
+    /* Check if token_node isn't null */
+    if(token_node == NULL){
+        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        return false;
+    }
+    
     /* Allocate new lex_str */
     _new_lex_str = (char *) malloc(sizeof(char) * (strlen(lex_str) + 1));
     
@@ -89,6 +100,30 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Copy content from lex_str to the new token */
     strcpy(token_node->lex_str, lex_str);
+    
+    /* Return success */
+    return true;
+}
+
+/**
+ * Add Token String.
+ *
+ * @param token_node Token which lex_str will be appended.
+ * @param token_root Token root pointer value to be copied to TokenNode.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
+    /* Check if malloc has succeed */
+    if(_new_token_str == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
+        return false;
+    }
+    
+    /* Store the new token_str array pointer */
+    token_node->token_str = _new_token_str;
+    
+    /* Copy content from token_str to the new token */
+    strcpy(token_node->token_str, token_str);
     
     /* Return success */
     return true;
@@ -142,9 +177,15 @@ TokenList* newTokenList(){
 bool listAddToken(TokenList *token_list, TokenNode *token){
     TokenNode **_reallocated_items;
     
-    /* Check if either token or token_list isn't null */
-    if(token_list == NULL || token == NULL){
-        fprintf(stderr, "[ERROR] TOKEN OR TOKEN LIST IS NULL!\n");
+    /* Check if token isn't null */
+    if(token_list == NULL){
+        fprintf(stderr, "[ERROR] TOKEN LIST IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if token isn't null */
+    if(token == NULL){
+        fprintf(stderr, "[ERROR] TOKEN IS NULL!\n");
         return false;
     }
     
@@ -652,7 +693,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool useTab, bool 
  * @param instruction The instruction that will be printed.
  * @return true if there's no error on execution and false otherwise.
  */
-bool printInstructionNode(FILE *_output_file, InstructionNode *instruction_node){
+bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_node){
     int _fprintf_status;
     
     /* Check if instruction node is not NULL */
@@ -677,6 +718,146 @@ bool printInstructionNode(FILE *_output_file, InstructionNode *instruction_node)
     }
     
     /* Sucess */
+    return true;
+}
+
+/**
+ * Get instruction length.
+ * 
+ * @param instruction The instruction.
+ * @return a positivie number if instruction is valid and a negative number if instruction or instruction value is null;
+ */
+int instructionNodeLength(InstructionNode *instruction){
+    /* Check if instruction node is not NULL */
+    if(instruction == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION IS NULL!\n");
+        return -1;
+    }
+    
+    /* Check if instruction value is not NULL */
+    if(instruction->instruction == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION VALUE IS NULL!\n");
+        return -1;
+    }
+    
+    /* Return size of the given instruction node */
+    return instruction->length;
+}
+
+/* ---------- Instruction Queue Methods ----------- */
+
+/**
+ * Return a new Instruction Queue.
+ * 
+ * @return a newly created instruction queue.
+ */
+InstructionQueue *newInstructionQueue(){
+    InstructionQueue *_new_instruction_queue;
+    InstructionNode **_new_instruction_nodes;
+    
+    /* Try to malloc a new Instruction queue */
+    _new_instruction_queue = (InstructionQueue *) malloc(sizeof(InstructionQueue));
+    
+    /* Give a falta error if malloc failled */
+    if(_new_instruction_queue == NULL){
+        fprintf(stderr, "[ERROR] CANNOT ALLOCATE NEW INSTRUCTION QUEUE\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Mallocate array of instruction nodes */
+    _new_instruction_nodes = (InstructionNode **) malloc(sizeof(InstructionNode *) * DEFAULT_BLOCK_SIZE);
+    
+    /* Give a falta error if malloc failled */
+    if(_new_instruction_nodes == NULL){
+        fprintf(stderr, "[ERROR] CANNOT ALLOCATE ARRAY OF INSTRUCTIONS NODE\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Set the new Instruction Queue */
+    _new_instruction_queue->size = DEFAULT_BLOCK_SIZE;
+    _new_instruction_queue->length = 0;
+    _new_instruction_queue->instructions = _new_instruction_nodes;
+    
+    /* Return pointer to the new instruction queue object */
+    return _new_instruction_queue;
+}
+
+/**
+ * Add a new instruction to Instruction Queue.
+ * 
+ * @param instruction_queue Instruction Queue.
+ * @param instruction_string Instruction String.
+ * @param useTab Check if user want's add '\t' on start string.
+ * @param copyInstruction check if user wants to copy instruction or just store the pointer.
+ * @return true if there's no error on execution and false otherwise. 
+ */
+bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, char *instruction_string, bool useTab, bool copyInstruction){
+    InstructionNode *_new_instruction_node;
+    InstructionNode **_reallocated_instructions;
+    
+    /* Try to create a new instruction node */
+    _new_instruction_node = newInstructionNode(instruction_string, useTab, copyInstruction);
+    
+    /* Check if for some reason new instruction node is null */
+    if(_new_instruction_node == NULL){
+        fprintf(stderr, "[ERROR] RECEIVED A NULL NEW INSTRUCTION NODE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Check if there are left spaces on instruction queue */
+    if(instruction_queue->length == instruction_queue->size){
+        /* Increase block size */
+        instruction_queue->size += DEFAULT_BLOCK_SIZE;
+        
+        /* Try to reallocate instructions array */
+        _reallocated_instructions = (InstructionNode **) realloc(instruction_queue->instructions, sizeof(InstructionNode *) * instruction_queue->size);
+        
+        /* Give fatal error if malloc has failled */
+        if(_reallocated_instructions == NULL){
+            fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    /* Store the new instruction node */
+    instruction_queue->instructions[instruction_queue->length] = _new_instruction_node;
+    instruction_queue->length += 1;
+    
+    /* Return success */
+    return true;
+}
+
+/** 
+ * Print a instruction queue on a given file.
+ * 
+ * @param _output_file output file, use stdout or stderr for system files, and a pointer to a valid file.
+ * @param instruction Instruction Queue that will be printed.
+ * @return true if there's no error on execution and false otherwise. 
+ */
+bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction_queue){
+    int i;
+    
+    /* Check if _output_file is not null */
+    if(_output_file == NULL){
+        fprintf(stderr,"[ERROR] OUTPUT FILE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if instruction_queue is not null */
+    if(instruction_queue == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION QUEUE IS NULL!\n");
+        return false;
+    }
+    
+    /* Print all instructions in instruction queue to _output_file */
+    for(i = 0; i < instruction->queue; i++){
+        /* Execute fprintf, and return ex */
+        if(!instructionNodeFilePrint(_output_file, instruction_queue->instructions[i])){
+            return false;
+        }
+    }
+    
+    /* Return success */
     return true;
 }
 

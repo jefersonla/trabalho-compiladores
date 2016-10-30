@@ -29,13 +29,16 @@ typedef struct strToken{
 /*------------ Token Structure Methods ------------ */
 
 /* Creates a new token node */
-TokenNode* newTokenNode(TokenNode *root_token, int token_type);
+TokenNode* newTokenNode(int token_type);
 
 /* Add Token String */
 bool nodeAddTokenStr(TokenNode *token_node, char *token_str);
 
 /* Add Lexical String */
 bool nodeAddLexStr(TokenNode *token_node, char *lex_str);
+
+/* Add Root Token */
+bool nodeAddRootToken(TokenNode *token_node, TokenNode *root_token);
 
 /* ------------------------------------------------ */
 /*                Token List Structure              */
@@ -122,63 +125,15 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol);
 bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name);
 
 /* Get symbol node by name */
-SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symbol_name);
+SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table,
+                                            char *symbol_name);
 
 /* Set symbol value by name */
-bool symbolTableSetSymbolNodeValue(SymbolTable *symbol_table, char *symbol_name, char *symbol_value);
+bool symbolTableSetSymbolNodeValue( SymbolTable *symbol_table, char *symbol_name,
+                                    char *symbol_value);
 
 /* Get index of a given symbol_name */
 int symbolTableGetSymbolNodeIndex(SymbolTable *symbol_table, char *symbol_name);
-
-/*
-
-** TAD **
-
-FIFO
-
-QUEUE === FILA
-
-1 INS ^
-2 INS |
-3 INS |
-4 INS |
-5 INS |
-6 INS |
-7 INS | <----
-
-------------------------------------------
-
-X
-.
-X
-
-const char z
-
-Y
-&z
-&z
-&z
-
-li $%s, 4
-...
-...
-.
-.
-.
-Y
-
-CGEN(exp)
-
-CGEN(T_NUMBER + T_NUMBER);
-
-vetor de instrucoes
-
-ins[] = &z
-        &z
-        ins3
-        ...
-
-*/
 
 /* ------------------------------------------------ */
 /*            Instruction Node Structure            */
@@ -198,22 +153,42 @@ typedef struct strInstructionNode{
 /* ---------- Instruction Node Methods ----------- */
 
 /* Return a new Instruction Node  */
-InstructionNode *newInstructionNode(char* instruction_string, bool use_tab, bool copyInstruction);
+InstructionNode *newInstructionNode(char* instruction_string, bool useTab,
+                                    bool copyInstruction);
 
-/* Print a instruction node */
-printInstructionNode(FILE *_output_file, InstructionNode *instruction);
+/* Print a instruction node on a given file */
+bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction);
+
+/* Get instruction length */
+int instructionNodeLength(InstructionNode *instruction);
 
 /* ------------------------------------------------ */
 /*            Instruction Queue Structure           */
 /* ------------------------------------------------ */
 
 typedef struct strInstructionQueue{
+    /* Instructions Array */
+    InstructionNode **instructions;
     
+    /* Structure size */
+    int size;
+    
+    /* Quantity of elements */
+    int length;
 } InstructionQueue, *ptrInstructionQueue;
 
 /* ---------- Instruction Queue Methods ----------- */
 
+/* Return a new Instruction Queue */
+InstructionQueue* newInstructionQueue();
 
+/* Add a new instruction to instruction queue */
+bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue,
+                                        char *instruction_string, bool useTab,
+                                        bool copyInstruction);
+
+/* Print a instruction queue on a given file */
+bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction);
 
 /* ------------------------------------------------ */
 /*                     Utilities                    */
@@ -223,7 +198,7 @@ typedef struct strInstructionQueue{
 #define DEFAULT_BLOCK_SIZE      10
 
 /* Newline char */
-#define NEWLINE_CHAR            ""\n"
+#define NEWLINE_CHAR            "\n"
 
 /* Tab char */
 #define TAB_CHAR                "\n"

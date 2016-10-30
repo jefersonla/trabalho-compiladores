@@ -59,21 +59,35 @@
 #endif
 
 /* Common define */
-#define yyerrorfound -1
-#define yycheckstate(VAR) (VAR == yyerrorfound ? 1 : 0)
+#define yyerrorfound                    -1
+#define yycheckstate(VAR)               (VAR == yyerrorfound ? 1 : 0)
+
+/* Concat all tokens */
+#define CONCAT_ALL_TOKENS(TOKEN)        all_tokens = (char *)   realloc(all_tokens, (strlen(all_tokens) + strlen(#TOKEN) + strlen(yytext) + 10) * sizeof(char)); \
+                                        sprintf(&all_tokens[last_char], "[" #TOKEN ", \"%s\"], " , yytext); \
+                                        last_char = strlen(all_tokens)
+
+/* Ignore first letters of literal strings */
+#define IGNORE_FIRST_LETTERS_LITERAL()  yytext++; yytext[strlen(yytext)-1] = 0
+
+/* Initialize Node */
+#define INITIALIZE_NODE(TOKEN)          yylval.token_node = newTokenNode(TOKEN); \
+                                        nodeAddLexStr(yylval.token_node, yytext); \
+                                        nodeAddTokenStr(yylval.token_node, yytext)
+                                            
+/* **************************************************************************************** */
 
 #ifdef LEXICAL_ANALYSER
+
+/* **************************************************************************************** */
+
 /* General Macros */
-#define FPRINTF_PRINTF(OUT, STR, VAR)	do{fprintf(OUT, STR, VAR);printf(STR "\n", VAR);}while(0)
-#define PUT_TOKEN(TOKEN) 				do{FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);}while(0)
+#define FPRINTF_PRINTF(OUT, STR, VAR)	do{ fprintf(OUT, STR, VAR); printf(STR "\n", VAR); }while(0)
+#define PUT_TOKEN(TOKEN) 				do{ FPRINTF_PRINTF(output_file, "[" #TOKEN ", \"%s\"], ", yytext); }while(0)
 #define PUT_LITERAL(TOKEN) 				do{\
-                                            yytext++; \
-                                            yytext[strlen(yytext)-1] = 0;\
-                                            FPRINTF_PRINTF(output_file, "[" TOKEN ", \"%s\"], ", yytext);\
+                                            IGNORE_FIRST_LETTERS_LITERAL(); \
+                                            FPRINTF_PRINTF(output_file, "[" #TOKEN ", \"%s\"], ", yytext);\
                                         }while(0)
-// #### DEPRECATED ####
-#define PUT_NUMBER(TOKEN)               PUT_TOKEN(TOKEN)
-// ####################
 #define PUT_SYMBOL(TOKEN)               PUT_TOKEN(TOKEN)
 #define PUT_CONTENT(STR)				fprintf(output_file, STR)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
@@ -81,73 +95,67 @@
 /* External Variables */
 char output_filename[MAX_OUTPUT_FILENAME];
 FILE *output_file;
+
+/* **************************************************************************************** */
+
 #elif DEBUG
+
+/* **************************************************************************************** */
+
 /* Store a list of all tokens */
 extern char *all_tokens;
 extern int last_char;
+
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.lex_str, yytext); \
-                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.token_str, yytext); \
+                                            INITIALIZE_NODE(TOKEN); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PUT_SYMBOL(TOKEN)               do{ \
+                                            INITIALIZE_NODE(TOKEN); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
-                                            yytext++; \
-                                            yytext[strlen(yytext)-1] = 0; \
-                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.lex_str, yytext); \
-                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.token_str, yytext); \
+                                            IGNORE_FIRST_LETTERS_LITERAL(); \
+                                            INITIALIZE_NODE(TOKEN); \
                                             printf("[" TOKEN ", \"%s\"], ", yytext); \
-                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
-
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()			printf("%s\n", yytext)
+
+/* **************************************************************************************** */
+
 #else
+
+/* **************************************************************************************** */
+
 /* Store a list of all tokens */
 extern char *all_tokens;
 extern int last_char;
+
 /* General Macros */
 #define PUT_TOKEN(TOKEN) 				do{ \
-                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.lex_str, yytext); \
-                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.token_str, yytext); \
-                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
+                                            INITIALIZE_NODE(TOKEN); \
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PUT_SYMBOL(TOKEN)               do{ \
-                                            all_tokens = (char *) realloc(all_tokens, (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(&all_tokens[last_char],"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
+                                            INITIALIZE_NODE(TOKEN); \
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PUT_LITERAL(TOKEN) 				do{ \
-                                            yytext++; \
-                                            yytext[strlen(yytext)-1] = 0; \
-                                            yylval.token_node.lex_str = (char *) malloc((strlen(yytext) + 1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.lex_str, yytext); \
-                                            yylval.token_node.token_str = (char *) malloc((strlen(yytext)+1) * sizeof(char)); \
-                                            strcpy(yylval.token_node.token_str, yytext); \
-                                            all_tokens = (char *) realloc(&all_tokens[last_char], (strlen(all_tokens) + strlen(TOKEN) + strlen(yytext) + 10) * sizeof(char));\
-                                            sprintf(all_tokens,"[" TOKEN ", \"%s\"], ", yytext); \
-                                            last_char = strlen(all_tokens); \
+                                            IGNORE_FIRST_LETTERS_LITERAL(); \
+                                            INITIALIZE_NODE(TOKEN); \
+                                            CONCAT_ALL_TOKENS(TOKEN); \
                                         }while(0)
 #define PRINT_COMMENT_DEBUG()
+
+/* **************************************************************************************** */
+
 #endif
+
+/* **************************************************************************************** */
 
 /*
 
@@ -189,38 +197,38 @@ DONE
 
 	/*** MATCHES FOR SYMBOLS ***/
 
-T_OPENPAR	\(
-T_CLOSEPAR 	\)
-T_PLUS		\+
-T_MINUS		\-
-T_TIMES		\*
-T_DIV		\/
-T_COMMA		\,
-T_SEMICOL	\;
-T_COLON		\:
-T_ASSIGN	\=
-T_EQ 		\=\=
-T_NEQ 		\~\=
-T_LTEQ 		\<\=
-T_GTEQ 		\>\=
-T_LT 		\<
-T_GT 		\>
-T_SEP 		\.
-T_CONCAT	\.\.
-T_VARARG    \.\.\.
-T_MOD		\%
-T_EXP 		\^
-T_FLOOR		\/\/
-T_BIT_AND 	\&
-T_BIT_OR 	\|
-T_BIT_N_XOR \~
-T_BIT_RSH 	\>\>
-T_BIT_LSH 	\<\<
+T_OPENPAR	    \(
+T_CLOSEPAR 	    \)
+T_PLUS		    \+
+T_MINUS		    \-
+T_TIMES		    \*
+T_DIV		    \/
+T_COMMA		    \,
+T_SEMICOL	    \;
+T_COLON		    \:
+T_ASSIGN	    \=
+T_EQ 		    \=\=
+T_NEQ 		    \~\=
+T_LTEQ 		    \<\=
+T_GTEQ 		    \>\=
+T_LT 		    \<
+T_GT 		    \>
+T_SEP 		    \.
+T_CONCAT	    \.\.
+T_VARARG        \.\.\.
+T_MOD		    \%
+T_EXP 		    \^
+T_FLOOR		    \/\/
+T_BIT_AND 	    \&
+T_BIT_OR 	    \|
+T_BIT_N_XOR     \~
+T_BIT_RSH 	    \>\>
+T_BIT_LSH 	    \<\<
 T_OPENBRACE  	\{
 T_CLOSEBRACE 	\}
 T_OPENBRACKET 	\[
 T_CLOSEBRACKET  \]
-T_LABEL 	\:\:
+T_LABEL 	    \:\:
 
     /*** MATCHES FOR NUMBERS ***/
 
@@ -297,38 +305,38 @@ T_UNTIL		until
 
 	/*** SYMBOLS ***/
 
-{T_OPENPAR}		{ PUT_SYMBOL("T_OPENPAR"); 		 return T_OPENPAR;		}
-{T_CLOSEPAR}    { PUT_SYMBOL("T_CLOSEPAR");      return T_CLOSEPAR;     }
-{T_PLUS} 		{ PUT_SYMBOL("T_PLUS"); 		 return T_PLUS;		 	}
-{T_MINUS} 		{ PUT_SYMBOL("T_MINUS"); 		 return T_MINUS;		}
-{T_TIMES} 		{ PUT_SYMBOL("T_TIMES"); 		 return T_TIMES;		}
-{T_DIV} 		{ PUT_SYMBOL("T_DIV"); 			 return T_DIV;		 	}
-{T_COMMA} 		{ PUT_SYMBOL("T_COMMA"); 		 return T_COMMA;		}
-{T_SEMICOL} 	{ PUT_SYMBOL("T_SEMICOL"); 		 return T_SEMICOL;		}
-{T_COLON} 		{ PUT_SYMBOL("T_COLON"); 		 return T_COLON;		}
-{T_ASSIGN} 		{ PUT_SYMBOL("T_ASSIGN"); 		 return T_ASSIGN;		}
-{T_EQ} 			{ PUT_SYMBOL("T_EQ"); 			 return T_EQ;		 	}
-{T_NEQ} 		{ PUT_SYMBOL("T_NEQ"); 			 return T_NEQ;		 	}
-{T_LTEQ} 		{ PUT_SYMBOL("T_LTEQ"); 		 return T_LTEQ;		 	}
-{T_GTEQ} 		{ PUT_SYMBOL("T_GTEQ"); 		 return T_GTEQ;		 	}
-{T_LT} 			{ PUT_SYMBOL("T_LT"); 			 return T_LT;		 	}
-{T_GT} 			{ PUT_SYMBOL("T_GT"); 			 return T_GT;		 	}
-{T_SEP} 		{ PUT_SYMBOL("T_SEP"); 			 return T_SEP;		 	}
-{T_CONCAT} 		{ PUT_SYMBOL("T_CONCAT");		 return T_CONCAT;		}
-{T_MOD} 		{ PUT_SYMBOL("T_MOD");			 return T_MOD;		 	}
-{T_EXP} 		{ PUT_SYMBOL("T_EXP");			 return T_EXP;		 	}
-{T_FLOOR} 		{ PUT_SYMBOL("T_FLOOR");		 return T_FLOOR;		}
-{T_BIT_AND} 	{ PUT_SYMBOL("T_BIT_AND");		 return T_BIT_AND;		}
-{T_BIT_OR} 		{ PUT_SYMBOL("T_BIT_OR");		 return T_BIT_OR;		}
-{T_BIT_N_XOR} 	{ PUT_SYMBOL("T_BIT_N_XOR");	 return T_BIT_N_XOR;	}
-{T_BIT_RSH} 	{ PUT_SYMBOL("T_BIT_RSH");		 return T_BIT_RSH;		}
-{T_BIT_LSH} 	{ PUT_SYMBOL("T_BIT_LSH");		 return T_BIT_LSH;		}
-{T_LABEL}       { PUT_SYMBOL("T_LABEL");         return T_LABEL;        }
-{T_VARARG}      { PUT_SYMBOL("T_VARARG");        return T_VARARG;       }
-{T_OPENBRACE}    { PUT_SYMBOL("T_OPENBRACE");    return T_OPENBRACE;    }
-{T_CLOSEBRACE}   { PUT_SYMBOL("T_CLOSEBRACE");   return T_CLOSEBRACE;   }
-{T_OPENBRACKET}  { PUT_SYMBOL("T_OPENBRACKET");  return T_OPENBRACKET;  }
-{T_CLOSEBRACKET} { PUT_SYMBOL("T_CLOSEBRACKET"); return T_CLOSEBRACKET; }
+{T_OPENPAR}		{ PUT_SYMBOL(T_OPENPAR); 		return T_OPENPAR;		}
+{T_CLOSEPAR}    { PUT_SYMBOL(T_CLOSEPAR);       return T_CLOSEPAR;     }
+{T_PLUS} 		{ PUT_SYMBOL(T_PLUS); 		    return T_PLUS;		 	}
+{T_MINUS} 		{ PUT_SYMBOL(T_MINUS); 		    return T_MINUS;		}
+{T_TIMES} 		{ PUT_SYMBOL(T_TIMES); 		    return T_TIMES;		}
+{T_DIV} 		{ PUT_SYMBOL(T_DIV); 			return T_DIV;		 	}
+{T_COMMA} 		{ PUT_SYMBOL(T_COMMA); 		    return T_COMMA;		}
+{T_SEMICOL} 	{ PUT_SYMBOL(T_SEMICOL); 		return T_SEMICOL;		}
+{T_COLON} 		{ PUT_SYMBOL(T_COLON); 		    return T_COLON;		}
+{T_ASSIGN} 		{ PUT_SYMBOL(T_ASSIGN); 		return T_ASSIGN;		}
+{T_EQ} 			{ PUT_SYMBOL(T_EQ); 			return T_EQ;		 	}
+{T_NEQ} 		{ PUT_SYMBOL(T_NEQ); 			return T_NEQ;		 	}
+{T_LTEQ} 		{ PUT_SYMBOL(T_LTEQ); 		    return T_LTEQ;		 	}
+{T_GTEQ} 		{ PUT_SYMBOL(T_GTEQ); 		    return T_GTEQ;		 	}
+{T_LT} 			{ PUT_SYMBOL(T_LT); 			return T_LT;		 	}
+{T_GT} 			{ PUT_SYMBOL(T_GT); 			return T_GT;		 	}
+{T_SEP} 		{ PUT_SYMBOL(T_SEP); 			return T_SEP;		 	}
+{T_CONCAT} 		{ PUT_SYMBOL(T_CONCAT);		    return T_CONCAT;		}
+{T_MOD} 		{ PUT_SYMBOL(T_MOD);			return T_MOD;		 	}
+{T_EXP} 		{ PUT_SYMBOL(T_EXP);			return T_EXP;		 	}
+{T_FLOOR} 		{ PUT_SYMBOL(T_FLOOR);		    return T_FLOOR;		}
+{T_BIT_AND} 	{ PUT_SYMBOL(T_BIT_AND);		return T_BIT_AND;		}
+{T_BIT_OR} 		{ PUT_SYMBOL(T_BIT_OR);		    return T_BIT_OR;		}
+{T_BIT_N_XOR} 	{ PUT_SYMBOL(T_BIT_N_XOR);	    return T_BIT_N_XOR;	}
+{T_BIT_RSH} 	{ PUT_SYMBOL(T_BIT_RSH);		return T_BIT_RSH;		}
+{T_BIT_LSH} 	{ PUT_SYMBOL(T_BIT_LSH);		return T_BIT_LSH;		}
+{T_LABEL}       { PUT_SYMBOL(T_LABEL);          return T_LABEL;        }
+{T_VARARG}      { PUT_SYMBOL(T_VARARG);         return T_VARARG;       }
+{T_OPENBRACE}    { PUT_SYMBOL(T_OPENBRACE);     return T_OPENBRACE;    }
+{T_CLOSEBRACE}   { PUT_SYMBOL(T_CLOSEBRACE);    return T_CLOSEBRACE;   }
+{T_OPENBRACKET}  { PUT_SYMBOL(T_OPENBRACKET);   return T_OPENBRACKET;  }
+{T_CLOSEBRACKET} { PUT_SYMBOL(T_CLOSEBRACKET);  return T_CLOSEBRACKET; }
 
 	/*** SOME TYPES OF VALUES ***/
 
