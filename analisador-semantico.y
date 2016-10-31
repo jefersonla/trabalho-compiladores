@@ -518,7 +518,13 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
+                                                             /* Check if there are errors with the actual node */
+                                                            if($$->child_list == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -856,7 +862,13 @@ listadenomes    : T_NAME                                {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
+                                                             /* Check if there are errors with the actual node */
+                                                            if($$->child_list == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -882,7 +894,13 @@ listaexp        : exp                                   {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
+                                                             /* Check if there are errors with the actual node */
+                                                            if($$->child_list == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -1009,8 +1027,13 @@ int main(int argc, char *argv[]){
     }
 
     /* Message of starting compilation */
+#ifdef SEMANTIC_ANALYSER
     printf( ":: OUTPUT FILE WILL BE %s ::\n\n"
             "::: STARTING SINTATIC AND SEMANTIC PROCESS :::\n", output_filename);
+#else
+    printf( ":: OUTPUT FILE WILL BE %s ::\n\n"
+            "::: STARTING CODE GENERATOR PROCESS :::\n", output_filename);
+#endif
 
     /* Output File for Flex */
     output_file = fopen(output_filename, "w");
