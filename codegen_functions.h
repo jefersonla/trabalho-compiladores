@@ -89,9 +89,15 @@ const char mips_footer[] =
 /* ------------------------------------------------------------- */
 
 /* Store a global variable */    
-const char mips_atributtion[] =
-    "\t# ------------ Store global variable ------------ #\n"
+const char mips_global_atributtion[] =
+    "\t# --------- Store $a0 in global variable -------- #\n"
     "\tsw $a0, _%s\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Load a global variable into $a0 */
+const char mips_global_load[] =
+    "\t# --------- Load global variable in $a0 --------- #\n"
+    "\tlw $a0, _%s\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Push temporary return of a expression */
@@ -113,21 +119,53 @@ const char mips_top_t1[] =
     "\tlw $t1, 4($sp)\n"
     "\t# ----------------------------------------------- #\n";
 
+/* Load a static number into $a0 */
+const char mips_static_number_load[] =
+    "\t# --------- Load static number into $a0 --------- #\n"
+    "\tli $a0, %s\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* ------------------------------------------------------------- */
+/*                  Unary Operations Template                    */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for unary operations
+ * 
+ *  Default Model:
+ *      CGEN(operand exp) ->
+ *          CGEN(exp)
+ *          CGEN(operand)
+ */
+
+/* Not a number in $a0 */
+const char mips_not_a0_a0[] =
+    "\t# ---------------- Not $a0 number --------------- #\n"
+    "\tnot $a0, $a0\n"
+    "\t# ----------------------------------------------- #\n";
+ 
+/* Convert $a0 to a negative number */
+const char mips_static_number_load[] =
+    "\t# -------------- Negative $a0 number ------------ #\n"
+    "\tnegu $a0, $a0\n"
+    "\t# ----------------------------------------------- #\n";
+
 /* ------------------------------------------------------------- */
 /*                  Binary Operations Template                   */
 /* ------------------------------------------------------------- */
 
-/*
-Default Model:
-
-CGEN(exp operand exp) ->
-    CGEN(exp1)
-    push_a0
-    CGEN(exp2)
-    top_t1
-    CGEN(operand)
-    pop_a0
-*/
+/**
+ * Model for binary operations
+ * 
+ *  Default Model:
+ *      CGEN(exp1 operand exp2) ->
+ *          CGEN(exp1)
+ *          push_a0
+ *          CGEN(exp2)
+ *          top_t1
+ *          CGEN(operand)
+ *          pop_a0
+ */
 
 /* Add value of $t1 with $a0 and store in $a0 */
 const char mips_add_a0_t1_a0[] =
@@ -167,88 +205,62 @@ const char mips_or_a0_t1_a0[] =
 
 /* Check if is greater than, the value of $t1 with $a0 and store in $a0 */
 const char mips_gt_a0_t1_a0[] =
-    "\t# ------------- Gt $a0 = $t1 > $a0  ------------- #\n"
+    "\t# ------------- Gt $a0 = $t1 > $a0 -------------- #\n"
     "\tslt $a0, $a0, $t1\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Check if is less than, the value of $t1 with $a0 and store in $a0 */
 const char mips_lt_a0_t1_a0[] =
-    "\t# ------------- Lt $a0 = $t1 < $a0  ------------- #\n"
+    "\t# ------------- Lt $a0 = $t1 < $a0 -------------- #\n"
     "\tslt $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
-    char modeloAnd[] =  
-                        top_t1;
-                        "\tand $a0, $t1, $a0\n"
-                        pop_stack;   
-                
-    char modeloOr[]  =  
-                        top_t1;
-                        "\tor $a0, $t1, $a0\n"
-                        pop_stack;
-     
-    char modeloMaior[] = 
-                         top_t1;
-                         "\tslt $a0, $a0, $t1\n"
-                         pop_stack;
+/* Check if $a0 is equal $t1 */
+const char mips_eq_a0_t1_a0[] =
+    "\t# ------------- Eq $a0 = $t1 == $a0 ------------- #\n"
+    "\tsubu $a0, $t1, $a0\n"
+    "\tsltu $a0, $0, $a0\n"
+    "\txori $a0, $a0, 1\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Check if $a0 is not equal $t1 */
+const char mips_neq_a0_t1_a0[] =
+    "\t# ------------- Neq $a0 = $t1 ~= $a0 ------------- #\n"
+    "\tsubu $a0, $t1, $a0\n"
+    "\tsltu $a0, $0, $a0\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Check if $a0 is greater or equal $t1 */
+const char mips_gte_a0_t1_a0[] =
+    "\t# ------------- Gte $a0 = $t1 >= $a0 ------------- #\n"
+    "\tslt $a0, $t1, $a0\n"
+    "\txori $a0, $a0, 1\n"
+    "\t# ----------------------------------------------- #\n";
     
-    char modeloMenor[] = 
-                         top_t1;
-                         "\tslt $a0, $t1, $a0\n"
-                         pop_stack; 
-                      
-                      
-                      
-                      
-    char modeloIgual[] = "%s"
-                                "\tsw $a0, 0($sp)\n"
-                                "\taddiu $sp, $sp, -4\n"
-                                "\tlw $t1, 4($sp)\n"
-                         "%s"
-                         "\tsubu $a0, $t1, $a0\n"
-                         "\tsltu $a0, $0, $a0\n"
-                         "\txori $a0, $a0, 1\n"
-                         pop_stack;
-                         
-    char modeloNaoIgual[] = "%S"
-                                "\tsw $a0, 0($sp)\n"
-                                "\taddiu $sp, $sp, -4\n"
-                                "\tlw $t1, 4($sp)\n"
-                            "%s"
-                            "\tsubu $a0, $t1, $a0\n"
-                            "\tsltu $a0, $0, $a0\n"
-                            pop_stack;
-                            
-    char modeloMaiorIgual[] =   "%s"
-                                "\tsw $a0, 0($sp)\n"
-                                "\taddiu $sp, $sp, -4\n"
-                                "\tlw $t1, 4($sp)\n"
-                                "%s"
-                                "\tslt $a0, $t1, $a0\n"
-                                "\txori $a0, $a0, 1\n"
-                                pop_stack;
-                                
-    char modeloMenorIgual[] =   "%s"
-                                "\tsw $a0, 0($sp)\n"
-                                "\taddiu $sp, $sp, -4\n"
-                                "\tlw $t1, 4($sp)\n"
-                                "%s"
-                                "\tslt $a0, $a0, $t1\n"
-                                "\txori $a0, $a0, 1\n"
-                                pop_stack;
-    
-    char modeloNome[]   = "\tlw $a0, _%s\n"; 
-    
-    char modeloNumero[] = "\tli $a0, %s\n"; 
-    
-    char modeloMenos[]  = "\tlw $a0, _%s\n"; 
-    
-    char modeloNot[] =  "%s"
-                        "\tnot $a0, $a0\n";
-    
-    /*NAO É TRIVIAL*/
-    char modeloNil[]    = "\tla $a0, _nil\n"
-                          "\tsw $a0, _%s\n";
+/* Check if $a0 is less or equal $t1 */
+const char mips_lte_a0_t1_a0[] =
+    "\t# ------------- Lte $a0 = $t1 <= $a0 ------------- #\n"
+    "\tslt $a0, $a0, $t1\n"
+    "\txori $a0, $a0, 1\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* ------------------------------------------------------------- */
+/*                  Binary Operations Template                   */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for binary operations
+ * 
+ *  Default Model:
+ *      CGEN(exp1 operand exp2) ->
+ *          CGEN(exp1)
+ *          push_a0
+ *          CGEN(exp2)
+ *          top_t1
+ *          CGEN(operand)
+ *          pop_a0
+ */
+
 
 
 #endif
