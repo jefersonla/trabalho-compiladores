@@ -100,7 +100,7 @@ debug.lex.yy.c: $(FLEX_SRC)
 
 # Executavel de Debug Analisador Lexico
 debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
-	$(CC) $(CFLAGS) debug.lex.yy.c $(LIBS_SRC) -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER 
+	$(CC) $(CFLAGS) debug.lex.yy.c $(LIBS_SRC) -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER  -D DEBUG_MODE
 
 # Executavel Analisador Lexico
 $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
