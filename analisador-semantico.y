@@ -196,14 +196,14 @@ SymbolTable *global_symbol_table;
 /* -- Program Section  -- */
 /*  > Store Application if success parsing */
 programa        : bloco                                 {
-                                                            /* Initialize Global AST */  
+                                                            /* Initialize Global AST */
                                                             allocateTokenAndChilds(&abstract_sintatic_tree, TI_PROGRAMA, 1, $1);
                                                             
                                                             /* Add NULL pointer to father */
                                                             nodeAddRootToken(abstract_sintatic_tree, NULL);
                                                             
                                                             /* Add Textual content */
-                                                            //...
+                                                            allocateTokenText(abstract_sintatic_tree, 3, "[programa ", $1->token_str, "]\n");
                                                             
                                                             #ifdef SEMANTIC_ANALYSER
                                                             /* Store output file result */
@@ -242,12 +242,18 @@ programa        : bloco                                 {
 
 /* -- Block are sections of code -- */
 bloco           : comando_list comandoret               { 
+                                                            /* Allocate Token and Childs */
                                                             allocateTokenAndChilds(&$$, TI_BLOCO, 2, $1, $2);
-                                                            //allocate2Tokens($$, "[bloco%s %s]", $1, $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 5, "[bloco", $1->token_str, " ", $2->token_str, "]");
                                                         }
                 | comando_list                          { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BLOCO, 1, $1);
-                                                            //allocate1Token($$, "[bloco%s]", $1);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, "[bloco", $1->token_str, "]");
                                                         }
                 ;
 
@@ -263,186 +269,226 @@ comando_list    : comando_list comando                  {
                                                             
                                                             /* Add the last node */
                                                             listAddToken($$->child_list, $2);
-                                                            //allocate2Tokens($$, "%s %s", $1, $2);
+                                                            
+                                                            /* Allocate Text */
+                                                            allocateTokenText($$, $1->token_str, " ", $2->token_str);
                                                         }
-                | /* Empty */                           { 
+                | /* Empty */                           {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EMPTY, 0);
-                                                            //allocateToken($$, "");
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 1, "");
                                                         }
                 ;
 
 /* -- Commands belong to program, and represent all the actions that can occur -- */
 comando         : T_SEMICOL                             {
+                                                            /* Copy pointer of the terminal token */
                                                             $$ = $1;
-                                                            //allocateToken($$, "[comando [T_SEMICOL ;]]");
                                                         }
                 | label                                 {
+                                                            /* Copy pointer of the terminal token */
                                                             $$ = $1;
-                                                            //allocate1Token($$, "[comando %s]", $1);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, "[comando ", $1->token_str, "]");
                                                         }
                 | T_BREAK                               { 
+                                                            /* Copy pointer of the terminal token */
                                                             $$ = $1;
-                                                            //allocateToken($$, "[comando [T_BREAK break]]");
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 1, "[comando [T_BREAK break]]");
                                                         }
                 | chamadadefuncao                       { 
+                                                            /* Copy pointer of the terminal token */
                                                             $$ = $1;
-                                                            //allocate1Token($$, "[comando %s]", $1);
+                                                            
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, "[comando ", $1->token_str, "]");
                                                         }
                 | listadenomes T_ASSIGN listaexp        {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_ASSIGN, 3, $1, $2, $3);
-                                                            //allocate2Tokens($$,
-                                                            //                "[comando "
-                                                            //                    "[listadenomes %s] "
-                                                            //                    "[T_ASSIGN =] "
-                                                            //                    "[listaexp %s]"
-                                                            //                "]",
-                                                            //                $1, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText(  $$, 5,
+                                                                                "[comando "
+                                                                                    "[listadenomes ", $1->token_str,"] "
+                                                                                    "[T_ASSIGN =] "
+                                                                                    "[listaexp ", $3->token_str,"]"
+                                                                                "]");
                                                         }
                 | T_DO bloco T_END                      {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BLOCO_COMANDO, 3, $1, $2, $3);
-                                                            //allocate1Token( $$,
-                                                            //                "[comando "
-                                                            //                    "[T_DO do] "
-                                                            //                    "%s "
-                                                            //                    "[T_END end]"
-                                                            //                "]",
-                                                            //                $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText(  $$, 3
+                                                                                "[comando "
+                                                                                    "[T_DO do] "
+                                                                                    , $2->token_str, " "
+                                                                                    "[T_END end]"
+                                                                                "]");
                                                         }
                 | T_WHILE exp T_DO bloco T_END          {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_WHILE, 4, $1, $2, $3, $4);
-                                                            //allocate2Tokens($$,
-                                                            //                "[comando "
-                                                            //                    "[T_WHILE while] "
-                                                            //                    "%s "
-                                                            //                    "[T_DO do] "
-                                                            //                    "%s "
-                                                            //                    "[T_END end]"
-                                                            //                "]",
-                                                            //                $2, $4);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText(  $$, 5
+                                                                                "[comando "
+                                                                                    "[T_WHILE while] "
+                                                                                    , $2->token_str, " "
+                                                                                    "[T_DO do] "
+                                                                                    , $4->token_str, " "
+                                                                                    "[T_END end]"
+                                                                                "]");
                                                         }
                 | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END    {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_FOR_INC, 11,
                                                                                                                     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);
-                                                                                            //allocate5Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_FOR for] "
-                                                                                            //                    "[T_NAME %s] "
-                                                                                            //                    "[T_ASSIGN =] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_COMMA ,] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_COMMA ,] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_DO do] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4, $6, $8, $1);
+                                                                                            
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 11,
+                                                                                                                "[comando "
+                                                                                                                    "[T_FOR for] "
+                                                                                                                    "[T_NAME ", $2->token_str, "] "
+                                                                                                                    "[T_ASSIGN =] "
+                                                                                                                    , $4->token_str, " "
+                                                                                                                    "[T_COMMA ,] "
+                                                                                                                    , $6->token_str, " "
+                                                                                                                    "[T_COMMA ,] "
+                                                                                                                    , $8->token_str, " "
+                                                                                                                    "[T_DO do] "
+                                                                                                                    , $10->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END                {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_FOR, 9,
                                                                                                                     $1, $2, $3, $4, $5, $6, $7, $8, $9);
-                                                                                            //allocate4Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_FOR for] "
-                                                                                            //                    "[T_NAME %s] "
-                                                                                            //                    "[T_ASSIGN =] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_COMMA ,] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_DO do] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4, $6, $8);
+                                                                                            
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 9,
+                                                                                                                "[comando "
+                                                                                                                    "[T_FOR for] "
+                                                                                                                    "[T_NAME ", $2->token_str, "] "
+                                                                                                                    "[T_ASSIGN =] "
+                                                                                                                    , $4->token_str, " "
+                                                                                                                    "[T_COMMA ,] "
+                                                                                                                    , $6->token_str, " "
+                                                                                                                    "[T_DO do] "
+                                                                                                                    , $8->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END                  {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_IF_ELSE, 8,
                                                                                                                     $1, $2, $3, $4, $5, $6, $7, $8);
-                                                                                            //allocate4Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_IF if] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_THEN then] "
-                                                                                            //                    "%s"
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_ELSE else] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4, $5, $7);
+                                                                                                                    
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 8,
+                                                                                                                "[comando "
+                                                                                                                    "[T_IF if] "
+                                                                                                                    , $2->token_str, " "
+                                                                                                                    "[T_THEN then] "
+                                                                                                                    , $4->token_str,
+                                                                                                                    , $5->token_str, " "
+                                                                                                                    "[T_ELSE else] "
+                                                                                                                    , $7->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_IF exp T_THEN bloco term_elseif T_END                               {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_IF, 6,
                                                                                                                     $1, $2, $3, $4, $5, $6);
-                                                                                            //allocate3Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_IF if] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_THEN then] "
-                                                                                            //                    "%s"
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4, $5);
+                                                                                            
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 6,
+                                                                                                                "[comando "
+                                                                                                                    "[T_IF if] "
+                                                                                                                    , $2->token_str, " "
+                                                                                                                    "[T_THEN then] "
+                                                                                                                    , $4->token_str,
+                                                                                                                    , $5->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END       {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_FUNCTION_PARAM, 7,
                                                                                                                     $1, $2, $3, $4, $5, $6, $7);
-                                                                                            //allocate3Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_FUNCTION function] "
-                                                                                            //                    "[T_NAME %s] "
-                                                                                            //                    "[T_OPENPAR (] "
-                                                                                            //                    "[listadenomes %s] "
-                                                                                            //                    "[T_CLOSEPAR )] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4, $6);
+                                                                                            
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 7,
+                                                                                                                "[comando "
+                                                                                                                    "[T_FUNCTION function] "
+                                                                                                                    "[T_NAME ", $2->token_str, "] "
+                                                                                                                    "[T_OPENPAR (] "
+                                                                                                                    "[listadenomes ", $4->token_str, "] "
+                                                                                                                    "[T_CLOSEPAR )] "
+                                                                                                                    , $6->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END                    {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_FUNCTION, 6,
                                                                                                                     $1, $2, $3, $4, $5, $6);
-                                                                                            //allocate2Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_FUNCTION function] "
-                                                                                            //                    "[T_NAME %s] "
-                                                                                            //                    "[T_OPENPAR (] "
-                                                                                            //                    "[T_CLOSEPAR )] "
-                                                                                            //                    "%s "
-                                                                                            //                    "[T_END end]"
-                                                                                            //                "]",
-                                                                                            //                $2, $5);
+                                                                                                                    
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 5,
+                                                                                                                "[comando "
+                                                                                                                    "[T_FUNCTION function] "
+                                                                                                                    "[T_NAME ", $2->token_str, "] "
+                                                                                                                    "[T_OPENPAR (] "
+                                                                                                                    "[T_CLOSEPAR )] "
+                                                                                                                    , $5->token_str, " "
+                                                                                                                    "[T_END end]"
+                                                                                                                "]");
                                                                                         }
                 | T_LOCAL listadenomes T_ASSIGN listaexp                                {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_LOCAL_ASSIGN, 4,
                                                                                                                     $1, $2, $3, $4);
-                                                                                            //allocate2Tokens($$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_LOCAL local] "
-                                                                                            //                    "[listadenomes %s] "
-                                                                                            //                    "[T_ASSIGN =] "
-                                                                                            //                    "[listaexp %s]"
-                                                                                            //                "]",
-                                                                                            //                $2, $4);
+                                                                                                                    
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText(  $$, 5
+                                                                                                                "[comando "
+                                                                                                                    "[T_LOCAL local] "
+                                                                                                                    "[listadenomes ", $2->token_str, "] "
+                                                                                                                    "[T_ASSIGN =] "
+                                                                                                                    "[listaexp ", $4->token_str, "]"
+                                                                                                                "]");
                                                                                         }
                 | T_LOCAL listadenomes                                                  {
+                                                                                            /* Allocate Token and append childs */
                                                                                             allocateTokenAndChilds( &$$, TI_LOCAL_DEFINE, 2,
                                                                                                                     $1, $2);
-                                                                                            //allocate1Token( $$,
-                                                                                            //                "[comando "
-                                                                                            //                    "[T_LOCAL local] "
-                                                                                            //                    "[listadenomes %s]"
-                                                                                            //                "]",
-                                                                                            //                $2);
+                                                                                            
+                                                                                            /* Allocate a concatenation of token text strings */
+                                                                                            allocateTokenText( $$, 3,
+                                                                                                                "[comando "
+                                                                                                                    "[T_LOCAL local] "
+                                                                                                                    "[listadenomes ", $2->token_str, "]"
+                                                                                                                "]");
                                                                                         }
                 ;
 
 
 label           : T_LABEL T_NAME T_LABEL                { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_LABEL, 3, $1, $2, $3);
-                                                            //allocate1Token($$, "[T_LABEL ::] [T_NAME %s] [T_LABEL ::]", $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, "[T_LABEL ::] [T_NAME ", $2->token_str, "] [T_LABEL ::]");
                                                         }
 
 term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
@@ -460,168 +506,264 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             listAddToken($$->child_list, $4);
                                                             listAddToken($$->child_list, $5);
                                                             
-                                                            //llocate3Tokens($$,"%s [T_ELSEIF elseif] %s [T_THEN then] %s", $1, $3, $5);
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, $1->token_str, " [T_ELSEIF elseif] ", $3->token_str, " [T_THEN then] ", $5->token_str);
                                                         }
                 | /* Empty */                           { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EMPTY, 0);
-                                                            //allocateToken($$, "");
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 1, "");
                                                         }
                 ;
 
 comandoret      : T_RETURN listaexp T_SEMICOL           {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_RETURN_EXPLIST, 2, $1, $2);
-                                                            //allocate1Token( $$,
-                                                            //                "[comandoret "
-                                                            //                    "[T_RETURN return] "
-                                                            //                    "[listaexp %s] "
-                                                            //                    "[T_SEMICOL ;]"
-                                                            //                "]",
-                                                            //                $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText(  $$, 3,
+                                                                                "[comandoret "
+                                                                                    "[T_RETURN return] "
+                                                                                    "[listaexp ", $2->token_str, "] "
+                                                                                    "[T_SEMICOL ;]"
+                                                                                "]");
                                                         }
                 | T_RETURN listaexp                     {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_RETURN_EXPLIST, 2, $1, $2);
-                                                            //allocate1Token($$, "[comandoret [T_RETURN return] [listaexp %s]]", $2);   
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, "[comandoret [T_RETURN return] [listaexp ", $2->token_str, "]]");
                                                         }
                 | T_RETURN T_SEMICOL                    { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_RETURN, 1, $1);
-                                                            //allocateToken($$, "[comandoret [T_RETURN return] [T_SEMICOL ;]]");
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 1, "[comandoret [T_RETURN return] [T_SEMICOL ;]]");
                                                         }
                 | T_RETURN                              {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_RETURN, 1, $1);
-                                                            //allocateToken($$, "[comandoret [T_RETURN return]]");
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 1, "[comandoret [T_RETURN return]]");
                                                         }
                 ;
 
 exp             : T_NIL                                 {
+                                                            
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocateToken($$, "[exp [T_NIL nil]]");
                                                         }
                 | T_VARARG                              { 
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocateToken($$, "[exp [T_VARARG ...]]");
                                                         }
                 | T_NUMBER                              {
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [T_NUMBER %s]]", $1);
                                                         }
                 | T_LITERAL                             {
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [T_LITERAL %s]]", $1);
                                                         }
                 | T_NAME                                { 
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [T_NAME %s]]", $1);
                                                         }
                 | chamadadefuncao                       { 
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp %s]", $1);
                                                         }
                 | T_MINUS exp                           {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_UMINUS, 2, $1, $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [opunaria [T_MINUS -]] %s]", $2);
                                                         }
                 | T_NOT exp                             {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_NOT, 2, $1, $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [opunaria [T_NOT not]] %s]", $2);                
                                                         }
                 | T_BIT_N_XOR exp                       {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_BIT_NOT, 2, $1, $2);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [opunaria [T_BIT_NOT ~]] %s]", $2);
                                                         }
                 | exp T_PLUS exp                        {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_PLUS, 3, $1, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate2Tokens($$,  &I$$"[exp, 3, $1, $2, $3 %s [opbin [T_PLUS +]] %s]", $1, $3);
                                                         }
                 | exp T_MINUS exp                       { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_MINUS, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_MINUS -]] %s]", $1, $3);
                                                         }
                 | exp T_TIMES exp                       {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_TIMES, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_TIMES *]] %s]", $1, $3);
                                                         }
                 | exp T_DIV exp                         {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_DIV, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_DIV /]] %s]", $1, $3);
                                                         }
                 | exp T_FLOOR exp                       { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_FLOOR, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_FLOOR //]] %s]", $1, $3);
                                                         }
                 | exp T_EXP exp                         {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EXP, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_EXP ^]] %s]", $1, $3);
                                                         }
                 | exp T_MOD exp                         { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_MOD, 3, $1, $2, $3);
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_MOD %%]] %s]", $1, $3);
                                                         }
                 | exp T_BIT_AND exp                     { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_AND, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_BIT_AND &]] %s]", $1, $3);
                                                         }
                 | exp T_BIT_OR exp                      {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_OR, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_BIT_OR |]] %s]", $1, $3);
                                                         }
                 | exp T_BIT_N_XOR exp                   {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_N_XOR, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_BIT_XOR ~]] %s]", $1, $3);
                                                         }
                 | exp T_BIT_LSH exp                     {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_LSH, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_BIT_LSH <<]] %s]", $1, $3);
                                                         }
                 | exp T_BIT_RSH exp                     {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_RSH, 3, $1, $2, $3);
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_BIT_RSH >>]] %s]", $1, $3);
                                                         }
                 | exp T_CONCAT exp                      { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_CONCAT, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_CONCAT ..]] %s]", $1, $3);
                                                         }
                 | exp T_LT exp                          {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_LT, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_LT <]] %s]", $1, $3);
                                                         }
                 | exp T_LTEQ exp                        {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_LTEQ, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_LTEQ <=]] %s]", $1, $3);
                                                         }
                 | exp T_GT exp                          {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_GT, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_GT >]] %s]", $1, $3);
                                                         }
                 | exp T_GTEQ exp                        {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_GTEQ, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_GTEQ >=]] %s]", $1, $3);
                                                         }
                 | exp T_EQ exp                          { 
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EQ, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_EQ ==]] %s]", $1, $3);
                                                         }
                 | exp T_NEQ exp                         {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_NEQ, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_NEQ ~=]] %s]", $1, $3);
                                                         }
                 | exp T_AND exp                         {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_AND, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_AND and]] %s]", $1, $3);
                                                         }
                 | exp T_OR exp                          {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_OR, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             // allocate2Tokens($$, "[exp %s [opbin [T_OR or]] %s]", $1, $3);
                                                         }
                 | T_OPENPAR exp T_CLOSEPAR              {
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[exp [T_OPENPAR (] %s [T_CLOSEPAR )]]", $2);
                                                         }
                 /*
                 | T_TRUE                                { 
                                                             allocateToken($$, "[exp [T_TRUE true]]");
                                                         }
-                */
-                /*
                 | T_FALSE                               {
                                                             allocateToken($$, "[exp [T_FALSE false]]");
                                                         }
@@ -629,7 +771,10 @@ exp             : T_NIL                                 {
                 ;
 
 chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR  {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_CALL_FUNCTION_PAR, 4, $1, $2, $3, $4);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate2Tokens($$,
                                                             //                "[chamadadefuncao "
                                                             //                    "[T_NAME %s] "
@@ -640,7 +785,10 @@ chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR  {
                                                             //                $1, $3);
                                                         }
                 | T_NAME T_OPENPAR T_CLOSEPAR           {
+                                                            /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_CALL_FUNCTION, 3, $1, $2, $3);
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token( $$,
                                                             //                "[chamadadefuncao "
                                                             //                    "[T_NAME %s] "
@@ -653,6 +801,8 @@ chamadadefuncao : T_NAME T_OPENPAR listaexp T_CLOSEPAR  {
 
 listadenomes    : T_NAME                                {
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "[T_NAME %s]", $1);
                                                         }
                 | listadenomes T_COMMA T_NAME           {
@@ -666,12 +816,15 @@ listadenomes    : T_NAME                                {
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
                                                             
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate2Tokens($$,"%s [T_COMMA ,] [T_NAME %s]", $1, $3);
                                                         }
                 ;
 
 listaexp        : exp                                   {
                                                             $$ = $1;
+                                                            
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate1Token($$, "%s", $1);
                                                         }
                 | listaexp T_COMMA exp                  {
@@ -685,6 +838,7 @@ listaexp        : exp                                   {
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
                                                             
+                                                            /* Allocate a concatenation of token text strings */
                                                             //allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);
                                                         }
                 ;

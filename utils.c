@@ -74,14 +74,77 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int no_par
  * Utility to allocate text of tokens
  * 
  * @param token_node A token node parameter.
- * @param token_format A format string.
  * @param no_params Number of variadic params.
- * @param ... A infinite list of child nodes.
+ * @param ... A infinite list of strings.
  * @return true if there's no error on execution and false otherwise. 
  */
-//bool allocateTokenText(TokenNode *token_node, const char *token_format, int no_params, ...){
-//    
-//}
+bool allocateTokenText(TokenNode *token_node, int no_params, ...){
+    int i;
+    char *_str_param;
+    char *_new_token_string;
+    va_list _params_list;
+    size_t param_str_size;
+    
+    /* Initialize arguments list */
+    va_start(_params_list, no_params);
+    
+    /* Check if token_node is not null */
+    if(token_node == NULL){
+        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        return false;
+    }
+    
+    /* Get size of the params list concatenated string */
+    for(i = 0, param_str_size = 2; i < no_params; i++){
+        /* Get next token */
+        _str_param = va_arg(_params_list, char*);
+        
+        /* Check if param is null */
+        if(_str_param == NULL){
+            fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
+            return false;
+        }
+        
+        /* Increase size of the token string */
+        param_str_size += strlen(_str_param);
+    }
+    
+    /* Allocate string size */
+    _new_token_string = (char *) malloc(sizeof(char) * param_str_size);
+    
+    /* Check if malloc failled */
+    if(_new_token_string == NULL){
+        fprintf(stderr,"[ERROR] CANNOT ALLOCATE NEW TOKEN STRING");
+        return false;
+    }
+    
+    /* Initialize the new empty string */
+    _new_token_string[0] = 0;
+    
+    /* Concatenate the new string with the parameter list */
+    for(i = 0; i < no_params; i++){
+        /* Get next token */
+        _str_param = va_arg(_params_list, char*);
+        
+        /* Check if param is null */
+        if(_str_param == NULL){
+            fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
+            return false;
+        }
+        
+        /* Concatenate string */
+        strcat(_new_token_string, _str_param);
+    }
+    
+    /* Store the new string */
+    token_node->token_str = _new_token_string;
+    
+    /* Clean argument list */
+    va_end(_params_list);
+
+    /* Return success */
+    return true;
+}
 
 /**
  * Utility to concatenate list of tokens.

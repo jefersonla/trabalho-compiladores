@@ -72,8 +72,7 @@
 
 /* Initialize Node */
 #define INITIALIZE_NODE(TOKEN)          yylval.token_node = newTokenNode(TOKEN); \
-                                        nodeAddLexStr(yylval.token_node, yytext); \
-                                        nodeAddTokenStr(yylval.token_node, yytext)
+                                        nodeAddLexStr(yylval.token_node, yytext)
                                             
 /* **************************************************************************************** */
 

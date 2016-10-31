@@ -8,6 +8,7 @@
 /* Generate all code */
 bool cgenAllCode();
 
+/* Generate blocks of code */
 
 
 /* ------------------------------------------------------------- */
@@ -154,8 +155,8 @@ const char mips_not_a0_a0[] =
     "\t# ----------------------------------------------- #\n";
  
 /* Convert $a0 to a negative number */
-const char mips_static_number_load[] =
-    "\t# -------------- Negative $a0 number ------------ #\n"
+const char mips_neg_a0[] =
+    "\t# ---------------- Neg $a0 number --------------- #\n"
     "\tnegu $a0, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
