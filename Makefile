@@ -167,6 +167,7 @@ package:
 	cp $(PKG_FILES) pkg/
 	cp pkgMakefile pkg/Makefile
 	zip -j pkg.zip pkg/*
+	@printf "Package created with name pkg.zip\n"
 
 # Limpa o ambiente
 clean:
