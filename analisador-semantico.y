@@ -272,7 +272,13 @@ comando_list    : comando_list comando                  {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
+                                                             /* Check if there are errors with the actual node */
+                                                            if($$->child_list == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
