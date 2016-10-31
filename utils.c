@@ -6,9 +6,6 @@
 #include "token_struct.h"
 #include "utils.h"
 
-/* Global Instruction queue */
-extern InstructionQueue *instruction_queue;
-
 /**
  * Utility to allocate a token and token childs
  * 
