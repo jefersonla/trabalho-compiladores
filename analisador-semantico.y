@@ -221,14 +221,13 @@ programa        : bloco                                 {
                                                             instructionQueueFilePrint(output_file, instruction_queue);
                                                             
                                                             /* Print Finished Result */
-                                                            fprintf(stderr, "\n::: CODE GENERATOR :::\n");
+                                                            printf("\n::: CODE GENERATOR :::\n");
                                                             
                                                             /* Print Instruction Queue */
-                                                            instructionQueueFilePrint(stderr, instruction_queue);
+                                                            instructionQueueFilePrint(stdout, instruction_queue);
                                                             
                                                             /* Print other structures */
-                                                            fprintf(stderr, 
-                                                                    "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
+                                                            printf( "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
                                                                     "[programa %s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n"
                                                                     "%s",
