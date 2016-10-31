@@ -142,7 +142,7 @@ parser-all-tests:
 
 # Parser extra
 check-extra:
-	rm -r tests/testing
+	\rm -r tests/testing
 	mkdir tests/testing
 	@ls tests/input | \
 	sort |\
