@@ -469,52 +469,52 @@ void showHelpUsage(){
 }
 
 int main( int argc, char **argv ) {
-	++argv, --argc; /* skip over program name */
+	++argv; --argc; /* skip over program name */
 
     /* Code Begin Message */
 	printf( " ::: LUA MIPS Compiler - Lexical Analyser ::: \n"  \
-            "Version 0.2 - Pre Alpha - LUA 5.3 Compilant\n"     \
+            "Version 0.4 - Pre Alpha - LUA SIMPLE UFBA Compilant\n"     \
             "Developed by Jeferson Lima and Jefferson Rene\n"   \
             "\n");
 
-    // If you have one or more arguments and they start with --
+    /* If you have one or more arguments and they start with -- */
     if((argc == 1) && (argv[0][0] == '-' && argv[0][1] == '-')){
         showHelpUsage();
         return EXIT_SUCCESS;
     }
 
-	// Verify number of parameters
+	/* Verify number of parameters  */
 	switch(argc){
-        // STDIN Input file
+        /* STDIN Input file */
 		case 0:
-			// Input stdin
+			/* Input stdin */
 			yyin = stdin;
 
-            // Print specified format
+            /* Print specified format */
             printf(":: STDIN COMMAND MODE SELECTED ::\n\n");
 
-			// The output will be a.out
+			/* The output will be a.out */
 			strcpy(output_filename, "stdin.out");
 			break;
-        // Default output filename
+        /* Default output filename */
 		case 1:
-			// Input file for Flex
+			/* Input file for Flex */
 			yyin = fopen(argv[0], "r");
 
-            // Print specified format
+            /* Print specified format */
             printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n");
 
-			// Output filename will be input_name+.out
+			/* Output filename will be input_name+.out */
 			strcpy(output_filename, argv[0]);
 			strcpy(&output_filename[strlen(output_filename)], ".out");
 
 			break;
-        // Both parameters specified
+        /* Both parameters specified */
 		case 2:
-			// Input file for Flex
+			/* Input file for Flex */
 			yyin = fopen(argv[0], "r");
 
-			// Output filename
+			/* Output filename */
 			strcpy(output_filename, argv[1]);
 
 			break;
@@ -524,18 +524,18 @@ int main( int argc, char **argv ) {
 			return EXIT_FAILURE;
 	}
 
-    // Message of starting compilation
+    /* Message of starting compilation */
     printf( ":: OUTPUT FILE WILL BE %s.out ::\n\n"
             "::: STARTING LEX PARSER PROCESS :::\n", output_filename);
 
-	// Output File for Flex
+	/* Output File for Flex */
 	output_file = fopen(output_filename, "w");
 
-    // While there are tokens to process
+    /* While there are tokens to process */
     int yylex_state;
     for(yylex_state = yylex() ; (yylex_state) && (yylex_state != yyerrorfound) ; yylex_state = yylex());
 
-    // If no errors has been related EXIT_SUCCESS
+    /* If no errors has been related EXIT_SUCCESS */
 	return yycheckstate(yylex_state);
 }
 #endif
