@@ -92,7 +92,7 @@ lex.yy.c: $(FLEX_SRC)
 	flex $(FLEX_FLAGS) $(FLEX_SRC)
 
 # Compilação Flex em modo Debug
-lexical-debug: debug.lex.yy.c debug_lexical_executable
+lexical-debug: debug.y.tab.c debug.lex.yy.c debug_lexical_executable
 
 # Compilação Flex Debug
 debug.lex.yy.c: $(FLEX_SRC)
