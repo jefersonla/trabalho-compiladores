@@ -58,6 +58,9 @@ TokenNode *abstract_sintatic_tree;
 /* Generated Code */
 InstructionQueue *instruction_queue;
 
+/* Global Symbol Table */
+SymbolTable *global_symbol_table;
+
 %}
 
 /* Definition of token iterator */
@@ -248,8 +251,18 @@ bloco           : comando_list comandoret               {
                                                         }
                 ;
 
+/* -- List of commands -- */
 comando_list    : comando_list comando                  {
-                                                            allocateTokenAndChilds(&$$, TI_COMANDO_LIST, 2, $1, $2);
+                                                            /* Initialize the list with no childs  */
+                                                            allocateTokenAndChilds(&$$, TI_COMANDO_LIST, 0);
+                                                            
+                                                            /* If the last type wasn't empty copy childs of this node */
+                                                            if($1->token_type != TI_EMPTY){
+                                                                concatenateChildTokens($$, &$1);
+                                                            }
+                                                            
+                                                            /* Add the last node */
+                                                            listAddToken($$->child_list, $2);
                                                             //allocate2Tokens($$, "%s %s", $1, $2);
                                                         }
                 | /* Empty */                           { 
@@ -433,7 +446,20 @@ label           : T_LABEL T_NAME T_LABEL                {
                                                         }
 
 term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
-                                                            allocateTokenAndChilds( &$$, TI_LIST_ELSEIF, 5, $1, $2, $3, $4, $5);
+                                                            /* Initialize the list with no childs  */
+                                                            allocateTokenAndChilds(&$$, TI_LIST_ELSEIF, 0);
+                                                            
+                                                            /* If the last type wasn't empty copy childs of this node */
+                                                            if($1->token_type != TI_EMPTY){
+                                                                concatenateChildTokens($$, &$1);
+                                                            }
+                                                            
+                                                            /* Add the last node */
+                                                            listAddToken($$->child_list, $2);
+                                                            listAddToken($$->child_list, $3);
+                                                            listAddToken($$->child_list, $4);
+                                                            listAddToken($$->child_list, $5);
+                                                            
                                                             //llocate3Tokens($$,"%s [T_ELSEIF elseif] %s [T_THEN then] %s", $1, $3, $5);
                                                         }
                 | /* Empty */                           { 
@@ -630,7 +656,16 @@ listadenomes    : T_NAME                                {
                                                             //allocate1Token($$, "[T_NAME %s]", $1);
                                                         }
                 | listadenomes T_COMMA T_NAME           {
-                                                            allocateTokenAndChilds(&$$, TI_LISTADENOMES, 3, $1, $2, $3);
+                                                            /* Initialize the list with no childs  */
+                                                            allocateTokenAndChilds(&$$, TI_LISTADENOMES, 0);
+                                                            
+                                                            /* Concatenate the first elements with the actual node */
+                                                            concatenateChildTokens($$, &$1);
+                                                            
+                                                            /* Add the last nodes */
+                                                            listAddToken($$->child_list, $2);
+                                                            listAddToken($$->child_list, $3);
+                                                            
                                                             //allocate2Tokens($$,"%s [T_COMMA ,] [T_NAME %s]", $1, $3);
                                                         }
                 ;
@@ -640,7 +675,16 @@ listaexp        : exp                                   {
                                                             //allocate1Token($$, "%s", $1);
                                                         }
                 | listaexp T_COMMA exp                  {
-                                                            allocateTokenAndChilds(&$$, TI_LISTAEXP, 3, $1, $2, $3);
+                                                            /* Initialize the list with no childs  */
+                                                            allocateTokenAndChilds(&$$, TI_LISTAEXP, 0);
+                                                            
+                                                            /* Concatenate the first elements with the actual node */
+                                                            concatenateChildTokens($$, &$1);
+                                                            
+                                                            /* Add the last nodes */
+                                                            listAddToken($$->child_list, $2);
+                                                            listAddToken($$->child_list, $3);
+                                                            
                                                             //allocate2Tokens($$, "%s [T_COMMA ,] %s", $1, $3);
                                                         }
                 ;
@@ -760,9 +804,6 @@ int main(int argc, char *argv[]){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT WRITE TO FILE!\n");
         return EXIT_FAILURE;
     }
-
-    //char *code_gen = (char *) calloc(strlen(mips_header), sizeof(char));
-    //strcpy(code_gen, mips_header);
 
     /* Message of starting compilation */
     printf( ":: OUTPUT FILE WILL BE %s ::\n\n"

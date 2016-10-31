@@ -35,6 +35,35 @@ TokenNode* newTokenNode(int token_type){
     return _new_token_node;
 }
 
+/** 
+ * Destroy a already allocated token node.
+ * 
+ * @param token that will be destroyed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteTokenNode(ptrTokenNode *token_node){
+    /* Check if token node exists */
+    if(token_node == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN VARIABLE NODE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*token_node) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN NODE!\n");
+        return false;
+    }
+    
+    /* Free toke_node pointer */
+    free((*token_node));
+
+    /* Null the pointer apponted by token_node */
+    (*token_node) = NULL;
+    
+    /* Return success */
+    return true;
+}
+
 /**
  * Add Token String.
  *

@@ -82,3 +82,57 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int no_par
 //bool allocateTokenText(TokenNode *token_node, const char *token_format, int no_params, ...){
 //    
 //}
+
+/**
+ * Utility to concatenate list of tokens.
+ * 
+ * @param token_node_dest Destination token.
+ * @param token_node_src  Source token.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node_src){
+    int i;
+    bool _comand_status;
+    
+    /* Check if dest token is null */
+    if(token_node_dest == NULL){
+        fprintf(stderr, "[ERROR] DESTINATION TOKEN IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if src token is null */
+    if(token_node_src == NULL){
+        fprintf(stderr, "[ERROR] SOURCE TOKEN IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if src token is null */
+    if((*token_node_src) == NULL){
+        fprintf(stderr, "[ERROR] SOURCE TOKEN IS NULL!\n");
+        return false;
+    }
+    
+    /* Can only concat if the dest is empty */
+    if(token_node_dest->child_list->length != 0){
+        fprintf(stderr, "[ERROR] DESTINATION TOKEN IS NOT EMPTY!\n");
+        return false;
+    }
+    
+    /* Concatenate the two tokens */
+    for(i = 0; i < (*token_node_src)->child_list->length; i++){
+        /* Add token a token from the src list */
+        _comand_status = listAddToken(token_node_dest->child_list, listGetTokenByIndex((*token_node_src)->child_list, i + 1));
+        
+        /* Check if the add token method has worked */
+        if(!_comand_status){
+            fprintf(stderr, "[ERROR] DURING CONCATENATION!\n");
+            return false;
+        }
+    }
+    
+    /* Delete src token */
+    deleteTokenNode(token_node_src);
+    
+    /* Return success */
+    return true;
+}

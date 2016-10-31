@@ -54,6 +54,9 @@ typedef struct strToken{
 /* Creates a new token node */
 TokenNode* newTokenNode(int token_type);
 
+/* Free a token */
+bool deleteTokenNode(ptrTokenNode *token_node);
+
 /* Add Token String */
 bool nodeAddTokenStr(TokenNode *token_node, char *token_str);
 
