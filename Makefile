@@ -154,8 +154,6 @@ check-extra:
 				param3="output-"a[2] ; \
 				command="./test.sh $(PARSER_EXECUTABLE) tests/input/"$$1" tests/testing/"param2" tests/output/"param3; \
 				system(command); \
-				print param3, param2, $$1 ; \
-				print command; \
 			} \
 		}'
 
