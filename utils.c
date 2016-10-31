@@ -109,6 +109,9 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         param_str_size += strlen(_str_param);
     }
     
+    /* Initialize arguments list again */
+    va_start(_params_list, no_params);
+    
     /* Allocate string size */
     _new_token_string = (char *) malloc(sizeof(char) * param_str_size);
     

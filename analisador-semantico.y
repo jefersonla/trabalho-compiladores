@@ -262,6 +262,9 @@ comando_list    : comando_list comando                  {
                                                             /* Initialize the list with no childs  */
                                                             allocateTokenAndChilds(&$$, TI_COMANDO_LIST, 0);
                                                             
+                                                            /* Allocate Text */
+                                                            allocateTokenText($$, 3, $1->token_str, " ", $2->token_str);
+                                                            
                                                             /* If the last type wasn't empty copy childs of this node */
                                                             if($1->token_type != TI_EMPTY){
                                                                 concatenateChildTokens($$, &$1);
@@ -269,9 +272,6 @@ comando_list    : comando_list comando                  {
                                                             
                                                             /* Add the last node */
                                                             listAddToken($$->child_list, $2);
-                                                            
-                                                            /* Allocate Text */
-                                                            allocateTokenText($$, 3, $1->token_str, " ", $2->token_str);
                                                         }
                 | /* Empty */                           {
                                                             /* Allocate Token and append childs */
@@ -583,7 +583,7 @@ exp             : T_NIL                                 {
                                                             $$ = $1;
                                                             
                                                             /* Allocate a concatenation of token text strings */
-                                                            allocateTokenText($$, 3, "[exp [T_LITERAL ", $1->lex_str, "]]");
+                                                            allocateTokenText($$, 3, "[exp [T_LITERAL \"", $1->lex_str, "\"]]");
                                                         }
                 | T_NAME                                { 
                                                             /* Copy pointer of the terminal */
@@ -830,15 +830,15 @@ listadenomes    : T_NAME                                {
                                                             /* Initialize the list with no childs  */
                                                             allocateTokenAndChilds(&$$, TI_LISTADENOMES, 0);
                                                             
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 4, $1->token_str, " [T_COMMA ,] [T_NAME ", $3->lex_str, "]");
+                                                            
                                                             /* Concatenate the first elements with the actual node */
                                                             concatenateChildTokens($$, &$1);
                                                             
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
-                                                            
-                                                            /* Allocate a concatenation of token text strings */
-                                                            allocateTokenText($$, 4, $1->token_str, " [T_COMMA ,] [T_NAME ", $3->lex_str, "]");
                                                         }
                 ;
 
@@ -850,15 +850,15 @@ listaexp        : exp                                   {
                                                             /* Initialize the list with no childs  */
                                                             allocateTokenAndChilds(&$$, TI_LISTAEXP, 0);
                                                             
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 3, $1->token_str, " [T_COMMA ,] ", $3->token_str);
+                                                            
                                                             /* Concatenate the first elements with the actual node */
                                                             concatenateChildTokens($$, &$1);
                                                             
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
-                                                            
-                                                            /* Allocate a concatenation of token text strings */
-                                                            allocateTokenText($$, 3, $1->token_str, " [T_COMMA ,] ", $3->token_str);
                                                         }
                 ;
 

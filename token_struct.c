@@ -54,6 +54,16 @@ bool deleteTokenNode(ptrTokenNode *token_node){
         return false;
     }
     
+    /* Free token_str if it exists */
+    if((*token_node)->token_str != NULL){
+        free((*token_node)->token_str);
+    }
+    
+    /* Free lex_str if it exists */
+    if((*token_node)->lex_str != NULL){
+        free((*token_node)->lex_str);
+    }
+    
     /* Free toke_node pointer */
     free((*token_node));
 

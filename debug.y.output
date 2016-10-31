@@ -1,0 +1,2771 @@
+Terminals unused in grammar
+
+   T_OPENBRACE
+   T_CLOSEBRACE
+   T_OPENBRACKET
+   T_CLOSEBRACKET
+   T_SEP
+   T_COLON
+   T_REPEAT
+   T_UNTIL
+   T_GLOBAL
+   T_IN
+
+
+Grammar
+
+    0 $accept: programa $end
+
+    1 programa: bloco
+
+    2 bloco: comando_list comandoret
+    3      | comando_list
+
+    4 comando_list: comando_list comando
+    5             | %empty
+
+    6 comando: T_SEMICOL
+    7        | label
+    8        | T_BREAK
+    9        | chamadadefuncao
+   10        | listadenomes T_ASSIGN listaexp
+   11        | T_DO bloco T_END
+   12        | T_WHILE exp T_DO bloco T_END
+   13        | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END
+   15        | T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END
+   16        | T_IF exp T_THEN bloco term_elseif T_END
+   17        | T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END
+   18        | T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END
+   19        | T_LOCAL listadenomes T_ASSIGN listaexp
+   20        | T_LOCAL listadenomes
+
+   21 label: T_LABEL T_NAME T_LABEL
+
+   22 term_elseif: term_elseif T_ELSEIF exp T_THEN bloco
+   23            | %empty
+
+   24 comandoret: T_RETURN listaexp T_SEMICOL
+   25           | T_RETURN listaexp
+   26           | T_RETURN T_SEMICOL
+   27           | T_RETURN
+
+   28 exp: T_NIL
+   29    | T_VARARG
+   30    | T_NUMBER
+   31    | T_LITERAL
+   32    | T_NAME
+   33    | chamadadefuncao
+   34    | T_MINUS exp
+   35    | T_NOT exp
+   36    | T_BIT_N_XOR exp
+   37    | exp T_PLUS exp
+   38    | exp T_MINUS exp
+   39    | exp T_TIMES exp
+   40    | exp T_DIV exp
+   41    | exp T_FLOOR exp
+   42    | exp T_EXP exp
+   43    | exp T_MOD exp
+   44    | exp T_BIT_AND exp
+   45    | exp T_BIT_OR exp
+   46    | exp T_BIT_N_XOR exp
+   47    | exp T_BIT_LSH exp
+   48    | exp T_BIT_RSH exp
+   49    | exp T_CONCAT exp
+   50    | exp T_LT exp
+   51    | exp T_LTEQ exp
+   52    | exp T_GT exp
+   53    | exp T_GTEQ exp
+   54    | exp T_EQ exp
+   55    | exp T_NEQ exp
+   56    | exp T_AND exp
+   57    | exp T_OR exp
+   58    | T_OPENPAR exp T_CLOSEPAR
+
+   59 chamadadefuncao: T_NAME T_OPENPAR listaexp T_CLOSEPAR
+   60                | T_NAME T_OPENPAR T_CLOSEPAR
+
+   61 listadenomes: T_NAME
+   62             | listadenomes T_COMMA T_NAME
+
+   63 listaexp: exp
+   64         | listaexp T_COMMA exp
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+T_AND (258) 56
+T_OR (259) 57
+T_NOT (260) 35
+T_PLUS (261) 37
+T_MINUS (262) 34 38
+T_TIMES (263) 39
+T_DIV (264) 40
+T_MOD (265) 43
+T_EXP (266) 42
+T_FLOOR (267) 41
+T_EQ (268) 54
+T_NEQ (269) 55
+T_LTEQ (270) 51
+T_GTEQ (271) 53
+T_LT (272) 50
+T_GT (273) 52
+T_COMMA (274) 13 14 62 64
+T_SEMICOL (275) 6 24 26
+T_ASSIGN (276) 10 13 14 19
+T_BIT_AND (277) 44
+T_BIT_OR (278) 45
+T_BIT_N_XOR (279) 36 46
+T_BIT_RSH (280) 48
+T_BIT_LSH (281) 47
+T_OPENPAR (282) 17 18 58 59 60
+T_CLOSEPAR (283) 17 18 58 59 60
+T_OPENBRACE (284)
+T_CLOSEBRACE (285)
+T_OPENBRACKET (286)
+T_CLOSEBRACKET (287)
+T_CONCAT (288) 49
+T_VARARG (289) 29
+T_SEP (290)
+T_COLON (291)
+T_LABEL (292) 21
+T_IF (293) 15 16
+T_ELSEIF (294) 22
+T_ELSE (295) 15
+T_THEN (296) 15 16 22
+T_FOR (297) 13 14
+T_WHILE (298) 12
+T_DO (299) 11 12 13 14
+T_END (300) 11 12 13 14 15 16 17 18
+T_RETURN (301) 24 25 26 27
+T_FUNCTION (302) 17 18
+T_LOCAL (303) 19 20
+T_NIL (304) 28
+T_REPEAT (305)
+T_UNTIL (306)
+T_BREAK (307) 8
+T_GLOBAL (308)
+T_IN (309)
+T_NUMBER (310) 30
+T_LITERAL (311) 31
+T_NAME (312) 13 14 17 18 21 32 59 60 61 62
+
+
+Nonterminals, with rules where they appear
+
+$accept (58)
+    on left: 0
+programa (59)
+    on left: 1, on right: 0
+bloco (60)
+    on left: 2 3, on right: 1 11 12 13 14 15 16 17 18 22
+comando_list (61)
+    on left: 4 5, on right: 2 3 4
+comando (62)
+    on left: 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20, on right: 4
+label (63)
+    on left: 21, on right: 7
+term_elseif (64)
+    on left: 22 23, on right: 15 16 22
+comandoret (65)
+    on left: 24 25 26 27, on right: 2
+exp (66)
+    on left: 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45
+    46 47 48 49 50 51 52 53 54 55 56 57 58, on right: 12 13 14 15 16
+    22 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53
+    54 55 56 57 58 63 64
+chamadadefuncao (67)
+    on left: 59 60, on right: 9 33
+listadenomes (68)
+    on left: 61 62, on right: 10 17 19 20 62
+listaexp (69)
+    on left: 63 64, on right: 10 19 24 25 59 64
+
+
+State 0
+
+    0 $accept: . programa $end
+
+    $default  reduce using rule 5 (comando_list)
+
+    programa      go to state 1
+    bloco         go to state 2
+    comando_list  go to state 3
+
+
+State 1
+
+    0 $accept: programa . $end
+
+    $end  shift, and go to state 4
+
+
+State 2
+
+    1 programa: bloco .
+
+    $default  reduce using rule 1 (programa)
+
+
+State 3
+
+    2 bloco: comando_list . comandoret
+    3      | comando_list .
+    4 comando_list: comando_list . comando
+
+    T_SEMICOL   shift, and go to state 5
+    T_LABEL     shift, and go to state 6
+    T_IF        shift, and go to state 7
+    T_FOR       shift, and go to state 8
+    T_WHILE     shift, and go to state 9
+    T_DO        shift, and go to state 10
+    T_RETURN    shift, and go to state 11
+    T_FUNCTION  shift, and go to state 12
+    T_LOCAL     shift, and go to state 13
+    T_BREAK     shift, and go to state 14
+    T_NAME      shift, and go to state 15
+
+    $default  reduce using rule 3 (bloco)
+
+    comando          go to state 16
+    label            go to state 17
+    comandoret       go to state 18
+    chamadadefuncao  go to state 19
+    listadenomes     go to state 20
+
+
+State 4
+
+    0 $accept: programa $end .
+
+    $default  accept
+
+
+State 5
+
+    6 comando: T_SEMICOL .
+
+    $default  reduce using rule 6 (comando)
+
+
+State 6
+
+   21 label: T_LABEL . T_NAME T_LABEL
+
+    T_NAME  shift, and go to state 21
+
+
+State 7
+
+   15 comando: T_IF . exp T_THEN bloco term_elseif T_ELSE bloco T_END
+   16        | T_IF . exp T_THEN bloco term_elseif T_END
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 31
+    chamadadefuncao  go to state 32
+
+
+State 8
+
+   13 comando: T_FOR . T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR . T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END
+
+    T_NAME  shift, and go to state 33
+
+
+State 9
+
+   12 comando: T_WHILE . exp T_DO bloco T_END
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 34
+    chamadadefuncao  go to state 32
+
+
+State 10
+
+   11 comando: T_DO . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 35
+    comando_list  go to state 3
+
+
+State 11
+
+   24 comandoret: T_RETURN . listaexp T_SEMICOL
+   25           | T_RETURN . listaexp
+   26           | T_RETURN . T_SEMICOL
+   27           | T_RETURN .
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_SEMICOL    shift, and go to state 36
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    $default  reduce using rule 27 (comandoret)
+
+    exp              go to state 37
+    chamadadefuncao  go to state 32
+    listaexp         go to state 38
+
+
+State 12
+
+   17 comando: T_FUNCTION . T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END
+   18        | T_FUNCTION . T_NAME T_OPENPAR T_CLOSEPAR bloco T_END
+
+    T_NAME  shift, and go to state 39
+
+
+State 13
+
+   19 comando: T_LOCAL . listadenomes T_ASSIGN listaexp
+   20        | T_LOCAL . listadenomes
+
+    T_NAME  shift, and go to state 40
+
+    listadenomes  go to state 41
+
+
+State 14
+
+    8 comando: T_BREAK .
+
+    $default  reduce using rule 8 (comando)
+
+
+State 15
+
+   59 chamadadefuncao: T_NAME . T_OPENPAR listaexp T_CLOSEPAR
+   60                | T_NAME . T_OPENPAR T_CLOSEPAR
+   61 listadenomes: T_NAME .
+
+    T_OPENPAR  shift, and go to state 42
+
+    $default  reduce using rule 61 (listadenomes)
+
+
+State 16
+
+    4 comando_list: comando_list comando .
+
+    $default  reduce using rule 4 (comando_list)
+
+
+State 17
+
+    7 comando: label .
+
+    $default  reduce using rule 7 (comando)
+
+
+State 18
+
+    2 bloco: comando_list comandoret .
+
+    $default  reduce using rule 2 (bloco)
+
+
+State 19
+
+    9 comando: chamadadefuncao .
+
+    $default  reduce using rule 9 (comando)
+
+
+State 20
+
+   10 comando: listadenomes . T_ASSIGN listaexp
+   62 listadenomes: listadenomes . T_COMMA T_NAME
+
+    T_COMMA   shift, and go to state 43
+    T_ASSIGN  shift, and go to state 44
+
+
+State 21
+
+   21 label: T_LABEL T_NAME . T_LABEL
+
+    T_LABEL  shift, and go to state 45
+
+
+State 22
+
+   35 exp: T_NOT . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 46
+    chamadadefuncao  go to state 32
+
+
+State 23
+
+   34 exp: T_MINUS . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 47
+    chamadadefuncao  go to state 32
+
+
+State 24
+
+   36 exp: T_BIT_N_XOR . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 48
+    chamadadefuncao  go to state 32
+
+
+State 25
+
+   58 exp: T_OPENPAR . exp T_CLOSEPAR
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 49
+    chamadadefuncao  go to state 32
+
+
+State 26
+
+   29 exp: T_VARARG .
+
+    $default  reduce using rule 29 (exp)
+
+
+State 27
+
+   28 exp: T_NIL .
+
+    $default  reduce using rule 28 (exp)
+
+
+State 28
+
+   30 exp: T_NUMBER .
+
+    $default  reduce using rule 30 (exp)
+
+
+State 29
+
+   31 exp: T_LITERAL .
+
+    $default  reduce using rule 31 (exp)
+
+
+State 30
+
+   32 exp: T_NAME .
+   59 chamadadefuncao: T_NAME . T_OPENPAR listaexp T_CLOSEPAR
+   60                | T_NAME . T_OPENPAR T_CLOSEPAR
+
+    T_OPENPAR  shift, and go to state 42
+
+    $default  reduce using rule 32 (exp)
+
+
+State 31
+
+   15 comando: T_IF exp . T_THEN bloco term_elseif T_ELSE bloco T_END
+   16        | T_IF exp . T_THEN bloco term_elseif T_END
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+    T_THEN       shift, and go to state 71
+
+
+State 32
+
+   33 exp: chamadadefuncao .
+
+    $default  reduce using rule 33 (exp)
+
+
+State 33
+
+   13 comando: T_FOR T_NAME . T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME . T_ASSIGN exp T_COMMA exp T_DO bloco T_END
+
+    T_ASSIGN  shift, and go to state 72
+
+
+State 34
+
+   12 comando: T_WHILE exp . T_DO bloco T_END
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+    T_DO         shift, and go to state 73
+
+
+State 35
+
+   11 comando: T_DO bloco . T_END
+
+    T_END  shift, and go to state 74
+
+
+State 36
+
+   26 comandoret: T_RETURN T_SEMICOL .
+
+    $default  reduce using rule 26 (comandoret)
+
+
+State 37
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+   63 listaexp: exp .
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+
+    $default  reduce using rule 63 (listaexp)
+
+
+State 38
+
+   24 comandoret: T_RETURN listaexp . T_SEMICOL
+   25           | T_RETURN listaexp .
+   64 listaexp: listaexp . T_COMMA exp
+
+    T_COMMA    shift, and go to state 75
+    T_SEMICOL  shift, and go to state 76
+
+    $default  reduce using rule 25 (comandoret)
+
+
+State 39
+
+   17 comando: T_FUNCTION T_NAME . T_OPENPAR listadenomes T_CLOSEPAR bloco T_END
+   18        | T_FUNCTION T_NAME . T_OPENPAR T_CLOSEPAR bloco T_END
+
+    T_OPENPAR  shift, and go to state 77
+
+
+State 40
+
+   61 listadenomes: T_NAME .
+
+    $default  reduce using rule 61 (listadenomes)
+
+
+State 41
+
+   19 comando: T_LOCAL listadenomes . T_ASSIGN listaexp
+   20        | T_LOCAL listadenomes .
+   62 listadenomes: listadenomes . T_COMMA T_NAME
+
+    T_COMMA   shift, and go to state 43
+    T_ASSIGN  shift, and go to state 78
+
+    $default  reduce using rule 20 (comando)
+
+
+State 42
+
+   59 chamadadefuncao: T_NAME T_OPENPAR . listaexp T_CLOSEPAR
+   60                | T_NAME T_OPENPAR . T_CLOSEPAR
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_CLOSEPAR   shift, and go to state 79
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 37
+    chamadadefuncao  go to state 32
+    listaexp         go to state 80
+
+
+State 43
+
+   62 listadenomes: listadenomes T_COMMA . T_NAME
+
+    T_NAME  shift, and go to state 81
+
+
+State 44
+
+   10 comando: listadenomes T_ASSIGN . listaexp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 37
+    chamadadefuncao  go to state 32
+    listaexp         go to state 82
+
+
+State 45
+
+   21 label: T_LABEL T_NAME T_LABEL .
+
+    $default  reduce using rule 21 (label)
+
+
+State 46
+
+   35 exp: T_NOT exp .
+   37    | exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    $default  reduce using rule 35 (exp)
+
+
+State 47
+
+   34 exp: T_MINUS exp .
+   37    | exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 34 (exp)
+
+
+State 48
+
+   36 exp: T_BIT_N_XOR exp .
+   37    | exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND    shift, and go to state 50
+    T_OR     shift, and go to state 51
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 36 (exp)
+
+
+State 49
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+   58    | T_OPENPAR exp . T_CLOSEPAR
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CLOSEPAR   shift, and go to state 83
+    T_CONCAT     shift, and go to state 70
+
+
+State 50
+
+   56 exp: exp T_AND . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 84
+    chamadadefuncao  go to state 32
+
+
+State 51
+
+   57 exp: exp T_OR . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 85
+    chamadadefuncao  go to state 32
+
+
+State 52
+
+   37 exp: exp T_PLUS . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 86
+    chamadadefuncao  go to state 32
+
+
+State 53
+
+   38 exp: exp T_MINUS . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 87
+    chamadadefuncao  go to state 32
+
+
+State 54
+
+   39 exp: exp T_TIMES . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 88
+    chamadadefuncao  go to state 32
+
+
+State 55
+
+   40 exp: exp T_DIV . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 89
+    chamadadefuncao  go to state 32
+
+
+State 56
+
+   43 exp: exp T_MOD . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 90
+    chamadadefuncao  go to state 32
+
+
+State 57
+
+   42 exp: exp T_EXP . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 91
+    chamadadefuncao  go to state 32
+
+
+State 58
+
+   41 exp: exp T_FLOOR . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 92
+    chamadadefuncao  go to state 32
+
+
+State 59
+
+   54 exp: exp T_EQ . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 93
+    chamadadefuncao  go to state 32
+
+
+State 60
+
+   55 exp: exp T_NEQ . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 94
+    chamadadefuncao  go to state 32
+
+
+State 61
+
+   51 exp: exp T_LTEQ . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 95
+    chamadadefuncao  go to state 32
+
+
+State 62
+
+   53 exp: exp T_GTEQ . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 96
+    chamadadefuncao  go to state 32
+
+
+State 63
+
+   50 exp: exp T_LT . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 97
+    chamadadefuncao  go to state 32
+
+
+State 64
+
+   52 exp: exp T_GT . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 98
+    chamadadefuncao  go to state 32
+
+
+State 65
+
+   44 exp: exp T_BIT_AND . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 99
+    chamadadefuncao  go to state 32
+
+
+State 66
+
+   45 exp: exp T_BIT_OR . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 100
+    chamadadefuncao  go to state 32
+
+
+State 67
+
+   46 exp: exp T_BIT_N_XOR . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 101
+    chamadadefuncao  go to state 32
+
+
+State 68
+
+   48 exp: exp T_BIT_RSH . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 102
+    chamadadefuncao  go to state 32
+
+
+State 69
+
+   47 exp: exp T_BIT_LSH . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 103
+    chamadadefuncao  go to state 32
+
+
+State 70
+
+   49 exp: exp T_CONCAT . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 104
+    chamadadefuncao  go to state 32
+
+
+State 71
+
+   15 comando: T_IF exp T_THEN . bloco term_elseif T_ELSE bloco T_END
+   16        | T_IF exp T_THEN . bloco term_elseif T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 105
+    comando_list  go to state 3
+
+
+State 72
+
+   13 comando: T_FOR T_NAME T_ASSIGN . exp T_COMMA exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME T_ASSIGN . exp T_COMMA exp T_DO bloco T_END
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 106
+    chamadadefuncao  go to state 32
+
+
+State 73
+
+   12 comando: T_WHILE exp T_DO . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 107
+    comando_list  go to state 3
+
+
+State 74
+
+   11 comando: T_DO bloco T_END .
+
+    $default  reduce using rule 11 (comando)
+
+
+State 75
+
+   64 listaexp: listaexp T_COMMA . exp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 108
+    chamadadefuncao  go to state 32
+
+
+State 76
+
+   24 comandoret: T_RETURN listaexp T_SEMICOL .
+
+    $default  reduce using rule 24 (comandoret)
+
+
+State 77
+
+   17 comando: T_FUNCTION T_NAME T_OPENPAR . listadenomes T_CLOSEPAR bloco T_END
+   18        | T_FUNCTION T_NAME T_OPENPAR . T_CLOSEPAR bloco T_END
+
+    T_CLOSEPAR  shift, and go to state 109
+    T_NAME      shift, and go to state 40
+
+    listadenomes  go to state 110
+
+
+State 78
+
+   19 comando: T_LOCAL listadenomes T_ASSIGN . listaexp
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 37
+    chamadadefuncao  go to state 32
+    listaexp         go to state 111
+
+
+State 79
+
+   60 chamadadefuncao: T_NAME T_OPENPAR T_CLOSEPAR .
+
+    $default  reduce using rule 60 (chamadadefuncao)
+
+
+State 80
+
+   59 chamadadefuncao: T_NAME T_OPENPAR listaexp . T_CLOSEPAR
+   64 listaexp: listaexp . T_COMMA exp
+
+    T_COMMA     shift, and go to state 75
+    T_CLOSEPAR  shift, and go to state 112
+
+
+State 81
+
+   62 listadenomes: listadenomes T_COMMA T_NAME .
+
+    $default  reduce using rule 62 (listadenomes)
+
+
+State 82
+
+   10 comando: listadenomes T_ASSIGN listaexp .
+   64 listaexp: listaexp . T_COMMA exp
+
+    T_COMMA  shift, and go to state 75
+
+    $default  reduce using rule 10 (comando)
+
+
+State 83
+
+   58 exp: T_OPENPAR exp T_CLOSEPAR .
+
+    $default  reduce using rule 58 (exp)
+
+
+State 84
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   56    | exp T_AND exp .
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 56 (exp)
+
+
+State 85
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+   57    | exp T_OR exp .
+
+    T_AND    shift, and go to state 50
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 57 (exp)
+
+
+State 86
+
+   37 exp: exp . T_PLUS exp
+   37    | exp T_PLUS exp .
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 37 (exp)
+
+
+State 87
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   38    | exp T_MINUS exp .
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 38 (exp)
+
+
+State 88
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   39    | exp T_TIMES exp .
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    $default  reduce using rule 39 (exp)
+
+
+State 89
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   40    | exp T_DIV exp .
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    $default  reduce using rule 40 (exp)
+
+
+State 90
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   43    | exp T_MOD exp .
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    $default  reduce using rule 43 (exp)
+
+
+State 91
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   42    | exp T_EXP exp .
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+
+    $default  reduce using rule 42 (exp)
+
+
+State 92
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   41    | exp T_FLOOR exp .
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+
+    $default  reduce using rule 41 (exp)
+
+
+State 93
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   54    | exp T_EQ exp .
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 54 (exp)
+
+
+State 94
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   55    | exp T_NEQ exp .
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 55 (exp)
+
+
+State 95
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   51    | exp T_LTEQ exp .
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 51 (exp)
+
+
+State 96
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   53    | exp T_GTEQ exp .
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 53 (exp)
+
+
+State 97
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   50    | exp T_LT exp .
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 50 (exp)
+
+
+State 98
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   52    | exp T_GT exp .
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+
+    $default  reduce using rule 52 (exp)
+
+
+State 99
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   44    | exp T_BIT_AND exp .
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+
+    $default  reduce using rule 44 (exp)
+
+
+State 100
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   45    | exp T_BIT_OR exp .
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+
+    $default  reduce using rule 45 (exp)
+
+
+State 101
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   46    | exp T_BIT_N_XOR exp .
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND    shift, and go to state 50
+    T_OR     shift, and go to state 51
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 46 (exp)
+
+
+State 102
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   48    | exp T_BIT_RSH exp .
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND    shift, and go to state 50
+    T_OR     shift, and go to state 51
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 48 (exp)
+
+
+State 103
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   47    | exp T_BIT_LSH exp .
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND    shift, and go to state 50
+    T_OR     shift, and go to state 51
+    T_PLUS   shift, and go to state 52
+    T_MINUS  shift, and go to state 53
+    T_TIMES  shift, and go to state 54
+    T_DIV    shift, and go to state 55
+    T_MOD    shift, and go to state 56
+    T_EQ     shift, and go to state 59
+    T_NEQ    shift, and go to state 60
+    T_LTEQ   shift, and go to state 61
+    T_GTEQ   shift, and go to state 62
+    T_LT     shift, and go to state 63
+    T_GT     shift, and go to state 64
+
+    $default  reduce using rule 47 (exp)
+
+
+State 104
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   49    | exp T_CONCAT exp .
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+
+    $default  reduce using rule 49 (exp)
+
+
+State 105
+
+   15 comando: T_IF exp T_THEN bloco . term_elseif T_ELSE bloco T_END
+   16        | T_IF exp T_THEN bloco . term_elseif T_END
+
+    $default  reduce using rule 23 (term_elseif)
+
+    term_elseif  go to state 113
+
+
+State 106
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp . T_COMMA exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME T_ASSIGN exp . T_COMMA exp T_DO bloco T_END
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_COMMA      shift, and go to state 114
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+
+
+State 107
+
+   12 comando: T_WHILE exp T_DO bloco . T_END
+
+    T_END  shift, and go to state 115
+
+
+State 108
+
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+   64 listaexp: listaexp T_COMMA exp .
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+
+    $default  reduce using rule 64 (listaexp)
+
+
+State 109
+
+   18 comando: T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 116
+    comando_list  go to state 3
+
+
+State 110
+
+   17 comando: T_FUNCTION T_NAME T_OPENPAR listadenomes . T_CLOSEPAR bloco T_END
+   62 listadenomes: listadenomes . T_COMMA T_NAME
+
+    T_COMMA     shift, and go to state 43
+    T_CLOSEPAR  shift, and go to state 117
+
+
+State 111
+
+   19 comando: T_LOCAL listadenomes T_ASSIGN listaexp .
+   64 listaexp: listaexp . T_COMMA exp
+
+    T_COMMA  shift, and go to state 75
+
+    $default  reduce using rule 19 (comando)
+
+
+State 112
+
+   59 chamadadefuncao: T_NAME T_OPENPAR listaexp T_CLOSEPAR .
+
+    $default  reduce using rule 59 (chamadadefuncao)
+
+
+State 113
+
+   15 comando: T_IF exp T_THEN bloco term_elseif . T_ELSE bloco T_END
+   16        | T_IF exp T_THEN bloco term_elseif . T_END
+   22 term_elseif: term_elseif . T_ELSEIF exp T_THEN bloco
+
+    T_ELSEIF  shift, and go to state 118
+    T_ELSE    shift, and go to state 119
+    T_END     shift, and go to state 120
+
+
+State 114
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA . exp T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME T_ASSIGN exp T_COMMA . exp T_DO bloco T_END
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 121
+    chamadadefuncao  go to state 32
+
+
+State 115
+
+   12 comando: T_WHILE exp T_DO bloco T_END .
+
+    $default  reduce using rule 12 (comando)
+
+
+State 116
+
+   18 comando: T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco . T_END
+
+    T_END  shift, and go to state 122
+
+
+State 117
+
+   17 comando: T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 123
+    comando_list  go to state 3
+
+
+State 118
+
+   22 term_elseif: term_elseif T_ELSEIF . exp T_THEN bloco
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 124
+    chamadadefuncao  go to state 32
+
+
+State 119
+
+   15 comando: T_IF exp T_THEN bloco term_elseif T_ELSE . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 125
+    comando_list  go to state 3
+
+
+State 120
+
+   16 comando: T_IF exp T_THEN bloco term_elseif T_END .
+
+    $default  reduce using rule 16 (comando)
+
+
+State 121
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp . T_COMMA exp T_DO bloco T_END
+   14        | T_FOR T_NAME T_ASSIGN exp T_COMMA exp . T_DO bloco T_END
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_COMMA      shift, and go to state 126
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+    T_DO         shift, and go to state 127
+
+
+State 122
+
+   18 comando: T_FUNCTION T_NAME T_OPENPAR T_CLOSEPAR bloco T_END .
+
+    $default  reduce using rule 18 (comando)
+
+
+State 123
+
+   17 comando: T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco . T_END
+
+    T_END  shift, and go to state 128
+
+
+State 124
+
+   22 term_elseif: term_elseif T_ELSEIF exp . T_THEN bloco
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+    T_THEN       shift, and go to state 129
+
+
+State 125
+
+   15 comando: T_IF exp T_THEN bloco term_elseif T_ELSE bloco . T_END
+
+    T_END  shift, and go to state 130
+
+
+State 126
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA . exp T_DO bloco T_END
+
+    T_NOT        shift, and go to state 22
+    T_MINUS      shift, and go to state 23
+    T_BIT_N_XOR  shift, and go to state 24
+    T_OPENPAR    shift, and go to state 25
+    T_VARARG     shift, and go to state 26
+    T_NIL        shift, and go to state 27
+    T_NUMBER     shift, and go to state 28
+    T_LITERAL    shift, and go to state 29
+    T_NAME       shift, and go to state 30
+
+    exp              go to state 131
+    chamadadefuncao  go to state 32
+
+
+State 127
+
+   14 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 132
+    comando_list  go to state 3
+
+
+State 128
+
+   17 comando: T_FUNCTION T_NAME T_OPENPAR listadenomes T_CLOSEPAR bloco T_END .
+
+    $default  reduce using rule 17 (comando)
+
+
+State 129
+
+   22 term_elseif: term_elseif T_ELSEIF exp T_THEN . bloco
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 133
+    comando_list  go to state 3
+
+
+State 130
+
+   15 comando: T_IF exp T_THEN bloco term_elseif T_ELSE bloco T_END .
+
+    $default  reduce using rule 15 (comando)
+
+
+State 131
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp . T_DO bloco T_END
+   37 exp: exp . T_PLUS exp
+   38    | exp . T_MINUS exp
+   39    | exp . T_TIMES exp
+   40    | exp . T_DIV exp
+   41    | exp . T_FLOOR exp
+   42    | exp . T_EXP exp
+   43    | exp . T_MOD exp
+   44    | exp . T_BIT_AND exp
+   45    | exp . T_BIT_OR exp
+   46    | exp . T_BIT_N_XOR exp
+   47    | exp . T_BIT_LSH exp
+   48    | exp . T_BIT_RSH exp
+   49    | exp . T_CONCAT exp
+   50    | exp . T_LT exp
+   51    | exp . T_LTEQ exp
+   52    | exp . T_GT exp
+   53    | exp . T_GTEQ exp
+   54    | exp . T_EQ exp
+   55    | exp . T_NEQ exp
+   56    | exp . T_AND exp
+   57    | exp . T_OR exp
+
+    T_AND        shift, and go to state 50
+    T_OR         shift, and go to state 51
+    T_PLUS       shift, and go to state 52
+    T_MINUS      shift, and go to state 53
+    T_TIMES      shift, and go to state 54
+    T_DIV        shift, and go to state 55
+    T_MOD        shift, and go to state 56
+    T_EXP        shift, and go to state 57
+    T_FLOOR      shift, and go to state 58
+    T_EQ         shift, and go to state 59
+    T_NEQ        shift, and go to state 60
+    T_LTEQ       shift, and go to state 61
+    T_GTEQ       shift, and go to state 62
+    T_LT         shift, and go to state 63
+    T_GT         shift, and go to state 64
+    T_BIT_AND    shift, and go to state 65
+    T_BIT_OR     shift, and go to state 66
+    T_BIT_N_XOR  shift, and go to state 67
+    T_BIT_RSH    shift, and go to state 68
+    T_BIT_LSH    shift, and go to state 69
+    T_CONCAT     shift, and go to state 70
+    T_DO         shift, and go to state 134
+
+
+State 132
+
+   14 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco . T_END
+
+    T_END  shift, and go to state 135
+
+
+State 133
+
+   22 term_elseif: term_elseif T_ELSEIF exp T_THEN bloco .
+
+    $default  reduce using rule 22 (term_elseif)
+
+
+State 134
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO . bloco T_END
+
+    $default  reduce using rule 5 (comando_list)
+
+    bloco         go to state 136
+    comando_list  go to state 3
+
+
+State 135
+
+   14 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_DO bloco T_END .
+
+    $default  reduce using rule 14 (comando)
+
+
+State 136
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco . T_END
+
+    T_END  shift, and go to state 137
+
+
+State 137
+
+   13 comando: T_FOR T_NAME T_ASSIGN exp T_COMMA exp T_COMMA exp T_DO bloco T_END .
+
+    $default  reduce using rule 13 (comando)
