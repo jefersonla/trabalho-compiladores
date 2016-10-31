@@ -7,16 +7,20 @@ then
 	exit 0
 fi
 
+echo ">> -------------------------------------------------"
+
 # Check if theres a  variable
 if [ -z "$1" ]
 then
 	echo "[ERROR] NOT SPECIFIED EXECUTABLE FILES!"
+	echo "<< -------------------------------------------------"
 	exit 1
 fi
 
 if [ -z "$2" ]
 then
     echo "[ERROR] NOT SPECIFIED FILE FOR TEST!"
+    echo "<< -------------------------------------------------"
     exit 1
 fi
 
@@ -36,6 +40,7 @@ then
 	"./$1" "$2" "$OUTPUT_FILE" > /dev/null 2>&1
 else
 	echo "[ERROR] FILE NOT EXIST, IS EMPTY OR CAN'T BE EXECUTABLE!"
+	echo "<< -------------------------------------------------"
 	exit 1
 fi
 
@@ -56,6 +61,7 @@ then
 	echo ">> TESTING $2 WITH BINARY $1" 
 else
 	echo "[ERROR] OUTPUT FILE NOT EXIST!"
+	echo "<< -------------------------------------------------"
 	exit 1
 fi
 
@@ -79,8 +85,10 @@ then
 		echo "Install diffchecker with 'sudo npm install -g diffchecker' to check what's wrong"
 	fi
     echo "[ERROR] RESULT IS DIFFERENT FROM WHAT IS EXPECTED"
+    echo "<< -------------------------------------------------"
     exit 1
-else
-    echo ">> COMPLETED! EVERYTHING IS CORRECT WITH $2 :)"	
-    exit 0
 fi
+
+echo ">> COMPLETED! EVERYTHING IS CORRECT WITH $2 :)"
+echo "<< -------------------------------------------------"
+exit 0
