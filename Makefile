@@ -31,9 +31,9 @@ BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
-PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.c token_struct.h $(LIBS_SRC) utils.h codegen_functions.h
+PKG_FILES=analisador-lexico.l analisador-semantico.y lexical.defs.h parser.defs.h token_struct.h utils.h codegen_functions.h $(LIBS_SRC)
 # Libs sources
-LIBS_SRC=utils.c token_struct.c codegen_functions.c
+LIBS_SRC=token_struct.c utils.c codegen_functions.c
 
 # Rota padrão
 all: main
@@ -42,7 +42,7 @@ all: main
 # TODO Constroi o compilador
 # Por enquanto o compilador vai ser o parser
 main: codegen parser lexical
-	@printf "TODO: Constroi ultima parte do compilador\n"
+	@printf "All modules compiled\n"
 	@printf "Compilation Finished With Success!\n"
 
 # Compilação Analisador Léxico e Sintático/Semântico com flags de DEBUG
