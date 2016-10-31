@@ -645,7 +645,7 @@ exp             : T_NIL                                 {
                                                         }
                 | exp T_PLUS exp                        {
                                                             /* Allocate Token and append childs */
-                                                            allocateTokenAndChilds( &$$, TI_PLUS, 3, $1, $3);
+                                                            allocateTokenAndChilds( &$$, TI_PLUS, 3, $1, $2, $3);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_PLUS +]] ", $3->token_str, "]");
