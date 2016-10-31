@@ -444,7 +444,8 @@ T_UNTIL		until
                 printf("INVALID CHARACTER!\n");
         }
         // Stop Application
-        return yyerrorfound;
+        //return yyerrorfound;
+        exit(EXIT_FAILURE);
 	}
 
 %%
