@@ -1,6 +1,8 @@
 #ifndef CODEGEN_FUNCTIONS_H
 #define CODEGEN_FUNCTIONS_H
 
+#include <stdbool.h>
+
 /* ------------------------------------------------------------- */
 /*                     Code Generator Functions                  */
 /* ------------------------------------------------------------- */
