@@ -32,7 +32,7 @@ typedef struct strInstructionQueue InstructionQueue;
 
 typedef struct strToken{
     /* Root token of the given node */
-    struct strToken *root_token;
+    TokenNode *root_token;
     
     /* Token String */
     /* Store token string node */

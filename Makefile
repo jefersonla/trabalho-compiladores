@@ -31,9 +31,9 @@ BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
-PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.c token_struct.h $(LIBS_SRC) utils.h
+PKG_FILES=lexical.defs.h analisador-lexico.l analisador-semantico.y parser.defs.h token_struct.c token_struct.h $(LIBS_SRC) utils.h codegen_functions.h
 # Libs sources
-LIBS_SRC=utils.c token_struct.c
+LIBS_SRC=utils.c token_struct.c codegen_functions.c
 
 # Rota padrão
 all: main
@@ -60,7 +60,7 @@ debug_codegen_executable: debug.lex.yy.c debug.y.tab.c
 
 # Executavel Gerador de código
 $(EXECUTABLE): lex.yy.c y.tab.c
-	$(CC) $(CFLAGS) -o $(EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER) 
+	$(CC) $(CFLAGS) -o $(EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(CFLAGS_PARSER)
 	
 # Compilação Analisador Sintático/Semântico
 parser: lex.yy.c y.tab.c $(PARSER_EXECUTABLE)
