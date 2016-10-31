@@ -228,7 +228,7 @@ programa        : bloco                                 {
                                                             
                                                             /* Print other structures */
                                                             fprintf(stderr, 
-                                                                    "::: SYNTATIC/SEMANTIC ANALYSER :::\n"
+                                                                    "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"
                                                                     "[programa %s]\n\n"
                                                                     "::: LEXICAL PARSER :::\n"
                                                                     "%s",
