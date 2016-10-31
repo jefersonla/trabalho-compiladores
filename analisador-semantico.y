@@ -270,6 +270,12 @@ comando_list    : comando_list comando                  {
                                                                 concatenateChildTokens($$, &$1);
                                                             }
                                                             
+                                                            /* Check if there are errors with the actual node */
+                                                            if($$ == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
                                                             /* Add the last node */
                                                             listAddToken($$->child_list, $2);
                                                         }
@@ -502,6 +508,12 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             /* If the last type wasn't empty copy childs of this node */
                                                             if($1->token_type != TI_EMPTY){
                                                                 concatenateChildTokens($$, &$1);
+                                                            }
+                                                            
+                                                            /* Check if there are errors with the actual node */
+                                                            if($$ == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                return EXIT_FAILURE;
                                                             }
                                                             
                                                             /* Add the last node */
@@ -836,6 +848,12 @@ listadenomes    : T_NAME                                {
                                                             /* Concatenate the first elements with the actual node */
                                                             concatenateChildTokens($$, &$1);
                                                             
+                                                            /* Check if there are errors with the actual node */
+                                                            if($$ == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
+                                                            
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
@@ -855,6 +873,12 @@ listaexp        : exp                                   {
                                                             
                                                             /* Concatenate the first elements with the actual node */
                                                             concatenateChildTokens($$, &$1);
+                                                            
+                                                            /* Check if there are errors with the actual node */
+                                                            if($$ == NULL){
+                                                                fprintf(stderr, "[ERROR] FATAL ERROR BUG ON CHILD LIST!\n");
+                                                                return EXIT_FAILURE;
+                                                            }
                                                             
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);

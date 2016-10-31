@@ -49,5 +49,8 @@ analisador_semantico
 *.tab.h
 *.tab.c
 
+# Debug status
+debug.y.output
+
 # Temp files
 *.swp
