@@ -4,11 +4,18 @@
 #include <stdbool.h>
 
 /* ------------------------------------------------------------- */
+/*                     Code Generator Constants                  */
+/* ------------------------------------------------------------- */
+
+/* Global Start Address */
+#define GLOBAL_START_ADRESS             -1
+
+/* ------------------------------------------------------------- */
 /*                     Code Generator Functions                  */
 /* ------------------------------------------------------------- */
 
 /* Generate all code */
-bool cgenAllCode();
+bool cgenAllCode(TokenNode *root_token);
 
 /* Generate blocks of code */
 
@@ -28,11 +35,12 @@ const char mips_header[] =
         "\t.data\n"
     "\n"
     "# System default variables \n"
-    "__newline: .asciiz \"\\n\"\n"
-    "__nil:\t.asciiz \"nil\"\n"
+    "_newline: .asciiz \"\\n\"\n"
+    "_nil:\t.asciiz \"nil\"\n"
     "\n"
     "# User Global Variables";
-    
+
+/* -- SHOULD START_WITH __ */
 /* -- GLOBAL VARS -- "%s" */
 
 /* System Functions */        
@@ -65,13 +73,13 @@ const char mips_system_functions[] =
     "print_nil_value:\n"
         "\t# Print Value nil\n"
         "\tli $v0, 4\n"
-        "\tla $a0, __nil\n"
+        "\tla $a0, _nil\n"
         "\tsyscall\n"
         "\n"
     "end_print:\n"
         "\t# Print linefeed\n"
         "\tli $v0, 4\n"
-        "\tla $a0, __newline\n"
+        "\tla $a0, _newline\n"
         "\tsyscall\n"
         "\n"
         "\t# Close Print Function \n"
@@ -103,13 +111,13 @@ const char mips_footer[] =
 /* Store a global variable */    
 const char mips_global_atributtion[] =
     "\t# --------- Store $a0 in global variable -------- #\n"
-    "\tsw $a0, _%s\n"
+    "\tsw $a0, __%s\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load a global variable into $a0 */
 const char mips_global_load[] =
     "\t# --------- Load global variable in $a0 --------- #\n"
-    "\tlw $a0, _%s\n"
+    "\tlw $a0, __%s\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Push temporary return of a expression */
@@ -237,7 +245,7 @@ const char mips_eq_a0_t1_a0[] =
 
 /* Check if $a0 is not equal $t1 */
 const char mips_neq_a0_t1_a0[] =
-    "\t# ------------- Neq $a0 = $t1 ~= $a0 ------------- #\n"
+    "\t# ------------- Neq $a0 = $t1 ~= $a0 ------------ #\n"
     "\tsubu $a0, $t1, $a0\n"
     "\tsltu $a0, $0, $a0\n"
     "\t# ----------------------------------------------- #\n";
@@ -256,6 +264,32 @@ const char mips_lte_a0_t1_a0[] =
     "\txori $a0, $a0, 1\n"
     "\t# ----------------------------------------------- #\n";
 
+
+/* ------------------------------------------------------------- */
+/*               Conditional Operations Template                 */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for conditional operations
+ * 
+ *  Default Model:
+ *      CGEN(if exp1 then exp2) ->
+ *          CGEN(exp1)
+ *          push_a0 m 
+ *          CGEN(exp2)
+ *          top_t1
+ *          CGEN(operand)
+ *          pop_a0
+ */
+ 
+ /* Check if $a0 is less or equal $t1 */
+const char mips_lte_a0_t1_a0[] =
+    "\t# ------------- Lte $a0 = $t1 <= $a0 ------------- #\n"
+    "\tslt $a0, $a0, $t1\n"
+    "\txori $a0, $a0, 1\n"
+    "\t# ----------------------------------------------- #\n";
+ 
+ 
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */
 /* ------------------------------------------------------------- */
