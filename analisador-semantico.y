@@ -510,6 +510,9 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             /* Initialize the list with no childs  */
                                                             allocateTokenAndChilds(&$$, TI_LIST_ELSEIF, 0);
                                                             
+                                                            /* Allocate a concatenation of token text strings */
+                                                            allocateTokenText($$, 5, $1->token_str, " [T_ELSEIF elseif] ", $3->token_str, " [T_THEN then] ", $5->token_str);
+                                                            
                                                             /* If the last type wasn't empty copy childs of this node */
                                                             if($1->token_type != TI_EMPTY){
                                                                 concatenateChildTokens($$, &$1);
@@ -532,9 +535,6 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             listAddToken($$->child_list, $3);
                                                             listAddToken($$->child_list, $4);
                                                             listAddToken($$->child_list, $5);
-                                                            
-                                                            /* Allocate a concatenation of token text strings */
-                                                            allocateTokenText($$, 5, $1->token_str, " [T_ELSEIF elseif] ", $3->token_str, " [T_THEN then] ", $5->token_str);
                                                         }
                 | /* Empty */                           { 
                                                             /* Allocate Token and append childs */
@@ -753,7 +753,7 @@ exp             : T_NIL                                 {
                                                             allocateTokenAndChilds(&$$, TI_GT, 3, $1, $2, $3);
                                                             
                                                             /* Allocate a concatenation of token text strings */
-                                                            // allocate2Tokens($$, "[exp %s [opbin [T_GT >]] ", $3->token_str, "]");
+                                                            allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_GT >]] ", $3->token_str, "]");
                                                         }
                 | exp T_GTEQ exp                        {
                                                             /* Allocate Token and append childs */
