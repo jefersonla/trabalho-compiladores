@@ -702,6 +702,9 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
  * @return Return true if symbol name exist on table and false otherwise.
  */
 bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
+    int i;
+    SymbolTable *_actual_symbol_table;
+    
     /* Check if symbol table is not NULL */
     if(symbol_table == NULL){
         fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
@@ -714,16 +717,25 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
         return false;
     }
     
-    /* Check if the symbol table have elements and them search for */ 
-    if(symbol_table->length != 0){
-        int i;
-        
-        /* Check if symbol table already has a symbol with this name */
-        for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
-                return true;
+    /* Get the actual symbl table */
+    _actual_symbol_table = symbol_table;
+    
+    /* Search for the variable in the actual symbol table */
+    while(_actual_symbol_table != NULL){
+    
+        /* Check if the symbol table have elements and them search for */ 
+        if(symbol_table->length != 0){
+            
+            /* Check if symbol table already has a symbol with this name */
+            for(i = 0; i < symbol_table->length; i++){
+                if(symbolEqualsName(symbol_table->items[i], symbol_name)){
+                    return true;
+                }
             }
         }
+        
+        /* Get the previous symbol table */
+        _actual_symbol_table = _actual_symbol_table->previous_scope; 
     }
     
     /* The element is not on symbol table */
@@ -738,6 +750,9 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
  * @return A pointer to the symbol with the given name
  */
 SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symbol_name){
+    int i;
+    SymbolTable *_actual_symbol_table;
+    
     /* Check if symbol table is not NULL */
     if(symbol_table == NULL){
         fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
@@ -749,17 +764,28 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
         fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
         return false;
     }
+
+    /* Get the actual symbl table */
+    _actual_symbol_table = symbol_table;
     
-    /* Check if the symbol table have elements and them search for */ 
-    if(symbol_table->length != 0){
-        int i;
+    /* Search for the variable in the actual symbol table */
+    
+    /* Search for the variable in the actual symbol table */
+    while(_actual_symbol_table != NULL){
         
-        /* Check if symbol table already has a symbol with this name */
-        for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
-                return symbol_table->items[i];
+        /* Check if the symbol table have elements and them search for */ 
+        if(symbol_table->length != 0){
+            
+            /* Check if symbol table already has a symbol with this name */
+            for(i = 0; i < symbol_table->length; i++){
+                if(symbolEqualsName(symbol_table->items[i], symbol_name)){
+                    return symbol_table->items[i];
+                }
             }
         }
+        
+        /* Get the previous symbol table */
+        _actual_symbol_table = _actual_symbol_table->previous_scope; 
     }
     
     /* The element is not on symbol table */

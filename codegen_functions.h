@@ -21,6 +21,7 @@
 #define GLOBAL_VARIABLE_PREFIX                  "__"
 
 /* Value of a nil variable */
+#define NIL_TYPE_MASK                           "0x80000000"
 #define NIL_TYPE_VALUE                          "0x7FFFFFFF"
 
 /* ------------------------------------------------------------- */
@@ -94,7 +95,7 @@ const char mips_footer[] =
         "\tlw $a0, 4($fp)\n"
         "\n"
         "\t# Check if it's a nil number\n"
-        "\tli $t1, 0x80000000\n"
+        "\tli $t1, " NIL_TYPE_MASK "\n"
         "\txor $t0, $a0, $t1\n"
         "\tnot $t0, $t0\n"
         "\tbeq $t0, $0, print_nil_value\n"
@@ -138,7 +139,7 @@ const char mips_global_define[] =
 /* Define a local variable */    
 const char mips_global_define[] =
     "\t# ------------ Define a local variable ---------- #\n"
-    "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
+    "\taddiu $sp, $sp, -4\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Store a global variable */    
@@ -297,14 +298,14 @@ const char mips_neq_a0_t1_a0[] =
 
 /* Check if $a0 is greater or equal $t1 */
 const char mips_gte_a0_t1_a0[] =
-    "\t# ------------- Gte $a0 = $t1 >= $a0 ------------- #\n"
+    "\t# ------------- Gte $a0 = $t1 >= $a0 ------------ #\n"
     "\tslt $a0, $t1, $a0\n"
     "\txori $a0, $a0, 1\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Check if $a0 is less or equal $t1 */
 const char mips_lte_a0_t1_a0[] =
-    "\t# ------------- Lte $a0 = $t1 <= $a0 ------------- #\n"
+    "\t# ------------- Lte $a0 = $t1 <= $a0 ------------ #\n"
     "\tslt $a0, $a0, $t1\n"
     "\txori $a0, $a0, 1\n"
     "\t# ----------------------------------------------- #\n";
@@ -382,7 +383,7 @@ const char mips_while =
     "\tbeq $a0, $ao, end_while\n"
     "\t%s\n"
     "\tb while%d\n"
-    "end_while:"
+    "end_while%d:"
     "\t# ----------------------------------------------- #\n";
     
 /* Loop type for */

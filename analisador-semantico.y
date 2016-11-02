@@ -7,6 +7,7 @@
 /** Licença     MIT                 **/
 /** Descrição:  Analisador          **/
 /**             Sintatico/Semantico **/
+/**             e gerador de código **/
 /**             para a linguagem    **/
 /**             LUA.                **/
 /**                                 **/
