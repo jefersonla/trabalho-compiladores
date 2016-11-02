@@ -103,23 +103,44 @@ typedef struct strSymbolNode{
     /* Name of the symbol */
     char *symbol_name;
     
-    /* Value of the symbol */
-    char *symbol_value;
+    /* Start adress */
+    int symbol_address;
     
-    /* Check if symbol is null */
-    bool isNull;
+    /* Symbol Size in bytes */
+    int symbol_size;
+    
+    /* Type of the symbol */
+    int symbol_type;
+    
+    /* Symbol type byte size */
+    int symbol_type_size/
 } SymbolNode, *ptrSymbolNode;
 
 /* -------------- Symbol Node Methods ------------- */
 
 /* Create a new symbol node. */
-SymbolNode* newSymbolNode(char *symbol_name, char *symbol_value);
+SymbolNode* newSymbolNode(char *symbol_name, int symbol_address, int symbol_type);
 
 /* Compare symbol value */
 bool symbolEqualsName(SymbolNode *symbol, char *symbol_name);
 
-/* Set value of symbol */
-bool setSymbolValue(SymbolNode *symbol, char *symbol_value);
+/* Get symbol address of a symbol node */
+int symbolNodeGetSymbolAdress(SymbolNode *symbol_node);
+
+/* Get symbol size of a given symbol node */
+int symbolNodeGetSymbolSize(SymbolNode *symbol_node);
+
+/* Get load a symbol into a register instruction */
+InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node);
+
+/* Get store a symbol into a register instruction */
+InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node);
+
+/* Get load a symbol type into a register instruction */
+InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node);
+
+/* Get store a symbol type into a register instruction */
+InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node);
 
 /* ------------------------------------------------ */
 /*               Symbol Table Structure             */
@@ -147,25 +168,22 @@ typedef struct strSymbolTable{
 
 /* ------------- Symbol Table Methods ------------- */
 
+/* Create a new global Symbol Table */
+SymbolTable* newGlobalSymbolTable();
+
 /* Create a new SymbolTable */
-SymbolTable* newSymbolTable(int start_address, int shift_address);
+SymbolTable* newSymbolTable(SymbolTable *symbol_table);
 
 /* Add a new symbol to symbol table */
-bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol);
+bool symbolTableAddSymbol(  SymbolTable *symbol_table, char *symbol_name, 
+                            int symbol_type);
 
 /* Check if a symbol of a given name is present on the table */
 bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name);
 
 /* Get symbol node by name */
-SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table,
+SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table, 
                                             char *symbol_name);
-
-/* Set symbol value by name */
-bool symbolTableSetSymbolNodeValue( SymbolTable *symbol_table, char *symbol_name,
-                                    char *symbol_value);
-
-/* Get index of a given symbol_name */
-int symbolTableGetSymbolNodeIndex(SymbolTable *symbol_table, char *symbol_name);
 
 /* ------------------------------------------------ */
 /*            Instruction Node Structure            */
@@ -218,6 +236,10 @@ InstructionQueue* newInstructionQueue();
 bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue,
                                         char *instruction_string, bool useTab,
                                         bool copyInstruction);
+                                        
+/* Add a new instruction node structure to instruction queue */
+bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
+                                            InstructionNode *instruction_node);
 
 /* Print a instruction queue on a given file */
 bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction);
@@ -237,6 +259,9 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
 
 /* Empty String */
 #define EMPTY_STRING            ""
+
+/* Variable Size in Bytes */
+#define BYTE_VARIABLE_SIZE      4
 
 /* ------------------------------------------------ */
 

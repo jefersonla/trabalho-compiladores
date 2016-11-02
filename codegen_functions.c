@@ -22,7 +22,7 @@ extern SymbolTable *global_symbol_table;
  * @param root_token the root token node of the AST.
  * @return true if there's no error on execution and false otherwise.
  */
-bool cgenAllCode(TokenNode *root_token);
+bool cgenAllCode(TokenNode *root_token){
     /* Initialize Header Instruction Queue */
     header_instruction_queue = newInstructionQueue();
     
@@ -75,7 +75,15 @@ bool cgenAllCode(TokenNode *root_token);
     return true;
 }
 
-bool cgenBlockCode(block_token, )
+/**
+ * 
+ * @param block_token Receive a block token.
+ * @param previous_scope Previous table symbol escope.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
+    
+}
 
 void solveExpression(TokenNode token_node) {
     TokenNode * token_left = listGetTokenByIndex(token_node->child_list, 1);
@@ -86,22 +94,30 @@ void solveExpression(TokenNode token_node) {
         solveExpression(token_left);
         
         // push_a0
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false, false);
         
         //CGEN(exp2)
         solveExpression(token_right);
         
         //top_t1
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1, false, false);
     
         //CGEN(operand)
         switch(token_node->token_type) {
             case TI_PLUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0, false, false);
                 break;
                 
             case TI_MINUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0, false, false);
+                break;
+                
+            case TI_TIMES:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_mul_a0_t1_a0, false, false);
+                break;
+                
+            case TI_DIV:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_div_a0_t1_a0, false, false);
                 break;
                 
             default:
@@ -109,6 +125,22 @@ void solveExpression(TokenNode token_node) {
         }
         
         //pop
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_pop);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_pop, false, false);
+    }
+    
+    int i;
+    
+    switch (token_node->type) {
+        case TI_LISTAEXP:
+            if (token_node->root_token->type == TI_CALL_FUNCTION) {
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_function_call, false, false);
+                
+                for(i = token_node->child_list->length - 1; i >= 0; i--) {
+                    solveExpression(listGetTokenByIndex(token_node->child_list, i));
+                    
+                }
+            }
+        
+            break;
     }
 }

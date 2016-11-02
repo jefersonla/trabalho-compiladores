@@ -2,13 +2,23 @@
 #define CODEGEN_FUNCTIONS_H
 
 #include <stdbool.h>
+#include "token_struct.h"
 
 /* ------------------------------------------------------------- */
 /*                     Code Generator Constants                  */
 /* ------------------------------------------------------------- */
 
 /* Global Start Address */
-#define GLOBAL_START_ADRESS             -1
+#define GLOBAL_START_ADRESS                     -1
+
+/* Function Prefix */
+#define FUNCTION_PREFIX                         "function_"
+
+/* Global reserved variables Prefix */
+#define GLOBAL_SYSTEM_VARIABLE_PREFIX           "_"
+
+/* Global variables Prefix */
+#define GLOBAL_VARIABLE_PREFIX                  "__"
 
 /* ------------------------------------------------------------- */
 /*                     Code Generator Functions                  */
@@ -35,8 +45,8 @@ const char mips_header[] =
         "\t.data\n"
     "\n"
     "# System default variables \n"
-    "_newline: .asciiz \"\\n\"\n"
-    "_nil:\t.asciiz \"nil\"\n"
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "newline: .asciiz \"\\n\"\n"
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil:\t.asciiz \"nil\"\n"
     "\n"
     "# User Global Variables";
 
@@ -53,7 +63,7 @@ const char mips_system_functions[] =
     "# System Defined Functions\n"
     "\n"
     "# -- Print Function -- #\n"
-    "function_print:\n"
+    FUNCTION_PREFIX "print:\n"
         "\t# Load Function Frame Pointer and Return Adress\n"
         "\tmove $fp, $sp\n"
         "\tsw $ra, 0($sp)\n"
@@ -61,7 +71,7 @@ const char mips_system_functions[] =
         "\n"
         "\t# Load First Parameter\n"
         "\tlw $a0, 4($fp)\n"
-        "\tla $t0, _nil\n"
+        "\tla $t0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil\n"
         "\n"
         "\t# Check if it's a nil number\n"
         "\tbe $a0, $t0, print_nil_value\n"
@@ -73,13 +83,13 @@ const char mips_system_functions[] =
     "print_nil_value:\n"
         "\t# Print Value nil\n"
         "\tli $v0, 4\n"
-        "\tla $a0, _nil\n"
+        "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil\n"
         "\tsyscall\n"
         "\n"
     "end_print:\n"
         "\t# Print linefeed\n"
         "\tli $v0, 4\n"
-        "\tla $a0, _newline\n"
+        "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "newline\n"
         "\tsyscall\n"
         "\n"
         "\t# Close Print Function \n"
@@ -111,32 +121,32 @@ const char mips_footer[] =
 /* Store a global variable */    
 const char mips_global_atributtion[] =
     "\t# --------- Store $a0 in global variable -------- #\n"
-    "\tsw $a0, __%s\n"
+    "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load a global variable into $a0 */
 const char mips_global_load[] =
     "\t# --------- Load global variable in $a0 --------- #\n"
-    "\tlw $a0, __%s\n"
+    "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Push temporary return of a expression */
 const char mips_push_a0[] =
     "\t# -------------- Push $a0 to stack -------------- #\n"
     "\tsw $a0, 0($sp)\n"
-    "\taddiu $sp, $sp, -4\n"
+    "\taddiu $sp, $sp, -" BYTE_VARIABLE_SIZE "\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Pop stack value */
 const char mips_pop[] =
     "\t# ------------------- Pop stack ----------------- #\n"
-    "\taddiu $sp, $sp, 4\n"
+    "\taddiu $sp, $sp, " BYTE_VARIABLE_SIZE "\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load top value to $t1 */
 const char mips_top_t1[] =
     "\t# ------------- Top of stack to $t1 ------------- #\n"
-    "\tlw $t1, 4($sp)\n"
+    "\tlw $t1, " BYTE_VARIABLE_SIZE "($sp)\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load a static number into $a0 */
@@ -280,17 +290,26 @@ const char mips_lte_a0_t1_a0[] =
  *          bne a0 t1 else
  *          CGEN(bloco1)
  *          j end
- *label     else
+ *  label   else
  *             CGEN(bloco2)
- *label     end    
+ *  label   end    
  */
     
  /* Conditional type If-elseif */
+const char mips_if =
+    "\t# -------------------- If ----------------------- #\n"
+    "\tbne $a0, $t1, endif%d\n"
+    "\t%s\n" //"then comes here"
+    "\tjal endif\n"
+    "endif:\n"
+    "\t# ----------------------------------------------- #\n";
+
 const char mips_elseif =
-    "\t# ----------------- If - elseif ----------------- #\n"
-    "\tbne $a0, $t1, else%d\n"
+    "\t# -------------------- Elseif ------------------- #\n"
+    "\tbne $a0, $t1, elseif%d\n"
     "\t%s\n" //"then comes here"
     "\tjal end\n"
+    "elseif%d\n"
     "\t# ----------------------------------------------- #\n";
     
  /* Conditional type Else */
@@ -302,19 +321,19 @@ const char mips_else =
     "\t# ----------------------------------------------- #\n";
  
 /* ------------------------------------------------------------- */
-/*               Loops Operations Template                 */
+/*                   Loops Operations Template                   */
 /* ------------------------------------------------------------- */
 
 /**
  * Model for loop operations
  *     Default Model While:
  *        CGEN(while(exp1) do bloco end) ->
- *label     while  
+ *  label   while  
  *          CGEN(exp1)
  *          beq $a0, $a0, end
  *          CGEN(bloco)
  *          b while
- *label          end
+ *   label      end
  * 
  * Default Model For:
  *       
@@ -323,15 +342,43 @@ const char mips_else =
 /* Loop type while */
 const char mips_while =
     "\t# -------------------- WHILE -------------------- #\n"
-    
+    "while%d:\n"
+    "\t%s\n"
+    "\tbeq $a0, $ao, end_while\n"
+    "\t%s\n"
+    "\tb while%d\n"
+    "end_while:"
     "\t# ----------------------------------------------- #\n";
     
- /* Loop type for */
+/* Loop type for */
 const char mips_for =
     "\t# ---------------------- FOR -------------------- #\n"
-    
+  
     "\t# ----------------------------------------------- #\n";
     
+/* ------------------------------------------------------------- */
+/*                        Function Calls                         */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for function call.
+ * 
+ *  Default Model CGEN(function_name(listexp[a,b,...])):
+ *      CGEN(listexp[1])
+ *      push $a0
+ *      CGEN(listexp[2])
+ *      push $a0
+ *      ...
+ *      jal function_name
+ */
+ const char mips_function_call[] =
+    "\tsw $fp, 0($sp)\n"
+    "\taddiu $sp, $sp, -4\n";
+
+/* ------------------------------------------------------------- */
+
+
+
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */

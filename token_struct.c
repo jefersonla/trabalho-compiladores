@@ -402,60 +402,56 @@ bool symbolEqualsName(SymbolNode *symbol, char *symbol_name){
     return (strcmp(symbol->symbol_name, symbol_name) == 0);
 }
 
-
-/**
- * Set value of symbol.
- * 
- * @param symbol symbol which is being seted.
- * @param symbol_value new symbol value.
- * @return true if there's no error on execution and false otherwise.
- */
-bool setSymbolValue(SymbolNode *symbol, char *symbol_value){
-    char *_new_symbol_value;
-    
-    /* Check if symbol is not NULL */
-    if(symbol == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL IS NULL!\n");
-        return false;
-    }
-    
-    /* Copy contents of symbol_value if it's not null */
-    if(symbol_value != NULL){
-        _new_symbol_value = (char *) malloc(sizeof(char) * (strlen(symbol_value) + 1));
-        
-        /* Give a falta error if malloc has errors */
-        if(_new_symbol_value == NULL){
-            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL VALUE!\n");
-            exit(EXIT_FAILURE);
-        }
-        
-        /* Copy contents of the symbol_value to the new symbol value */
-        strcpy(_new_symbol_value, symbol_value);
-    }
-    
-    /* Free last symbol value */
-    if(symbol->symbol_value != NULL){
-        free(symbol->symbol_value);
-    }
-    
-    /* Store the new symbol_value */
-    symbol->symbol_value = _new_symbol_value;
-    
-    /* Check the new value is null or not */
-    symbol->isNull = (symbol_value == NULL);
-    
-    /* Return success */
-    return true;
-}
-
 /* ------------- Symbol Table Methods ------------- */
+
+/** 
+ * Create a new global Symbol Table.
+ * 
+ * @return A new global symbol table.
+ */
+SymbolTable* newGlobalSymbolTable(){
+    SymbolTable *_new_global_symbol_table;
+    SymbolNode **_items_table;
+    
+    /* Allocate a new symbol table */
+    _new_global_symbol_table = (SymbolTable*) malloc(sizeof(SymbolTable));
+    
+    /* Give a fatal error if cannot allocate new symbol table */
+    if(_new_global_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Allocate item symbols */
+    _items_table = (SymbolNode **) malloc(sizeof(SymbolNode *) * DEFAULT_BLOCK_SIZE);
+    
+     /* Give a fatal error if cannot allocate items of the table */
+    if(_items_table == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ARRAY OF SYMBOLS FOR GLOBAL SYMBOL TABLE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Global Symbol Table Start Address */
+    _new_global_symbol_table->start_address = GLOBAL_START_ADRESS;
+    
+    /* Set the new symbol table */
+    _new_global_symbol_table->size = DEFAULT_BLOCK_SIZE;
+    _new_global_symbol_table->length = 0;
+    _new_global_symbol_table->shift_address = 0;
+    _new_global_symbol_table->previous_scope = previous_scope;
+    _new_global_symbol_table->items = _items_table;
+    
+    /* Return pointer of the new symbol table */
+    return _new_global_symbol_table;
+}
 
 /**
  * Create a new SymbolTable.
  * 
+ * @param previous_scope Previous symbol table, define symbol scope.
  * @return An empty symbol table.
  */
-SymbolTable* newSymbolTable(int start_address){
+SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     SymbolTable *_new_symbol_table;
     SymbolNode **_items_table;
     
@@ -477,12 +473,20 @@ SymbolTable* newSymbolTable(int start_address){
         exit(EXIT_FAILURE);
     }
     
+    /* If there are previous scope */
+    if(previous_scope != NULL){
+        _new_symbol_table->start_address = 0;
+    }
+    else{
+        _new_symbol_table->start_address = previous_scope->start_address + previous_scope->shift_address;
+    }
+    
     /* Set the new symbol table */
+    _new_symbol_table->size = DEFAULT_BLOCK_SIZE;
     _new_symbol_table->length = 0;
     _new_symbol_table->shift_address = 0;
-    _new_symbol_table->size = DEFAULT_BLOCK_SIZE;
+    _new_symbol_table->previous_scope = previous_scope;
     _new_symbol_table->items = _items_table;
-    _new_symbol_table->start_address = start_address;
     
     /* Return pointer of the new symbol table */
     return _new_symbol_table;
@@ -492,10 +496,12 @@ SymbolTable* newSymbolTable(int start_address){
  * Add a new symbol to symbol table.
  * 
  * @param symbol_table Table of symbols.
- * @param symbol Symbol which will be appended to symbol table.
+ * @param symbol_name Name of the symbol which will be appended to symbol table.
+ * @param symbol_type Type of the symbol which will be appended to symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
-bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol){
+bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symbol_type);
+    SymbolNode *_new_symbol_node;
     SymbolNode **_reallocated_items;
     
     /* Check if the symbol is already on symbol table */
@@ -523,14 +529,23 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol){
         symbol_table->items = _reallocated_items;
     }
     
+    /* Try allocate the new symbol node */
+    _new_symbol_node = newSymbolNode(symbol_name, _new_symbol_table->start_address + _new_symbol_table->shift_address + BYTE_VARIABLE_SIZE , symbol_type);
+    
+    /* Check if we can't allocate a new symbol node has returned no errors */
+    if(_new_symbol_node == NULL){
+        fprintf(stderr, "[ERROR] CANNOT CREATE NEW SYMBOL NODE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Increase shift */
+    _new_symbol_table->shift_address += BYTE_VARIABLE_SIZE;
+    
     /* Add the new symbol */
-    symbol_table->items[symbol_table->length] = symbol;
+    symbol_table->items[symbol_table->length] = _new_symbol_node;
     
     /* Increase number of symbols */
     symbol_table->length += 1;
-    
-    /* Increase shift */
-    _new_symbol_table->shift_address += 4;
     
     /* Return success */
     return true;
@@ -606,77 +621,6 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
     
     /* The element is not on symbol table */
     return NULL;
-}
-
-/**
- * Set symbol value using symbol name, and symbol value, if symbol value is null.
- * 
- * @param symbol_table Table of symbols.
- * @param symbol_name Name of the symbol that will receive the new value.
- * @return true if there's no error on execution and false otherwise.
- */
-bool symbolTableSetSymbolNodeValue(SymbolTable *symbol_table, char *symbol_name, char *symbol_value){
-    SymbolNode *_symbol_found;
-    
-    /* Check if symbol table is not NULL */
-    if(symbol_table == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
-        return false;
-    }
-    
-    /* Check if symbol_name is not NULL */
-    if(symbol_name == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
-        return false;
-    }
-    
-    /* Get Symbol */
-    _symbol_found = symbolTableGetSymbolNodeByName(symbol_table, symbol_name);
-    
-    /* Check if _symbol_found is not NULL */
-    if(_symbol_found == NULL){
-        fprintf(stderr, "[ERROR] CAN'T FIND SYMBOL OR SYMBOL IS NULL!\n");
-        return false;
-    }
-        
-    /* Return success */
-    return setSymbolValue(_symbol_found, symbol_value);
-}
-
-/**
- * Get a symbol node index by symbol name.
- * 
- * @param symbol_table Table of symbols.
- * @param symbol_name Name of the wanted symbol node index.
- * @return index of the symbol name or -1 if symbol is not present on table.
- */
-int symbolTableGetSymbolNodeIndex(SymbolTable *symbol_table, char *symbol_name){
-    /* Check if symbol table is not NULL */
-    if(symbol_table == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
-        return false;
-    }
-    
-    /* Check if symbol_name is not NULL */
-    if(symbol_name == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
-        return false;
-    }
-    
-    /* Check if the symbol table have elements and them search for it */ 
-    if(symbol_table->length != 0){
-        int i;
-        
-        /* Check if symbol table already has a symbol with this name */
-        for(i = 0; i < symbol_table->length; i++){
-            if(symbolEqualsName(symbol_table->items[i], symbol_name)){
-                return i + 1;
-            }
-        }
-    }
-    
-    /* The element is not on symbol table */
-    return -1;
 }
 
 /* ---------- Instruction Node Methods ----------- */
@@ -875,6 +819,46 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
     /* Return success */
     return true;
 }
+
+/* Add a new instruction node structure to instruction queue */
+bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue, InstructionNode *instruction_node){
+    InstructionNode **_reallocated_instructions;
+    
+    /* Check if instruction queue is null */
+    if(instruction_queue == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION QUEUE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if instruction node is null */
+    if(instruction_node == NULL){
+        fprintf(stderr, "[ERROR] INSTRUCTION NODE IS NULL!\n");
+        return false;
+    }
+    
+    /* Check if there are left spaces on instruction queue */
+    if(instruction_queue->length == instruction_queue->size){
+        /* Increase block size */
+        instruction_queue->size += DEFAULT_BLOCK_SIZE;
+        
+        /* Try to reallocate instructions array */
+        _reallocated_instructions = (InstructionNode **) realloc(instruction_queue->instructions, sizeof(InstructionNode *) * instruction_queue->size);
+        
+        /* Give fatal error if malloc has failled */
+        if(_reallocated_instructions == NULL){
+            fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    
+    /* Store the new instruction node */
+    instruction_queue->instructions[instruction_queue->length] = instruction_node;
+    instruction_queue->length += 1;
+
+    /* Return success */
+    return true;
+}
+
 
 /** 
  * Print a instruction queue on a given file.
