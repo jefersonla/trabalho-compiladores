@@ -91,9 +91,6 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         return false;
     }
     
-    /* X Error */
-    char *_x_error = "(ERROR)";
-    
     /* Get size of the params list concatenated string */
     for(i = 0, param_str_size = 2; i < no_params; i++){
         /* Get next token */
@@ -102,8 +99,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         /* Check if param is null */
         if(_str_param == NULL){
             fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
-            _str_param = _x_error;
-            //return false;
+            return false;
         }
         
         /* Increase size of the token string */
@@ -133,8 +129,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         /* Check if param is null */
         if(_str_param == NULL){
             fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
-            _str_param = _x_error;
-            //return false;
+            return false;
         }
         
         /* Concatenate string */
