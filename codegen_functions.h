@@ -31,11 +31,17 @@
 /* Generate all code */
 bool cgenAllCode(TokenNode *root_token);
 
+/* Copy global variable definitions */
+bool copyGlobalVariables();
+
 /* Generate blocks of code */
 bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope);
 
-/* Copy global variable definitions */
-bool copyGlobalVariables();
+/* Generate code for command list */
+bool cgenCommandList(TokenNode *command_list_token, SymbolTable *previous_scope);
+
+/* Generate code for command return */
+bool cgenComandReturn(TokenNode *comand_return_token, SymbolTable *previous_scope);
 
 /* ------------------------------------------------------------- */
 /*                         System Templates                      */

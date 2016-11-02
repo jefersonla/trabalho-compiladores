@@ -448,11 +448,11 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
 
     /* If this node belong toa global symbol table */
     if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return formatedInstruction(mips_global_define, symbol_node->symbol_name);
+        return newInstructionNode(formatedInstruction(mips_global_define, symbol_node->symbol_name), false);
     }
 
     /* Return the formated instruction */
-    return formatedInstruction(mips_local_define, symbol_node->symbol_address);
+    return newInstructionNode(mips_local_define, false);
 }
 
 /**
@@ -470,11 +470,11 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
 
     /* If this node belong toa global symbol table */
     if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return formatedInstruction(mips_global_load, symbol_node->symbol_name);
+        return newInstructionNode(formatedInstruction(mips_global_load, symbol_node->symbol_name), false);
     }
 
     /* Return the formated instruction */
-    return formatedInstruction(mips_local_load, symbol_node->symbol_address);
+    return newInstructionNode(formatedInstruction(mips_local_load, symbol_node->symbol_address), false);
 }
 
 /** 
@@ -492,11 +492,11 @@ InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
     
     /* If this node belong toa global symbol table */
     if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return formatedInstruction(mips_global_store, symbol_node->symbol_name);
+        return newInstructionNode(formatedInstruction(mips_global_store, symbol_node->symbol_name), false);
     }
 
     /* Return the formated instruction */
-    return formatedInstruction(mips_local_store, symbol_node->symbol_address);
+    return newInstructionNode(formatedInstruction(mips_local_store, symbol_node->symbol_address), false);
 }
 
 /**
@@ -513,7 +513,7 @@ InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
     }
     
     /* Return the formated instruction */
-    return formatedInstruction("# TODO - LOAD TYPE\n");
+    return newInstructionNode(formatedInstruction("# TODO - LOAD TYPE\n"), false);
 }
 
 /**
@@ -530,7 +530,7 @@ InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
     }
     
     /* Return the formated instruction */
-    return formatedInstruction("# TODO - STORE TYPE\n");
+    return newInstructionNode(formatedInstruction("# TODO - STORE TYPE\n"), false);
 }
 
 /* ------------- Symbol Table Methods ------------- */
@@ -767,8 +767,6 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
 
     /* Get the actual symbl table */
     _actual_symbol_table = symbol_table;
-    
-    /* Search for the variable in the actual symbol table */
     
     /* Search for the variable in the actual symbol table */
     while(_actual_symbol_table != NULL){
