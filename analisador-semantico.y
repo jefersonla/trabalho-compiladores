@@ -220,14 +220,20 @@ programa        : bloco                                 {
                                                                     "%s",
                                                                     $1->token_str, all_tokens);
                                                             #else 
-                                                            /* Store output file result */
+                                                            /* Store codegen header to output file */
                                                             instructionQueueFilePrint(output_file, instruction_queue);
+                                                            
+                                                            /* Store codegen main code to output file */
+                                                            instructionQueueFilePrint(output_file, main_instruction_queue);
                                                             
                                                             /* Print Finished Result */
                                                             printf("\n::: CODE GENERATOR :::\n");
                                                             
-                                                            /* Print Instruction Queue */
+                                                            /* Print Header Instruction Queue */
                                                             instructionQueueFilePrint(stdout, instruction_queue);
+                                                            
+                                                            /* Print Main Instruction Queue */
+                                                            instructionQueueFilePrint(stdout, main_instruction_queue);
                                                             
                                                             /* Print other structures */
                                                             printf( "\n::: SYNTATIC/SEMANTIC ANALYSER :::\n"

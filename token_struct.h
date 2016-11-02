@@ -135,6 +135,12 @@ typedef struct strSymbolTable{
     /* Start Address */
     int start_address;
     
+    /* Address Shift */
+    int shift_address;
+    
+    /* Previous Scope */
+    SymbolTable *previous_scope;
+    
     /* Items present on the table */
     SymbolNode **items;
 } SymbolTable, *ptrSymbolTable;
@@ -142,7 +148,7 @@ typedef struct strSymbolTable{
 /* ------------- Symbol Table Methods ------------- */
 
 /* Create a new SymbolTable */
-SymbolTable* newSymbolTable(int start_address);
+SymbolTable* newSymbolTable(int start_address, int shift_address);
 
 /* Add a new symbol to symbol table */
 bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol);

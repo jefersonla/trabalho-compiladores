@@ -479,6 +479,7 @@ SymbolTable* newSymbolTable(int start_address){
     
     /* Set the new symbol table */
     _new_symbol_table->length = 0;
+    _new_symbol_table->shift_address = 0;
     _new_symbol_table->size = DEFAULT_BLOCK_SIZE;
     _new_symbol_table->items = _items_table;
     _new_symbol_table->start_address = start_address;
@@ -527,6 +528,9 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, SymbolNode *symbol){
     
     /* Increase number of symbols */
     symbol_table->length += 1;
+    
+    /* Increase shift */
+    _new_symbol_table->shift_address += 4;
     
     /* Return success */
     return true;

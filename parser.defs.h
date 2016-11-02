@@ -32,9 +32,15 @@
 #define TI_LIST_ELSEIF          0xCB08
 #define TI_RETURN_EXPLIST       0xCB09
 #define TI_RETURN               0xCB0A
+
+/* Unary Operands */
+#define IS_UNARY_OPERAND(X)     (X >= 0xCB0B && X <= 0xCB0D)
 #define TI_UMINUS			    0xCB0B
 #define TI_NOT				    0xCB0C
 #define TI_BIT_NOT			    0xCB0D
+
+/* Binary Operands */
+#define IS_BINARY_OPERAND(X)    (X >= 0xCB0E && X <= 0xCB22)
 #define TI_PLUS				    0xCB0E
 #define TI_MINUS			    0xCB0F
 #define TI_TIMES			    0xCB10
@@ -55,6 +61,8 @@
 #define TI_NEQ				    0xCB20
 #define TI_AND				    0xCB21
 #define TI_OR				    0xCB22
+
+/* Call of functions */
 #define TI_CALL_FUNCTION_PAR    0xCB23
 #define TI_CALL_FUNCTION        0xCB24
 

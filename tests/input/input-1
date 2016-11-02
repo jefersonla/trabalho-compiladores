@@ -1,0 +1,7 @@
+function teste(x, y, z)
+    return x*y, z
+end
+
+x, y = teste(1, 2, 3)
+print(x)
+print(y)

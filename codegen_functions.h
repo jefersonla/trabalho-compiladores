@@ -128,8 +128,8 @@ const char mips_push_a0[] =
     "\t# ----------------------------------------------- #\n";
     
 /* Pop stack value */
-const char mips_pop_a0[] =
-    "\t# -------------- Pop $a0 from stack ------------- #\n"
+const char mips_pop[] =
+    "\t# ------------------- Pop stack ----------------- #\n"
     "\taddiu $sp, $sp, 4\n"
     "\t# ----------------------------------------------- #\n";
 
@@ -273,36 +273,65 @@ const char mips_lte_a0_t1_a0[] =
  * Model for conditional operations
  * 
  *  Default Model:
- *      CGEN(if exp1 then exp2 else exp3) ->
+ *      CGEN(if exp1 then bloco1 else bloco2) ->
  *          CGEN(exp1)
  *          push_a0 
  *          li t1 1
  *          bne a0 t1 else
- *          CGEN(exp2)
+ *          CGEN(bloco1)
  *          j end
  *label     else
- *             CGEN(exp3)
+ *             CGEN(bloco2)
  *label     end    
  */
- 
- /* Conditional type If-else */
-const char mips_if_else =
-    "\t# ------------------- If-Else ------------------- #\n"
-    "\tbne $a0, $t1, else\n"
+    
+ /* Conditional type If-elseif */
+const char mips_elseif =
+    "\t# ----------------- If - elseif ----------------- #\n"
+    "\tbne $a0, $t1, else%d\n"
     "\t%s\n" //"then comes here"
-    "\tj end\n"
-    "\telse:\n"
-    "\t%s\n" //"else(s) comes here"
-    "end:\n"
+    "\tjal end\n"
     "\t# ----------------------------------------------- #\n";
     
- /* Conditional type If-elseif-else */
-const char mips_if_else =
-    "\t# ------------------- If-Else ------------------- #\n"
-    "\t\n"
-    "\t\n"
+ /* Conditional type Else */
+const char mips_else =
+    "\t# --------------------- Else -------------------- #\n"
+    "\telse%d:\n"
+    "\t%s\n" //"else comes here"
+    "end%d:\n"
     "\t# ----------------------------------------------- #\n";
  
+/* ------------------------------------------------------------- */
+/*               Loops Operations Template                 */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for loop operations
+ *     Default Model While:
+ *        CGEN(while(exp1) do bloco end) ->
+ *label     while  
+ *          CGEN(exp1)
+ *          beq $a0, $a0, end
+ *          CGEN(bloco)
+ *          b while
+ *label          end
+ * 
+ * Default Model For:
+ *       
+ */
+
+/* Loop type while */
+const char mips_while =
+    "\t# -------------------- WHILE -------------------- #\n"
+    
+    "\t# ----------------------------------------------- #\n";
+    
+ /* Loop type for */
+const char mips_for =
+    "\t# ---------------------- FOR -------------------- #\n"
+    
+    "\t# ----------------------------------------------- #\n";
+    
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */
