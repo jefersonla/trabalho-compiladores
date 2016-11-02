@@ -434,6 +434,28 @@ int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
 }
 
 /**
+ * Get define a symbol type into a register instruction.
+ * 
+ * @param symbol_node The node which instruction is wanted.
+ * @return Pointer to a instruction node with the apropriated load instruction.
+ */
+InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return NULL;
+    }
+
+    /* If this node belong toa global symbol table */
+    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
+        return formatedInstruction(mips_global_define, symbol_node->symbol_name);
+    }
+
+    /* Return the formated instruction */
+    return formatedInstruction(mips_local_define, symbol_node->symbol_address);
+}
+
+/**
  * Get load a symbol into a register instruction.
  * 
  * @param symbol_node The node which instruction is wanted.
@@ -459,7 +481,7 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
  * Get store a symbol into a register instruction.
  *  
  * @param symbol_node The node which instruction is wanted.
- * @return Pointer to a instruction node with the apropriated load instruction.
+ * @return Pointer to a instruction node with the apropriated store instruction.
  */
 InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */

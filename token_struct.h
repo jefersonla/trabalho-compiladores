@@ -134,6 +134,9 @@ int symbolNodeGetSymbolAdress(SymbolNode *symbol_node);
 /* Get symbol size of a given symbol node */
 int symbolNodeGetSymbolSize(SymbolNode *symbol_node);
 
+/* Get define a symbol type into a register instruction */
+InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node);
+
 /* Get load a symbol into a register instruction */
 InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node);
 

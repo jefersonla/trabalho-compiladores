@@ -20,6 +20,9 @@
 /* Global variables Prefix */
 #define GLOBAL_VARIABLE_PREFIX                  "__"
 
+/* Value of a nil variable */
+#define NIL_TYPE_VALUE                          "0x7FFFFFFF"
+
 /* ------------------------------------------------------------- */
 /*                     Code Generator Functions                  */
 /* ------------------------------------------------------------- */
@@ -30,7 +33,8 @@ bool cgenAllCode(TokenNode *root_token);
 /* Generate blocks of code */
 bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope);
 
-
+/* Copy global variable definitions */
+bool copyGlobalVariables();
 
 /* ------------------------------------------------------------- */
 /*                         System Templates                      */
@@ -49,7 +53,7 @@ const char mips_header[] =
     "# System default variables \n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "newline: .asciiz \"\\n\"\n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str: .asciiz \"nil\"\n"
-    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   0x7FFFFFFF"
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   " NIL_TYPE_VALUE
     "\n"
     "# User Global Variables";
 
@@ -124,6 +128,18 @@ const char mips_footer[] =
 /* ------------------------------------------------------------- */
 /*                   Basic Instructions Template                 */
 /* ------------------------------------------------------------- */
+
+/* Define a global variable */    
+const char mips_global_define[] =
+    "# ----------- Define a global variable ---------- #\n"
+    "" GLOBAL_VARIABLE_PREFIX "%s .word " NIL_TYPE_VALUE "\n"
+    "# ----------------------------------------------- #\n";
+
+/* Define a local variable */    
+const char mips_global_define[] =
+    "\t# ------------ Define a local variable ---------- #\n"
+    "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
+    "\t# ----------------------------------------------- #\n";
 
 /* Store a global variable */    
 const char mips_global_store[] =

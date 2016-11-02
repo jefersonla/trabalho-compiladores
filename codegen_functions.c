@@ -19,7 +19,28 @@ extern SymbolTable *global_symbol_table;
 /** 
  * Copy global variables into header instruction queue.
  * 
+ * @return true if there's no error on execution and false otherwise.
  */
+bool copyGlobalVariables(){
+    int i;
+    
+    /* Check if header instruction queue is null */
+    if(header_instruction_queue == NULL){
+        fprintf(stderr, "[ERROR] HEADER INSTRUCTION QUEUE, NOT INITIALIZED!\n");
+        return false;
+    }
+    
+    /* Check if global symbol table is null */
+    if(global_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] GLOBAL SYMBOL TABLE, NOT INITIALIZED!\n");
+        return false;
+    }
+    
+    /* Enqueue global definition of every node in global symbol table */
+    for(i = 0; i < global_symbol_table->length; i++){
+        (global_symbol_table->items[i]);
+    }
+}
 
 /**
  * Generate code based on AST.
