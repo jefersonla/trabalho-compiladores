@@ -36,6 +36,9 @@
 /* Token Structure */
 #include "token_struct.h"
 
+/* Functions to generate code */
+#include "codegen_functions.h"
+
 /* Utils */
 #include "utils.h"
 
@@ -220,7 +223,10 @@ programa        : bloco                                 {
                                                                     "::: LEXICAL PARSER :::\n"
                                                                     "%s",
                                                                     $1->token_str, all_tokens);
-                                                            #else 
+                                                            #else
+                                                            /* Start generating code proccess */
+                                                            cgenAllCode(abstract_sintatic_tree);
+                                                            
                                                             /* Store codegen header to output file */
                                                             instructionQueueFilePrint(output_file, header_instruction_queue);
                                                             

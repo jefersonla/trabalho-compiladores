@@ -17,7 +17,7 @@ const char mips_header[] =
     "# System default variables \n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "newline: .asciiz \"\\n\"\n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str: .asciiz \"nil\"\n"
-    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   " NIL_TYPE_VALUE
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   " NIL_TYPE_VALUE "\n"
     "\n"
     "# User Global Variables";
 

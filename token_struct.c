@@ -605,8 +605,8 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
         exit(EXIT_FAILURE);
     }
     
-    /* If there are previous scope */
-    if(previous_scope != NULL){
+    /* If there are no previous scope */
+    if(previous_scope == NULL){
         _new_symbol_table->start_address = 0;
     }
     else{

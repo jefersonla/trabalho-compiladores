@@ -47,6 +47,8 @@ main: codegen parser lexical
 
 # Compilação Analisador Léxico e Sintático/Semântico com flags de DEBUG
 debug: codegen-debug parser-debug lexical-debug
+	@printf "All modules compiled with debug flags on\n"
+	@printf "Compilation Finished With Success!\n"
 
 # Compilação Gerador de código
 codegen: lex.yy.c y.tab.c $(EXECUTABLE)

@@ -2,7 +2,7 @@
 #include "codegen_functions.h"
 
 /* Terminals define */
-#ifdef DEBUG
+#ifdef DEBUG_MODE
 #include "debug.y.tab.h"
 #else
 #include "y.tab.h"
