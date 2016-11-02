@@ -94,15 +94,14 @@ void solveExpression(TokenNode token_node) {
         //top_t1
         instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1);
     
+        //CGEN(operand)
         switch(token_node->token_type) {
             case TI_PLUS:
-                //CGEN(operand)
                 instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0);
                 break;
                 
             case TI_MINUS:
-                //CGEN(operand)
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0);
                 break;
                 
             default:
