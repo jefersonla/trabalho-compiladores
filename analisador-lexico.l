@@ -472,9 +472,9 @@ int main( int argc, char **argv ) {
 	++argv; --argc; /* skip over program name */
 
     /* Code Begin Message */
-	printf( " ::: LUA MIPS Compiler - Lexical Analyser ::: \n"  \
-            "Version 0.4 - Pre Alpha - LUA SIMPLE UFBA Compilant\n"     \
-            "Developed by Jeferson Lima and Jefferson Rene\n"   \
+	printf( " ::: LUA MIPS Compiler - Lexical Analyser ::: \n"          \
+            "Version 0.6 - Pre Alpha - LUA SIMPLE UFBA Compilant\n"     \
+            "Developed by Jeferson Lima and Jefferson Rene\n"           \
             "\n");
 
     /* If you have one or more arguments and they start with -- */

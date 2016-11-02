@@ -973,7 +973,7 @@ int main(int argc, char *argv[]){
 
     /* Code Begin Message */
     printf( " ::: LUA MIPS Compiler - Sintatical and Semantic Analyser ::: \n"  \
-            "Version 0.4 - Pre Alpha - LUA SIMPLE UFBA Compilant\n"             \
+            "Version 0.6 - Pre Alpha - LUA SIMPLE UFBA Compilant\n"             \
             "Developed by Jeferson Lima and Jefferson Rene\n"                   \
             "\n");
 
