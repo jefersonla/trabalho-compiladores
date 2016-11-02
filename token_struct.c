@@ -803,7 +803,7 @@ InstructionQueue *newInstructionQueue(){
     /* Try to malloc a new Instruction queue */
     _new_instruction_queue = (InstructionQueue *) malloc(sizeof(InstructionQueue));
     
-    /* Give a falta error if malloc failled */
+    /* Give a fatal error if malloc failled */
     if(_new_instruction_queue == NULL){
         fprintf(stderr, "[ERROR] CANNOT ALLOCATE NEW INSTRUCTION QUEUE\n");
         exit(EXIT_FAILURE);
@@ -812,7 +812,7 @@ InstructionQueue *newInstructionQueue(){
     /* Mallocate array of instruction nodes */
     _new_instruction_nodes = (InstructionNode **) malloc(sizeof(InstructionNode *) * DEFAULT_BLOCK_SIZE);
     
-    /* Give a falta error if malloc failled */
+    /* Give a fatal error if malloc failed */
     if(_new_instruction_nodes == NULL){
         fprintf(stderr, "[ERROR] CANNOT ALLOCATE ARRAY OF INSTRUCTIONS NODE\n");
         exit(EXIT_FAILURE);

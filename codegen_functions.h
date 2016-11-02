@@ -184,7 +184,7 @@ const char mips_neg_a0[] =
  *          CGEN(exp2)
  *          top_t1
  *          CGEN(operand)
- *          pop_a0
+ *          pop
  */
 
 /* Add value of $t1 with $a0 and store in $a0 */
@@ -273,20 +273,34 @@ const char mips_lte_a0_t1_a0[] =
  * Model for conditional operations
  * 
  *  Default Model:
- *      CGEN(if exp1 then exp2) ->
+ *      CGEN(if exp1 then exp2 else exp3) ->
  *          CGEN(exp1)
- *          push_a0 m 
+ *          push_a0 
+ *          li t1 1
+ *          bne a0 t1 else
  *          CGEN(exp2)
- *          top_t1
- *          CGEN(operand)
- *          pop_a0
+ *          j end
+ *label     else
+ *             CGEN(exp3)
+ *label     end    
  */
  
- /* Check if $a0 is less or equal $t1 */
-const char mips_lte_a0_t1_a0[] =
-    "\t# ------------- Lte $a0 = $t1 <= $a0 ------------- #\n"
-    "\tslt $a0, $a0, $t1\n"
-    "\txori $a0, $a0, 1\n"
+ /* Conditional type If-else */
+const char mips_if_else =
+    "\t# ------------------- If-Else ------------------- #\n"
+    "\tbne $a0, $t1, else\n"
+    "\t%s\n" //"then comes here"
+    "\tj end\n"
+    "\telse:\n"
+    "\t%s\n" //"else(s) comes here"
+    "end:\n"
+    "\t# ----------------------------------------------- #\n";
+    
+ /* Conditional type If-elseif-else */
+const char mips_if_else =
+    "\t# ------------------- If-Else ------------------- #\n"
+    "\t\n"
+    "\t\n"
     "\t# ----------------------------------------------- #\n";
  
  

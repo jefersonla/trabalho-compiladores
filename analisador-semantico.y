@@ -55,8 +55,11 @@ int last_char;
 /* Master Root Token AST */
 TokenNode *abstract_sintatic_tree;
 
-/* Generated Code */
-InstructionQueue *instruction_queue;
+/* Header Generated Code */
+InstructionQueue *header_instruction_queue;
+
+/* Main Generated Code */
+InstructionQueue *main_instruction_queue;
 
 /* Global Symbol Table */
 SymbolTable *global_symbol_table;
