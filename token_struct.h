@@ -113,15 +113,19 @@ typedef struct strSymbolNode{
     int symbol_type;
     
     /* Symbol type byte size */
-    int symbol_type_size/
+    int symbol_type_size;
+    
+    /* Root SymbolTable */
+    SymbolTable *root_symbol_table;
 } SymbolNode, *ptrSymbolNode;
 
 /* -------------- Symbol Node Methods ------------- */
 
 /* Create a new symbol node. */
-SymbolNode* newSymbolNode(char *symbol_name, int symbol_address, int symbol_type);
+SymbolNode* newSymbolNode(  SymbolTable *root_symbol_table, char *symbol_name, 
+                            int symbol_address, int symbol_type);
 
-/* Compare symbol value */
+/* Compare symbol name */
 bool symbolEqualsName(SymbolNode *symbol, char *symbol_name);
 
 /* Get symbol address of a symbol node */
@@ -249,19 +253,23 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
 /* ------------------------------------------------ */
 
 /* Size of blocks in structures */
-#define DEFAULT_BLOCK_SIZE      10
+#define DEFAULT_BLOCK_SIZE          10
+
+/* Standard size of the type and size of the type descriptor */
+#define DEFAULT_SYMBOL_SIZE         4
+#define DEFAULT_SYMBOL_TYPE_SIZE    0
 
 /* Newline char */
-#define NEWLINE_CHAR            "\n"
+#define NEWLINE_CHAR                "\n"
 
 /* Tab char */
-#define TAB_CHAR                "\n"
+#define TAB_CHAR                    "\n"
 
 /* Empty String */
-#define EMPTY_STRING            ""
+#define EMPTY_STRING                ""
 
 /* Variable Size in Bytes */
-#define BYTE_VARIABLE_SIZE      4
+#define BYTE_VARIABLE_SIZE          4
 
 /* ------------------------------------------------ */
 

@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+
 #include "token_struct.h"
+#include "codegen_functions.h"
 
 /*------------ Token Structure Methods ------------ */
 
@@ -325,14 +327,20 @@ TokenList* listGetTokensByType(TokenList *token_list, int token_type){
 /**
  * Create a new symbol node, if symbol value it's null the symbol is of type nil.
  * 
+ * @param root_symbol_table Root symbol table of the given node.
  * @param symbol_name Name of the given symbol.
  * @param symbol_value Value of the symbol, use NULL to store nil value.
  * @return A new symbol, or fatal erro cause it fails.
  */
-SymbolNode* newSymbolNode(char *symbol_name, char *symbol_value){
+SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int symbol_address, int symbol_type){
     SymbolNode *_new_symbol_node;
     char *_new_symbol_name;
-    char *_new_symbol_value;
+    
+    /* Check if root symbol table is valid */
+    if(root_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] INVALID ROOT SYMBOL TABLE!\n");
+        return NULL;
+    }
     
     /* Try allocate this new symbol */
     _new_symbol_node = (SymbolNode*) malloc(sizeof(SymbolNode));
@@ -351,28 +359,17 @@ SymbolNode* newSymbolNode(char *symbol_name, char *symbol_value){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
         exit(EXIT_FAILURE);
     }
-    
-    /* Copy contents of symbol_value if it's not null */
-    if(symbol_value != NULL){
-        _new_symbol_value = (char *) malloc(sizeof(char) * (strlen(symbol_value) + 1));
-        
-        /* Give a falta error if malloc has errors */
-        if(_new_symbol_value == NULL){
-            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL VALUE!\n");
-            exit(EXIT_FAILURE);
-        }
-        
-        /* Copy contents of symbol_value to the new symbol_value */
-        strcpy(_new_symbol_value, symbol_value);
-    }
-    
+
     /* Copy content of the symbol name to this new structure */
     strcpy(_new_symbol_name, symbol_name);
 
     /* Set the new symbol node */
     _new_symbol_node->symbol_name = _new_symbol_name;
-    _new_symbol_node->symbol_value = (symbol_value == NULL) ? NULL : _new_symbol_value;
-    _new_symbol_node->isNull = (symbol_value == NULL);
+    _new_symbol_node->symbol_address = symbol_address;
+    _new_symbol_node->symbol_type = symbol_type;
+    _new_symbol_node->symbol_size = DEFAULT_SYMBOL_SIZE;
+    _new_symbol_node->symbol_type_size = DEFAULT_SYMBOL_TYPE_SIZE;
+    _new_symbol_node->root_symbol_table = root_symbol_table;
     
     /* Return pointer to this new node */
     return _new_symbol_node;
@@ -400,6 +397,137 @@ bool symbolEqualsName(SymbolNode *symbol, char *symbol_name){
     
     /* Compare symbol name of symbol with symbol_name */
     return (strcmp(symbol->symbol_name, symbol_name) == 0);
+}
+
+/** 
+ * Get relative address of a symbol node.
+ * 
+ * @param symbol_node Symbol node pointer structure.
+ * @return Integer relative stack address pointer;
+ */
+int symbolNodeGetSymbolAdress(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return -1;
+    }
+    
+    /* Return symbol relative address */
+    return symbol_node->symbol_address;
+}
+
+/** 
+ * Get symbol size of a given symbol node.
+ * 
+ * @param symbol_node The node which size is wanted.
+ * @return Size in bytes of a given symbol node.
+ */
+int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return -1;
+    }
+    
+    /* Return symbol relative address */
+    return symbol_node->symbol_size;
+}
+
+/* Store a global variable */    
+const char mips_global_atributtion[] =
+    "\t# --------- Store $a0 in global variable -------- #\n"
+    "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Load a global variable into $a0 */
+const char mips_global_load[] =
+    "\t# --------- Load global variable in $a0 --------- #\n"
+    "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Store a local variable */    
+const char mips_local_store[] =
+    "\t# --------- Store $a0 in local variable --------- #\n"
+    "\tsw $a0, %d($sp)\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Load a local variable into $a0 */
+const char mips_local_load[] =
+    "\t# --------- Load local variable in $a0 ---------- #\n"
+    "\tlw $a0, %d($sp)\n"
+    "\t# ----------------------------------------------- #\n";
+
+/**
+ * Get load a symbol into a register instruction.
+ * 
+ * @param symbol_node The node which instruction is wanted.
+ * @return Pointer to a instruction node with the apropriated load instruction.
+ */
+InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return NULL;
+    }
+
+    /* If this node belong toa global symbol table */
+    if(){
+        formatedInstruction(mips_global_load, symbol_node->symbol_name);
+    }
+
+    /* Return the formated instruction */
+    return ;
+}
+
+/** 
+ * Get store a symbol into a register instruction.
+ *  
+ * @param symbol_node The node which instruction is wanted.
+ * @return Pointer to a instruction node with the apropriated load instruction.
+ */
+InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return NULL;
+    }
+    
+    /* Return the formated instruction */
+    
+}
+
+/**
+ * Get load a symbol type into a register instruction.
+ * 
+ * @param symbol_node The node which instruction is wanted.
+ * @return Pointer to a instruction node with the apropriated load instruction.
+ */
+InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return NULL;
+    }
+    
+    /* Return the formated instruction */
+    
+}
+
+/**
+ * Get store a symbol type into a register instruction.
+ *
+ * @param symbol_node The node which instruction is wanted.
+ * @return Pointer to a instruction node with the apropriated store instruction.
+ */
+InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
+    /* Check if symbol node is not NULL */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        return NULL;
+    }
+    
+    /* Return the formated instruction */
+    
 }
 
 /* ------------- Symbol Table Methods ------------- */
@@ -503,6 +631,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
 bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symbol_type);
     SymbolNode *_new_symbol_node;
     SymbolNode **_reallocated_items;
+    int i;
     
     /* Check if symbol name is null or incorrect */
     if((symbol_name == NULL) || (strlen(symbol_name) == 0)){
@@ -536,12 +665,17 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Try allocate the new symbol node */
-    _new_symbol_node = newSymbolNode(symbol_name, _new_symbol_table->start_address + _new_symbol_table->shift_address + BYTE_VARIABLE_SIZE, symbol_type);
+    _new_symbol_node = newSymbolNode(symbol_table, symbol_name, _new_symbol_table->start_address + BYTE_VARIABLE_SIZE, symbol_type);
     
     /* Check if we can't allocate a new symbol node has returned no errors */
     if(_new_symbol_node == NULL){
         fprintf(stderr, "[ERROR] CANNOT CREATE NEW SYMBOL NODE!\n");
         exit(EXIT_FAILURE);
+    }
+    
+    /* Increase address of previous nodes */
+    for(i = 0; i < symbol_table->length; i++){
+        symbol_table->items[0]->symbol_address += BYTE_VARIABLE_SIZE;
     }
     
     /* Increase shift */

@@ -119,7 +119,7 @@ const char mips_footer[] =
 /* ------------------------------------------------------------- */
 
 /* Store a global variable */    
-const char mips_global_atributtion[] =
+const char mips_global_store[] =
     "\t# --------- Store $a0 in global variable -------- #\n"
     "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
     "\t# ----------------------------------------------- #\n";
@@ -128,6 +128,18 @@ const char mips_global_atributtion[] =
 const char mips_global_load[] =
     "\t# --------- Load global variable in $a0 --------- #\n"
     "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Store a local variable */    
+const char mips_local_store[] =
+    "\t# --------- Store $a0 in local variable --------- #\n"
+    "\tsw $a0, %d($sp)\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Load a local variable into $a0 */
+const char mips_local_load[] =
+    "\t# --------- Load local variable in $a0 ---------- #\n"
+    "\tlw $a0, %d($sp)\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Push temporary return of a expression */

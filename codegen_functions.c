@@ -120,6 +120,24 @@ void solveExpression(TokenNode token_node) {
                 instructionQueueEnqueueInstruction(main_instruction_queue, mips_div_a0_t1_a0, false, false);
                 break;
                 
+            case TI_GT:
+                break;
+                
+            case TI_GTEQ:
+                break;
+                
+            case TI_LT:
+                break;
+                
+            case TI_LTEQ:
+                break;
+                
+            case TI_EQ:
+                break;
+                
+            case TI_NEQ:
+                break;
+                
             default:
                 break;
         }
@@ -129,6 +147,7 @@ void solveExpression(TokenNode token_node) {
     }
     
     int i;
+    TokenNode * first_root_child = listGetTokenByIndex(token_node->root_token->child_list, 1);
     
     switch (token_node->type) {
         case TI_LISTAEXP:
@@ -141,7 +160,7 @@ void solveExpression(TokenNode token_node) {
                 }
                 
                 //jal f_entry
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_end_function_call, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(mips_end_function_call, first_root_child->lex_str)), false, false);
             }
         
             break;
