@@ -19,13 +19,13 @@ const char mips_header[] =
     GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str: .asciiz \"nil\"\n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   " NIL_TYPE_VALUE "\n"
     "\n"
-    "# User Global Variables";
+    "# User Global Variables\n";
 
 /* -- GLOBAL VARS -- */
 
 /* System Functions */        
 const char mips_main[] =
-    "# Start of mips code\n"
+    "\n# Start of mips code\n"
     ".globl main\n"
     ".text\n"
     "\n"

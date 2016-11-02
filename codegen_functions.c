@@ -135,7 +135,7 @@ bool cgenAllCode(TokenNode *root_token){
  */
 bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenCallFunction' - NOT IMPLEMENTED YET!\n");
     return false;
 }
 
@@ -148,7 +148,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenAssign' - NOT IMPLEMENTED YET!\n");
     return false;
 }
 
@@ -161,7 +161,7 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenCommandBlock' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -174,7 +174,7 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
  */
 bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenWhile' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -187,7 +187,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenFor' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -200,7 +200,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
  */
 bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenIf' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -213,7 +213,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  */
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenFunction' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -226,7 +226,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
  */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenLocalVariable' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
 
@@ -309,7 +309,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     // TODO!
-    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    fprintf(stderr, "[TODO] 'cgenCommandReturn' - NOT IMPLEMENTED YET!\n");
     return false;
 }
 
