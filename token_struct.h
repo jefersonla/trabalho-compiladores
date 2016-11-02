@@ -196,10 +196,7 @@ SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table,
 typedef struct strInstructionNode{
     /* Instruction String */
     char *instruction;
-    
-    /* With tab or not */
-    bool useTab;
-    
+
     /* Length of the instruction string */
     int length;
 } InstructionNode, *ptrInstructionNode;
@@ -207,8 +204,7 @@ typedef struct strInstructionNode{
 /* ---------- Instruction Node Methods ----------- */
 
 /* Return a new Instruction Node  */
-InstructionNode *newInstructionNode(char* instruction_string, bool useTab,
-                                    bool copyInstruction);
+InstructionNode *newInstructionNode(char* instruction_string, bool copyInstruction);
 
 /* Print a instruction node on a given file */
 bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction);
@@ -238,7 +234,7 @@ InstructionQueue* newInstructionQueue();
 
 /* Add a new instruction to instruction queue */
 bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue,
-                                        char *instruction_string, bool useTab,
+                                        char *instruction_string, 
                                         bool copyInstruction);
                                         
 /* Add a new instruction node structure to instruction queue */

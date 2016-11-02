@@ -16,6 +16,11 @@ extern InstructionQueue *main_instruction_queue;
 /* Global Symbol Table */
 extern SymbolTable *global_symbol_table;
 
+/** 
+ * Copy global variables into header instruction queue.
+ * 
+ */
+
 /**
  * Generate code based on AST.
  * 
@@ -60,22 +65,26 @@ bool cgenAllCode(TokenNode *root_token){
     }
     
     /* Add header on header instruction queue */
-    instructionQueueEnqueueInstruction(header_instruction_queue, mips_header, false, false);
+    instructionQueueEnqueueInstruction(header_instruction_queue, mips_header, false);
     
     /* Add header on main instruction queue */
-    instructionQueueEnqueueInstruction(main_instruction_queue, mips_system_functions, false, false);
+    instructionQueueEnqueueInstruction(main_instruction_queue, mips_main, false);
     
     /* Generate code for main application */
     cgenBlockCode(block_token, NULL);
     
+    /* Copy variable definitions to main-instruction_queue */
+    copyGlobalVariables();
+    
     /* Add header on main instruction queue */
-    instructionQueueEnqueueInstruction(main_instruction_queue, mips_footer, false, false);
+    instructionQueueEnqueueInstruction(main_instruction_queue, mips_footer, false);
     
     /* Return success */
     return true;
 }
 
 /**
+ * Generate block sections of code.
  * 
  * @param block_token Receive a block token.
  * @param previous_scope Previous table symbol escope.
@@ -94,48 +103,54 @@ void solveExpression(TokenNode token_node) {
         solveExpression(token_left);
         
         // push_a0
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false, false);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false);
         
         //CGEN(exp2)
         solveExpression(token_right);
         
         //top_t1
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1, false, false);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1, false);
     
         //CGEN(operand)
         switch(token_node->token_type) {
             case TI_PLUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0, false);
                 break;
                 
             case TI_MINUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0, false);
                 break;
                 
             case TI_TIMES:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_mul_a0_t1_a0, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_mul_a0_t1_a0, false);
                 break;
                 
             case TI_DIV:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_div_a0_t1_a0, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_div_a0_t1_a0, false);
                 break;
                 
             case TI_GT:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_gt_a0_t1_a0, false);
                 break;
                 
             case TI_GTEQ:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_gte_a0_t1_a0, false);
                 break;
                 
             case TI_LT:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_lt_a0_t1_a0, false);
                 break;
                 
             case TI_LTEQ:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_lte_a0_t1_a0, false);
                 break;
                 
             case TI_EQ:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_eq_a0_t1_a0, false);
                 break;
                 
             case TI_NEQ:
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_neq_a0_t1_a0, false);mips_neq_a0_t1_a0
                 break;
                 
             default:
@@ -143,7 +158,7 @@ void solveExpression(TokenNode token_node) {
         }
         
         //pop
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_pop, false, false);
+        instructionQueueEnqueueInstruction(main_instruction_queue, mips_pop, false);
     }
     
     int i;
@@ -152,15 +167,15 @@ void solveExpression(TokenNode token_node) {
     switch (token_node->type) {
         case TI_LISTAEXP:
             if (token_node->root_token->type == TI_CALL_FUNCTION) {
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_start_function_call, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_start_function_call, false);
                 
                 for(i = token_node->child_list->length - 1; i >= 0; i--) {
                     solveExpression(listGetTokenByIndex(token_node->child_list, i));
-                    instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false, false);
+                    instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false);
                 }
                 
                 //jal f_entry
-                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(mips_end_function_call, first_root_child->lex_str)), false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(mips_end_function_call, first_root_child->lex_str)), false);
             }
         
             break;

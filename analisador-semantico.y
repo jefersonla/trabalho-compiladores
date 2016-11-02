@@ -221,7 +221,7 @@ programa        : bloco                                 {
                                                                     $1->token_str, all_tokens);
                                                             #else 
                                                             /* Store codegen header to output file */
-                                                            instructionQueueFilePrint(output_file, instruction_queue);
+                                                            instructionQueueFilePrint(output_file, header_instruction_queue);
                                                             
                                                             /* Store codegen main code to output file */
                                                             instructionQueueFilePrint(output_file, main_instruction_queue);
@@ -230,7 +230,7 @@ programa        : bloco                                 {
                                                             printf("\n::: CODE GENERATOR :::\n");
                                                             
                                                             /* Print Header Instruction Queue */
-                                                            instructionQueueFilePrint(stdout, instruction_queue);
+                                                            instructionQueueFilePrint(stdout, header_instruction_queue);
                                                             
                                                             /* Print Main Instruction Queue */
                                                             instructionQueueFilePrint(stdout, main_instruction_queue);

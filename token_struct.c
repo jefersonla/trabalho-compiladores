@@ -433,30 +433,6 @@ int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
     return symbol_node->symbol_size;
 }
 
-/* Store a global variable */    
-const char mips_global_atributtion[] =
-    "\t# --------- Store $a0 in global variable -------- #\n"
-    "\tsw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
-    "\t# ----------------------------------------------- #\n";
-
-/* Load a global variable into $a0 */
-const char mips_global_load[] =
-    "\t# --------- Load global variable in $a0 --------- #\n"
-    "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "%s\n"
-    "\t# ----------------------------------------------- #\n";
-
-/* Store a local variable */    
-const char mips_local_store[] =
-    "\t# --------- Store $a0 in local variable --------- #\n"
-    "\tsw $a0, %d($sp)\n"
-    "\t# ----------------------------------------------- #\n";
-
-/* Load a local variable into $a0 */
-const char mips_local_load[] =
-    "\t# --------- Load local variable in $a0 ---------- #\n"
-    "\tlw $a0, %d($sp)\n"
-    "\t# ----------------------------------------------- #\n";
-
 /**
  * Get load a symbol into a register instruction.
  * 
@@ -471,12 +447,12 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
     }
 
     /* If this node belong toa global symbol table */
-    if(){
-        formatedInstruction(mips_global_load, symbol_node->symbol_name);
+    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
+        return formatedInstruction(mips_global_load, symbol_node->symbol_name);
     }
 
     /* Return the formated instruction */
-    return ;
+    return formatedInstruction(mips_local_load, symbol_node->symbol_address);
 }
 
 /** 
@@ -492,8 +468,13 @@ InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
         return NULL;
     }
     
+    /* If this node belong toa global symbol table */
+    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
+        return formatedInstruction(mips_global_store, symbol_node->symbol_name);
+    }
+
     /* Return the formated instruction */
-    
+    return formatedInstruction(mips_local_store, symbol_node->symbol_address);
 }
 
 /**
@@ -510,7 +491,7 @@ InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
     }
     
     /* Return the formated instruction */
-    
+    return formatedInstruction("# TODO - LOAD TYPE\n");
 }
 
 /**
@@ -527,7 +508,7 @@ InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
     }
     
     /* Return the formated instruction */
-    
+    return formatedInstruction("# TODO - STORE TYPE\n");
 }
 
 /* ------------- Symbol Table Methods ------------- */
@@ -769,11 +750,10 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
  * Return a new Instruction Node.
  * 
  * @param instruction_string string of the instruction.
- * @param useTab Flag that define if this instruction starts or not with tab or '\t' char.
  * @param copyInstruction Flag that ask if the user want to copy new instruction or just store the pointer
  * @return a newly created instruction node.
  */
-InstructionNode *newInstructionNode(char* instruction_string, bool useTab, bool copyInstruction){
+InstructionNode *newInstructionNode(char* instruction_string, bool copyInstruction){
     InstructionNode *_new_instruction_node;
     char *_new_instruction_string;
     
@@ -807,7 +787,6 @@ InstructionNode *newInstructionNode(char* instruction_string, bool useTab, bool 
     
     /* Set the new instrunction */
     _new_instruction_node->instruction = _new_instruction_string;
-    _new_instruction_node->useTab = useTab;
     _new_instruction_node->length = (int) strlen(_new_instruction_string);
 
     /* Return pointer to the new instruction node */
@@ -837,12 +816,7 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
     }
     
     /* Print the instruction */
-    if(instruction_node->useTab){
-        _fprintf_status = fprintf(_output_file, "%s" NEWLINE_CHAR, instruction_node->instruction);
-    }
-    else{
-        _fprintf_status = fprintf(_output_file, "%s" NEWLINE_CHAR, instruction_node->instruction);
-    }
+    _fprintf_status = fprintf(_output_file, "%s", instruction_node->instruction);
     
     /* Check if fprintf has worked */
     if(_fprintf_status < 0){
@@ -850,7 +824,7 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
         return false;
     }
     
-    /* Sucess */
+    /* Return Sucess */
     return true;
 }
 
@@ -920,16 +894,15 @@ InstructionQueue *newInstructionQueue(){
  * 
  * @param instruction_queue Instruction Queue.
  * @param instruction_string Instruction String.
- * @param useTab Check if user want's add '\t' on start string.
  * @param copyInstruction check if user wants to copy instruction or just store the pointer.
  * @return true if there's no error on execution and false otherwise. 
  */
-bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, char *instruction_string, bool useTab, bool copyInstruction){
+bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, char *instruction_string, bool copyInstruction){
     InstructionNode *_new_instruction_node;
     InstructionNode **_reallocated_instructions;
     
     /* Try to create a new instruction node */
-    _new_instruction_node = newInstructionNode(instruction_string, useTab, copyInstruction);
+    _new_instruction_node = newInstructionNode(instruction_string, copyInstruction);
     
     /* Check if for some reason new instruction node is null */
     if(_new_instruction_node == NULL){

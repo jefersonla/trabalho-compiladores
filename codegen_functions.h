@@ -28,6 +28,8 @@
 bool cgenAllCode(TokenNode *root_token);
 
 /* Generate blocks of code */
+bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope);
+
 
 
 /* ------------------------------------------------------------- */
@@ -42,54 +44,72 @@ const char mips_header[] =
     "# LUA MIPS Compiler Version 0.3 \n"
     "\n"
     "# Variable Declarations\n"
-        "\t.data\n"
+    ".data\n"
     "\n"
     "# System default variables \n"
     GLOBAL_SYSTEM_VARIABLE_PREFIX "newline: .asciiz \"\\n\"\n"
-    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil:\t.asciiz \"nil\"\n"
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str: .asciiz \"nil\"\n"
+    GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val: .word   0x7FFFFFFF"
     "\n"
     "# User Global Variables";
 
-/* -- SHOULD START_WITH __ */
-/* -- GLOBAL VARS -- "%s" */
+/* -- GLOBAL VARS -- */
 
 /* System Functions */        
-const char mips_system_functions[] =
-    "\n"
+const char mips_main[] =
     "# Start of mips code\n"
-        "\t.text\n"
-        "\t.globl main\n"
-        "\n"
+    ".globl main\n"
+    ".text\n"
+    "\n"
+    "# -- Main Definition -- #\n"
+    "main:\n"
+    "\n";
+    
+/* -- ALL INSTRUCTIONS -- "%s" */
+
+/* Close main */
+const char mips_footer[] =
+    "\n"
+    "# Close Main Declaration\n"
+    "close_main:\n"
+        "\tli $v0, 10\n"
+        "\tsyscall\n"
+    "\n"
+    "# -- End of Main -- #\n"
+    "\n"
     "# System Defined Functions\n"
     "\n"
     "# -- Print Function -- #\n"
-    FUNCTION_PREFIX "print:\n"
+    "function_print:\n"
         "\t# Load Function Frame Pointer and Return Adress\n"
         "\tmove $fp, $sp\n"
         "\tsw $ra, 0($sp)\n"
-        "\taddiu $sp, $sp, -4\n"
+        "\taddiu $sp, $sp, 4\n"
         "\n"
         "\t# Load First Parameter\n"
         "\tlw $a0, 4($fp)\n"
-        "\tla $t0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil\n"
         "\n"
         "\t# Check if it's a nil number\n"
-        "\tbe $a0, $t0, print_nil_value\n"
+        "\tli $t1, 0x80000000\n"
+        "\txor $t0, $a0, $t1\n"
+        "\tnot $t0, $t0\n"
+        "\tbeq $t0, $0, print_nil_value\n"
+        "\n"
         "\t# Print number if it's not nil\n"
         "\tli $v0, 1\n"
         "\tsyscall\n"
         "\tj end_print\n"
         "\n"
     "print_nil_value:\n"
-        "\t# Print Value nil\n"
+    "   	# Print Value nil"
         "\tli $v0, 4\n"
-        "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil\n"
+        "\tla $a0, _nil_str\n"
         "\tsyscall\n"
         "\n"
     "end_print:\n"
         "\t# Print linefeed\n"
         "\tli $v0, 4\n"
-        "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "newline\n"
+        "\tla $a0, _newline\n"
         "\tsyscall\n"
         "\n"
         "\t# Close Print Function \n"
@@ -99,19 +119,6 @@ const char mips_system_functions[] =
         "\tjr $ra\n"
     "# -- End Print Function -- #\n"
     "\n"
-    "# Main Definition\n"
-    "main:\n";
-    
-/* -- ALL INSTRUCTIONS -- "%s" */
-
-/* Close main */
-const char mips_footer[] =
-        "\n"
-    "# Close Main Declaration\n"
-    "close_main:\n"
-        "\tli $v0, 10\n"
-        "\tsyscall\n"
-        "\n"
     "# ### END OF GENERATED CODE ### #\n";
 
 /* ------------------------------------------------------------- */
@@ -394,7 +401,29 @@ const char mips_end_function_call[] =
 
 /* ------------------------------------------------------------- */
 
+/* ------------------------------------------------------------- */
+/*                      Nil type definition                      */
+/* ------------------------------------------------------------- */
 
+/**
+ * Model for nil numbers.
+ * 
+ *  Default Model CGEN(nil):
+ *      lw $a0, _nil_val
+ * 
+ *  Description:
+ *      Nil values is interpreted as the last signed number or 
+ *      0x7FFFFFFF this number represent the number 0x0 after
+ *      a xor with the mask 0x80000000 and a bitwise negation
+ *      if this value is used it will interpreted as a nil number
+ * 
+ *  Warning:
+ *      Operations should test if this number can be subtracted,
+ *      multiplied, addition and division is possible but should
+ *      be avoided as much as it's possible.
+ */
+
+/* ------------------------------------------------------------- */
 
  
 /* ------------------------------------------------------------- */
