@@ -134,19 +134,19 @@ const char mips_global_load[] =
 const char mips_push_a0[] =
     "\t# -------------- Push $a0 to stack -------------- #\n"
     "\tsw $a0, 0($sp)\n"
-    "\taddiu $sp, $sp, -" BYTE_VARIABLE_SIZE "\n"
+    "\taddiu $sp, $sp, -" TO_STRING(BYTE_VARIABLE_SIZE) "\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Pop stack value */
 const char mips_pop[] =
     "\t# ------------------- Pop stack ----------------- #\n"
-    "\taddiu $sp, $sp, " BYTE_VARIABLE_SIZE "\n"
+    "\taddiu $sp, $sp, " TO_STRING(BYTE_VARIABLE_SIZE) "\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load top value to $t1 */
 const char mips_top_t1[] =
     "\t# ------------- Top of stack to $t1 ------------- #\n"
-    "\tlw $t1, " BYTE_VARIABLE_SIZE "($sp)\n"
+    "\tlw $t1, " TO_STRING(BYTE_VARIABLE_SIZE) "($sp)\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load a static number into $a0 */
@@ -371,9 +371,14 @@ const char mips_for =
  *      ...
  *      jal function_name
  */
- const char mips_function_call[] =
+ const char mips_start_function_call[] =
+    "\t# ---------------- CALL FUNCTION ---------------- #\n"
     "\tsw $fp, 0($sp)\n"
     "\taddiu $sp, $sp, -4\n";
+    
+const char mips_end_function_call[] =
+    "\tjal function_%s\n"
+    "\t# ----------------------------------------------- #\n";
 
 /* ------------------------------------------------------------- */
 

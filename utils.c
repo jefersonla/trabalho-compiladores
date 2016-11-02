@@ -204,3 +204,44 @@ bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node
     /* Return success */
     return true;
 }
+
+/**
+ * Utility to allocate formatted instructions.
+ * 
+ * @param format_string String with the format of the instruction.
+ * @param ... A list of parameters used in format string.
+ * @return A pointer to a string with the formated instruction.
+ */
+char* formatedInstruction(const char *format_string, ...){
+    va_list params;
+    char *_new_formated_instruction;
+
+    /* Initialize list of params */
+    va_start (params, format_string);
+    
+    /* Get size of the printed string */
+    size_t str_len = snprintf(NULL, 0, format_string, params);
+
+    /* Check if the size received is invalid */
+    if(str_len <= 0){
+        fprintf(stderr, "[ERROR] ERROR GETING FORMATED INSTRUCTION SIZE!\n");
+        return NULL;
+    }
+    
+    /* Allocate formated string buffer */
+    _new_formated_instruction = (char *) malloc(sizeof(char) * (str_len + 2));
+    
+    /* Check if the malloc hasn't failed */
+    if(_new_formated_instruction == NULL){
+        fprintf(stderr, "[ERROR] ERROR ALLOCATING NEW FORMATED INSTRUCTION BUFFER!\n");
+        return NULL;
+    }
+    
+    /* Store the formated instruction */
+    va_start (params, format_string);
+    vsprintf (_new_formated_instruction, format_string, params);
+    va_end (params);
+    
+    /* Return the new formated instruction */
+    return _new_formated_instruction;
+}

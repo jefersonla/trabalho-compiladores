@@ -133,12 +133,15 @@ void solveExpression(TokenNode token_node) {
     switch (token_node->type) {
         case TI_LISTAEXP:
             if (token_node->root_token->type == TI_CALL_FUNCTION) {
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_function_call, false, false);
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_start_function_call, false, false);
                 
                 for(i = token_node->child_list->length - 1; i >= 0; i--) {
                     solveExpression(listGetTokenByIndex(token_node->child_list, i));
-                    
+                    instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false, false);
                 }
+                
+                //jal f_entry
+                instructionQueueEnqueueInstruction(main_instruction_queue, mips_end_function_call, false, false);
             }
         
             break;

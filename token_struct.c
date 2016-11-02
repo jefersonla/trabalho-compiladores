@@ -504,6 +504,12 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     SymbolNode *_new_symbol_node;
     SymbolNode **_reallocated_items;
     
+    /* Check if symbol name is null or incorrect */
+    if((symbol_name == NULL) || (strlen(symbol_name) == 0)){
+        fprintf(stderr, "[ERROR] SYMBOL NAME EMPTY OR INVALID !\n");
+        return false;
+    }
+    
     /* Check if the symbol is already on symbol table */
     if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol->symbol_name)){
         return false;
@@ -530,7 +536,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Try allocate the new symbol node */
-    _new_symbol_node = newSymbolNode(symbol_name, _new_symbol_table->start_address + _new_symbol_table->shift_address + BYTE_VARIABLE_SIZE , symbol_type);
+    _new_symbol_node = newSymbolNode(symbol_name, _new_symbol_table->start_address + _new_symbol_table->shift_address + BYTE_VARIABLE_SIZE, symbol_type);
     
     /* Check if we can't allocate a new symbol node has returned no errors */
     if(_new_symbol_node == NULL){

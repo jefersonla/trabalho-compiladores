@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include "token_struct.h"
 
+/* Max size of a 32Bit Number */
+#define MAX_SIZE_32BIT_STRING       11
+
 /* Utility to allocate text of tokens */
 bool allocateTokenText(TokenNode *token_node, int qtd_params, ...);
 
@@ -13,5 +16,8 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int qtd_pa
 
 /* Utility to concatenate list of tokens */
 bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node_src);
+
+/* Utility to allocate formatted instructions */
+char* formatedInstruction(char *format_string, ...);
 
 #endif
