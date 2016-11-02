@@ -33,7 +33,7 @@ SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
 PKG_FILES=analisador-lexico.l analisador-semantico.y lexical.defs.h parser.defs.h token_struct.h utils.h codegen_functions.h $(LIBS_SRC)
 # Libs sources
-LIBS_SRC=token_struct.c utils.c codegen_functions.c
+LIBS_SRC=token_struct.c utils.c codegen_models.c codegen_functions.c
 
 # Rota padrão
 all: main

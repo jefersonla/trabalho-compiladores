@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include "token_struct.h"
 
+/* Convert a constant to a string */
+#define QOUTE(_VAR)                 #_VAR
+#define TO_STRING(VAR)              QOUTE(VAR)
+
 /* Max size of a 32Bit Number */
 #define MAX_SIZE_32BIT_STRING       11
 
@@ -18,6 +22,6 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int qtd_pa
 bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node_src);
 
 /* Utility to allocate formatted instructions */
-char* formatedInstruction(char *format_string, ...);
+char* formatedInstruction(const char *format_string, ...);
 
 #endif

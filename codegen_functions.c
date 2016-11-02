@@ -1,6 +1,16 @@
 /* Codegen header */
 #include "codegen_functions.h"
 
+/* Terminals define */
+#ifdef DEBUG
+#include "debug.y.tab.h"
+#else
+#include "y.tab.h"
+#endif
+
+/* Non Terminals defines */
+#include "parser.defs.h"
+
 /* Token Structure */
 #include "token_struct.h"
 
@@ -8,13 +18,13 @@
 #include "utils.h"
 
 /* Generated Code */
-extern InstructionQueue *header_instruction_queue;
+InstructionQueue *header_instruction_queue;
 
 /* Main Generated Code */
-extern InstructionQueue *main_instruction_queue;
+InstructionQueue *main_instruction_queue;
 
 /* Global Symbol Table */
-extern SymbolTable *global_symbol_table;
+SymbolTable *global_symbol_table;
 
 /** 
  * Copy global variables into header instruction queue.
@@ -76,7 +86,7 @@ bool cgenAllCode(TokenNode *root_token){
     }
     
     /* Initialize Global Symbol Table */
-    global_symbol_table = newSymbolTable(GLOBAL_START_ADRESS);
+    global_symbol_table = newSymbolTable(NULL);
     
     /* Check if the global symbol was correct initialized */
     if(global_symbol_table == NULL){
@@ -84,20 +94,23 @@ bool cgenAllCode(TokenNode *root_token){
         return false;
     }
     
+    /* Configure symbol table as global */
+    global_symbol_table->start_address = GLOBAL_START_ADRESS;
+    
     /* Block token node */
-    TokenNode block_token = listGetTokenByIndex(root_token->child_list, 1);
+    TokenNode *block_token = listGetTokenByIndex(root_token->child_list, 1);
     
     /* Check if the block token really exists */
     if(block_token == NULL){
         fprintf(stderr, "[ERROR] CANNOT GET BLOCK TOKEN NODE.\n");
-        return false
+        return false;
     }
     
     /* Add header on header instruction queue */
-    instructionQueueEnqueueInstruction(header_instruction_queue, mips_header, false);
+    instructionQueueEnqueueInstruction(header_instruction_queue, (char *) mips_header, false);
     
     /* Add header on main instruction queue */
-    instructionQueueEnqueueInstruction(main_instruction_queue, mips_main, false);
+    addInstructionMainQueue(mips_main);
     
     /* Generate code for main application */
     cgenBlockCode(block_token, NULL);
@@ -106,10 +119,198 @@ bool cgenAllCode(TokenNode *root_token){
     copyGlobalVariables();
     
     /* Add header on main instruction queue */
-    instructionQueueEnqueueInstruction(main_instruction_queue, mips_footer, false);
+    addInstructionMainQueue(mips_footer);
     
     /* Return success */
     return true;
+}
+
+
+/** 
+ * Generate code for function call.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;
+}
+
+/** 
+ * Generate code for assign.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;
+}
+
+/** 
+ * Generate code for command block.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for while.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for for.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for if.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for function definition call.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for local variable operation.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;    
+}
+
+/** 
+ * Generate code for command.
+ * 
+ * @param block_token Receive a command token.
+ * @param actual_symbol_table Actual table symbol escope
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
+    /* Check if command list token is null */
+    if(command_token == NULL){
+        fprintf(stderr, "[ERROR] COMMAND LIST IS INVALID!\n");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        return false;
+    }
+    
+    /* Check the command and call the aproprietaded cgen function */
+    switch(command_token->token_type){
+        case T_SEMICOL:
+            /* Just ignore */
+            break;
+        case TI_CALL_FUNCTION:
+        case TI_CALL_FUNCTION_PAR:
+            /* Generate code for 'function call' */
+            cgenCallFunction(command_token, actual_symbol_table);
+            break;
+        case TI_ASSIGN:
+            /* Generate code for 'assign' */
+            cgenAssign(command_token, actual_symbol_table);
+            break;
+        case TI_BLOCO_COMANDO:
+            /* Generate code for command 'block' */
+            cgenCommandBlock(command_token, actual_symbol_table);
+            break;
+        case TI_WHILE:
+            /* Generate command for 'while' */
+            cgenWhile(command_token, actual_symbol_table);
+            break;
+        case TI_FOR:
+        case TI_FOR_INC:
+            /* Generate code for 'for' */
+            cgenFor(command_token, actual_symbol_table);
+            break;
+        case TI_IF:
+        case TI_IF_ELSE:
+            /* Generate code for 'if' */
+            cgenIf(command_token, actual_symbol_table);
+            break;
+        case TI_FUNCTION:
+        case TI_FUNCTION_PARAM:
+            /* Generate code for 'function definition' */
+            cgenFunction(command_token, actual_symbol_table);
+            break;
+        case TI_LOCAL_ASSIGN:
+        case TI_LOCAL_DEFINE:
+            /* Generate code for local variable definition or assing */
+            cgenLocalVariable(command_token, actual_symbol_table);
+            break;
+        default:
+            fprintf(stderr, "[WARNING] NOT IMPLEMENTED YET, TODO!\n");
+            return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Generate code for command return.
+ * 
+ * @param block_token Receive a command return token.
+ * @param actual_symbol_table Actual table symbol escope
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
+    // TODO!
+    fprintf(stderr, "[TODO] NOT IMPEMENTED YET!\n");
+    return false;
 }
 
 /**
@@ -157,10 +358,12 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
  * Generate code for command list.
  * 
  * @param block_token Receive a command list token.
- * @param actual_symbol_table Previous table symbol escope.
+ * @param actual_symbol_table Actual table symbol escope.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_table){
+    int i;
+    
     /* Check if command list token is null */
     if(command_list_token == NULL){
         fprintf(stderr, "[ERROR] COMMAND LIST IS INVALID!\n");
@@ -178,18 +381,13 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
         return true;
     }
     
+    /* If command list is not empty, exec every command */
+    for(i = 1; i <= command_list_token->child_list->length; i++){
+        cgenCommand(listGetTokenByIndex(command_list_token->child_list, i), actual_symbol_table);
+    }
     
-}
-
-/**
- * Generate code for command return.
- * 
- * @param block_token Receive a command return token.
- * @param actual_symbol_table Previous table symbol escope.
- * @return true if there's no error on execution and false otherwise.
- */
-bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
-    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -199,63 +397,63 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
  * @param previous_scope Previous table symbol escope.
  * @return true if there's no error on execution and false otherwise.
  */
-void cgenExpression(TokenNode exp_token, SymbolTable *previous_scope) {
-    TokenNode * token_left = listGetTokenByIndex(exp_token->child_list, 1);
-    TokenNode * token_right = listGetTokenByIndex(exp_token->child_list, 3);
+void cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
+    TokenNode *token_left = listGetTokenByIndex(exp_token->child_list, 1);
+    TokenNode *token_right = listGetTokenByIndex(exp_token->child_list, 3);
     
     if(IS_BINARY_OPERAND(exp_token->token_type)) {
         //CGEN(exp1)
-        cgenExpression(token_left);
+        cgenExpression(token_left, symbol_table);
         
         // push_a0
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false);
+        addInstructionMainQueue(mips_push_a0);
         
         //CGEN(exp2)
-        cgenExpression(token_right);
+        cgenExpression(token_right, symbol_table);
         
         //top_t1
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_top_t1, false);
+        addInstructionMainQueue(mips_top_t1);
     
         //CGEN(operand)
         switch(exp_token->token_type) {
             case TI_PLUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_add_a0_t1_a0, false);
+                addInstructionMainQueue(mips_add_a0_t1_a0);
                 break;
                 
             case TI_MINUS:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_sub_a0_t1_a0, false);
+                addInstructionMainQueue(mips_sub_a0_t1_a0);
                 break;
                 
             case TI_TIMES:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_mul_a0_t1_a0, false);
+                addInstructionMainQueue(mips_mul_a0_t1_a0);
                 break;
                 
             case TI_DIV:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_div_a0_t1_a0, false);
+                addInstructionMainQueue(mips_div_a0_t1_a0);
                 break;
                 
             case TI_GT:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_gt_a0_t1_a0, false);
+                addInstructionMainQueue(mips_gt_a0_t1_a0);
                 break;
                 
             case TI_GTEQ:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_gte_a0_t1_a0, false);
+                addInstructionMainQueue(mips_gte_a0_t1_a0);
                 break;
                 
             case TI_LT:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_lt_a0_t1_a0, false);
+                addInstructionMainQueue(mips_lt_a0_t1_a0);
                 break;
                 
             case TI_LTEQ:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_lte_a0_t1_a0, false);
+                addInstructionMainQueue(mips_lte_a0_t1_a0);
                 break;
                 
             case TI_EQ:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_eq_a0_t1_a0, false);
+                addInstructionMainQueue(mips_eq_a0_t1_a0);
                 break;
                 
             case TI_NEQ:
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_neq_a0_t1_a0, false);mips_neq_a0_t1_a0
+                addInstructionMainQueue(mips_neq_a0_t1_a0);
                 break;
                 
             default:
@@ -263,26 +461,29 @@ void cgenExpression(TokenNode exp_token, SymbolTable *previous_scope) {
         }
         
         //pop
-        instructionQueueEnqueueInstruction(main_instruction_queue, mips_pop, false);
+        addInstructionMainQueue(mips_pop);
     }
     
     int i;
     TokenNode * first_root_child = listGetTokenByIndex(exp_token->root_token->child_list, 1);
     
-    switch (exp_token->type) {
+    switch (exp_token->token_type) {
         case TI_LISTAEXP:
-            if (exp_token->root_token->type == TI_CALL_FUNCTION) {
-                instructionQueueEnqueueInstruction(main_instruction_queue, mips_start_function_call, false);
+            if (exp_token->root_token->token_type == TI_CALL_FUNCTION) {
+                addInstructionMainQueue(mips_start_function_call);
                 
                 for(i = exp_token->child_list->length - 1; i >= 0; i--) {
-                    cgenExpression(listGetTokenByIndex(exp_token->child_list, i));
-                    instructionQueueEnqueueInstruction(main_instruction_queue, mips_push_a0, false);
+                    cgenExpression(listGetTokenByIndex(exp_token->child_list, i), symbol_table);
+                    addInstructionMainQueue(mips_push_a0);
                 }
                 
                 //jal f_entry
-                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(mips_end_function_call, first_root_child->lex_str)), false);
+                addInstructionMainQueue(formatedInstruction(mips_end_function_call, first_root_child->lex_str));
             }
         
+            break;
+            
+        default:
             break;
     }
 }

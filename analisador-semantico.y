@@ -57,13 +57,13 @@ int last_char;
 TokenNode *abstract_sintatic_tree;
 
 /* Header Generated Code */
-InstructionQueue *header_instruction_queue;
+extern InstructionQueue *header_instruction_queue;
 
 /* Main Generated Code */
-InstructionQueue *main_instruction_queue;
+extern InstructionQueue *main_instruction_queue;
 
 /* Global Symbol Table */
-SymbolTable *global_symbol_table;
+extern SymbolTable *global_symbol_table;
 
 %}
 

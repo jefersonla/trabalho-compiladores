@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "utils.h"
 #include "token_struct.h"
 #include "codegen_functions.h"
 
@@ -452,7 +453,7 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
     }
 
     /* Return the formated instruction */
-    return newInstructionNode(mips_local_define, false);
+    return newInstructionNode((char *) mips_local_define, false);
 }
 
 /**
@@ -569,7 +570,7 @@ SymbolTable* newGlobalSymbolTable(){
     _new_global_symbol_table->size = DEFAULT_BLOCK_SIZE;
     _new_global_symbol_table->length = 0;
     _new_global_symbol_table->shift_address = 0;
-    _new_global_symbol_table->previous_scope = previous_scope;
+    _new_global_symbol_table->previous_scope = NULL;
     _new_global_symbol_table->items = _items_table;
     
     /* Return pointer of the new symbol table */
@@ -631,7 +632,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
  * @param symbol_type Type of the symbol which will be appended to symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
-bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symbol_type);
+bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symbol_type){
     SymbolNode *_new_symbol_node;
     SymbolNode **_reallocated_items;
     int i;
@@ -643,7 +644,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Check if the symbol is already on symbol table */
-    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol->symbol_name)){
+    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol_name)){
         return false;
     }
     
@@ -668,7 +669,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Try allocate the new symbol node */
-    _new_symbol_node = newSymbolNode(symbol_table, symbol_name, _new_symbol_table->start_address + BYTE_VARIABLE_SIZE, symbol_type);
+    _new_symbol_node = newSymbolNode(symbol_table, symbol_name, symbol_table->start_address + BYTE_VARIABLE_SIZE, symbol_type);
     
     /* Check if we can't allocate a new symbol node has returned no errors */
     if(_new_symbol_node == NULL){
@@ -682,7 +683,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Increase shift */
-    _new_symbol_table->shift_address += BYTE_VARIABLE_SIZE;
+    symbol_table->shift_address += BYTE_VARIABLE_SIZE;
     
     /* Add the new symbol */
     symbol_table->items[symbol_table->length] = _new_symbol_node;
