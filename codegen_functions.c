@@ -398,92 +398,133 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
  * @return true if there's no error on execution and false otherwise.
  */
 void cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
-    TokenNode *token_left = listGetTokenByIndex(exp_token->child_list, 1);
-    TokenNode *token_right = listGetTokenByIndex(exp_token->child_list, 3);
+    int i;
+    TokenNode *token_left;
+    TokenNode *token_right;
+    TokenNode *token_operand;
     
-    if(IS_BINARY_OPERAND(exp_token->token_type)) {
-        //CGEN(exp1)
+    /* Check if the operand is unary */
+    if(IS_UNARY_OPERAND(exp_token->token_type)){
+        
+        /* Get the token operand */
+        token_operand = listGetTokenByIndex(exp_token->child_list, 2);
+        
+        /* CGEN(exp) */
+        cgenExpression(token_operand, symbol_table);
+        
+        /* CGEN(operand) */
+        switch(exp_token->token_type){
+            case TI_UMINUS:
+                /* Add a minus transform operation to the instruction queue */
+                addInstructionMainQueue(mips_neg_a0);
+                break;
+            case TI_NOT:
+                /* Add a negation transform operation to the instruction queue */
+                addInstructionMainQueue(mips_not_a0);
+            default:
+                /* Binary expression not found or not implemented yet */
+                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
+                break;
+        }
+    }
+    /* Check if the operand is binary */
+    else if(IS_BINARY_OPERAND(exp_token->token_type)) {
+        
+        /* Get left and right childs of the expression */
+        token_right = listGetTokenByIndex(exp_token->child_list, 1);
+        token_left = listGetTokenByIndex(exp_token->child_list, 3);
+    
+        /* CGEN(exp1) */
         cgenExpression(token_left, symbol_table);
         
-        // push_a0
+        /* push_a0 */
         addInstructionMainQueue(mips_push_a0);
         
-        //CGEN(exp2)
+        /* CGEN(exp2) */
         cgenExpression(token_right, symbol_table);
         
-        //top_t1
+        /* top_t1 */
         addInstructionMainQueue(mips_top_t1);
     
-        //CGEN(operand)
+        /* CGEN(operand) */
         switch(exp_token->token_type) {
             case TI_PLUS:
+                /* Add an add operation to the instruction queue */
                 addInstructionMainQueue(mips_add_a0_t1_a0);
                 break;
-                
             case TI_MINUS:
+                /* Add a subtraction operation to the instruction queue */
                 addInstructionMainQueue(mips_sub_a0_t1_a0);
                 break;
-                
             case TI_TIMES:
+                /* Add a multiplication operation to the instruction queue */
                 addInstructionMainQueue(mips_mul_a0_t1_a0);
                 break;
-                
             case TI_DIV:
+                /* Add a division operation instruction to the instruction queue  */
                 addInstructionMainQueue(mips_div_a0_t1_a0);
                 break;
-                
             case TI_GT:
+                /* Add a '>' operation to the instruction queue */
                 addInstructionMainQueue(mips_gt_a0_t1_a0);
                 break;
-                
             case TI_GTEQ:
+                /* Add a '>= operation to the instruction queue */
                 addInstructionMainQueue(mips_gte_a0_t1_a0);
                 break;
-                
             case TI_LT:
+                /* Add a '<' operation to the instruction queue */
                 addInstructionMainQueue(mips_lt_a0_t1_a0);
                 break;
-                
             case TI_LTEQ:
+                /* Add a '<=' operation to the instruction queue */
                 addInstructionMainQueue(mips_lte_a0_t1_a0);
                 break;
-                
             case TI_EQ:
+                /* Add a '==' operation to the instruction queue */
                 addInstructionMainQueue(mips_eq_a0_t1_a0);
                 break;
-                
             case TI_NEQ:
+                /* Add a '~=' operation to the instruction queue */
                 addInstructionMainQueue(mips_neq_a0_t1_a0);
+                break;
+            default:
+                /* Binary expression not found or not implemented yet */
+                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
+                break;
+        }
+        
+        /* pop */
+        addInstructionMainQueue(mips_pop);
+    }
+    else{
+        TokenNode * first_root_child = listGetTokenByIndex(exp_token->root_token->child_list, 1);
+        
+        switch (exp_token->token_type) {
+            case TI_LISTAEXP:
+                if (exp_token->root_token->token_type == TI_CALL_FUNCTION) {
+                    addInstructionMainQueue(mips_start_function_call);
+                    
+                    for(i = exp_token->child_list->length - 1; i >= 0; i--) {
+                        cgenExpression(listGetTokenByIndex(exp_token->child_list, i), symbol_table);
+                        addInstructionMainQueue(mips_push_a0);
+                    }
+                    
+                    //jal f_entry
+                    addInstructionMainQueue(formatedInstruction(mips_end_function_call, first_root_child->lex_str));
+                }
+            
+                break;
+                
+            case T_NUMBER:
+                addInstructionMainQueue(formatedInstruction(mips_static_number_load, first_root_child->lex_str));
                 break;
                 
             default:
                 break;
         }
-        
-        //pop
-        addInstructionMainQueue(mips_pop);
     }
     
-    int i;
-    TokenNode * first_root_child = listGetTokenByIndex(exp_token->root_token->child_list, 1);
-    
-    switch (exp_token->token_type) {
-        case TI_LISTAEXP:
-            if (exp_token->root_token->token_type == TI_CALL_FUNCTION) {
-                addInstructionMainQueue(mips_start_function_call);
-                
-                for(i = exp_token->child_list->length - 1; i >= 0; i--) {
-                    cgenExpression(listGetTokenByIndex(exp_token->child_list, i), symbol_table);
-                    addInstructionMainQueue(mips_push_a0);
-                }
-                
-                //jal f_entry
-                addInstructionMainQueue(formatedInstruction(mips_end_function_call, first_root_child->lex_str));
-            }
-        
-            break;
-            
-        default:
-            break;
-    }
+    /* Return success */
+    return true;
 }

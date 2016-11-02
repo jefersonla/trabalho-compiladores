@@ -168,7 +168,7 @@ const char mips_static_number_load[] =
  */
 
 /* Not a number in $a0 */
-const char mips_not_a0_a0[] =
+const char mips_not_a0[] =
     "\t# ---------------- Not $a0 number --------------- #\n"
     "\tnot $a0, $a0\n"
     "\t# ----------------------------------------------- #\n";

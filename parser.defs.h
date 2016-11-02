@@ -66,6 +66,7 @@
 #define TI_CALL_FUNCTION_PAR    0xCB23
 #define TI_CALL_FUNCTION        0xCB24
 
+/* Empty non terminal */
 #define TI_EMPTY                0xCB25
 
 #endif

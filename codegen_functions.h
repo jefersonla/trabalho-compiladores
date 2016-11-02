@@ -131,7 +131,7 @@ extern const char mips_top_t1[];
 extern const char mips_static_number_load[];
 
 /* Not a number in $a0 */
-extern const char mips_not_a0_a0[];
+extern const char mips_not_a0[];
  
 /* Convert $a0 to a negative number */
 extern const char mips_neg_a0[];
