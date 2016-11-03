@@ -13,15 +13,15 @@ print(not 0)   -- 1
 --print(nil)     -- nil
 print(3+40/2)  -- 23
 print(1 or 0)  -- 1
-print(1 and 0) -- 0
-print(5>3)     -- 1
-print(4<2)     -- 0
-print(5>=8)    -- 0
-print(8<=10)   -- 1
+--print(1 and 0) -- 0
+--print(5>3)     -- 1
+--print(4<2)     -- 0
+--print(5>=8)    -- 0
+--print(8<=10)   -- 1
 --print(not nil)             --- VISH 
 --print(not not nil)         -- isso é vish
-print(0 and 0 and 1)         -- 0
-print((1 + 3) + (2 * (3+1))) -- 12
+--print(0 and 0 and 1)         -- 0
+--print((1 + 3) + (2 * (3+1))) -- 12
 
 --[[
 

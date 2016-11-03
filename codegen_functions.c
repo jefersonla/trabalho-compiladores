@@ -421,20 +421,28 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
  */
 bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
     int i;
+    TokenNode *token_node;
     
     /* Execute from right to left child list that is non T_COMMA */
     for(i = list_exp_token->child_list->length; i > 0; i--) {
+        /* Get the token i */
+        token_node = listGetTokenByIndex(list_exp_token->child_list, i);
+        
+        if(token_node == NULL){
+            fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
+            continue;
+        }
         
         /* Ignore comma  */
-        if(listGetTokenByIndex(list_exp_token->child_list, i)->token_type == T_COMMA){
+        if(token_node->token_type == T_COMMA){
             continue;
         }
         
         /* CGEN(exp) */
-        cgenExpression(listGetTokenByIndex(list_exp_token->child_list, i), symbol_table);
+        cgenExpression(token_node, symbol_table);
         
         /* push a0 */
-        addInstructionMainQueue(mips_push_a0);
+        addInstructionMainQueue(mips_else);
     }
     
     /* Return success */
@@ -579,7 +587,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 }
                 else{
                     /* Store the correct load instruction */
-                    addInstructionMainQueue(symbolNodeGetLoadInstruction(symbol_node));
+                    instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetLoadInstruction(symbol_node));
                 }
                 break;
             case TI_CALL_FUNCTION:
