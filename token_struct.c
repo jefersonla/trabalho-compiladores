@@ -41,7 +41,7 @@ TokenNode* newTokenNode(int token_type){
 /** 
  * Destroy an already allocated token node.
  * 
- * @param token that will be destroyed.
+ * @param token_node that will be destroyed.
  * @param deleteChilds if this flag is true it will destroy all childs related to this token.
  * @return true if there's no error on execution and false otherwise.
  */
@@ -60,22 +60,19 @@ bool deleteTokenNode(ptrTokenNode *token_node, bool deleteChilds){
     
     /* Free token_str if it exists */
     if((*token_node)->token_str != NULL){
-        free((*token_node)->token_str);
+        secureFree((*token_node)->token_str);
     }
     
     /* Free lex_str if it exists */
     if((*token_node)->lex_str != NULL){
-        free((*token_node)->lex_str);
+        secureFree((*token_node)->lex_str);
     }
     
     /* Delete child list, and childs if destroyChild is true */
-    deleteTokenList((*token_node)->child_list, deleteChilds);
+    deleteTokenList(&(*token_node)->child_list, deleteChilds);
     
     /* Free tokne_node pointer */
-    free((*token_node));
-
-    /* Null the pointer apponted by token_node */
-    (*token_node) = NULL;
+    secureFree((*token_node));
     
     /* Return success */
     return true;
@@ -98,7 +95,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     }
     
     /* Allocate new token_str */
-    _new_token_str = (char *) malloc(sizeof(char) * (strlen(token_str) + 1));
+    _new_token_str = mallocItString(_new_token_str, token_str);
     
     /* Check if malloc has succeed */
     if(_new_token_str == NULL){
@@ -108,14 +105,14 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if this token already has token str */
     if(token_node->token_str != NULL){
-        free(token_node->token_str);
+        secureFree(token_node->token_str);
     }
     
     /* Store the new token_str array pointer */
     token_node->token_str = _new_token_str;
     
     /* Copy content from token_str to the new token */
-    strcpy(token_node->token_str, token_str);
+    secureStringCopy(token_node->token_str, token_str);
     
     /* Return success */
     return true;
@@ -138,7 +135,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     }
     
     /* Allocate new lex_str */
-    _new_lex_str = (char *) malloc(sizeof(char) * (strlen(lex_str) + 1));
+    _new_lex_str = mallocItString(_new_lex_str, lex_str);
     
     /* Check if malloc has succeed */
     if(_new_lex_str == NULL){
@@ -148,14 +145,14 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if this token already has token str */
     if(token_node->lex_str != NULL){
-        free(token_node->lex_str);
+        secureFree(token_node->lex_str);
     }
     
     /* Store the new lex_str array pointer */
     token_node->lex_str = _new_lex_str;
     
     /* Copy content from lex_str to the new token */
-    strcpy(token_node->lex_str, lex_str);
+    secureStringCopy(token_node->lex_str, lex_str);
     
     /* Return success */
     return true;
@@ -228,7 +225,7 @@ TokenList* newTokenList(){
 /** 
  * Destroy an already allocated token list.
  * 
- * @param token pointer to the token list that will be destroyed.
+ * @param token_list pointer to the token list that will be destroyed.
  * @param deleteChilds if this flag is true it will delete childs recursively.
  * @return true if there's no error on execution and false otherwise.
  */
@@ -267,7 +264,7 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
     }
     
     /* Free token list  */
-    free((*token_list));
+    secureFree((*token_list));
 
     /* Null the pointer apponted by token_list */
     (*token_list) = NULL;
@@ -304,9 +301,7 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
         token_list->size += DEFAULT_BLOCK_SIZE;
         
         /* Try reallocate array of token_list items */
-        _reallocated_items = (TokenNode**) realloc( token_list->items,
-                                                    (token_list->size)
-                                                        * sizeof(TokenNode *));
+        _reallocated_items = reallocItArray(token_list->items, token_list->size);
         
         /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
@@ -374,9 +369,10 @@ TokenList* listGetTokensByType(TokenList *token_list, int token_type){
     _tokens_found = newTokenList();
     
     /* Search for the given types */
-    for(i = 0; i < token_list->length; i++){
+    for(i = 1; i <= token_list->length; i++){
+        
         /* Pick the token at index i */
-        _token_i = listGetTokenByIndex(token_list, i + 1);
+        _token_i = listGetTokenByIndex(token_list, i);
         
         /* Check if token_list item has the type wanted, and add this item to the found list */
         if(_token_i->token_type == token_type){
@@ -409,7 +405,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     }
     
     /* Try allocate this new symbol */
-    _new_symbol_node = (SymbolNode*) malloc(sizeof(SymbolNode));
+    _new_symbol_node = mallocIt(_new_symbol_node);
     
     /* Give a fatal error if malloc has errors */
     if(_new_symbol_node == NULL){
@@ -418,7 +414,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     }
     
     /* Try allocate the name of the new symbol */
-    _new_symbol_name = (char*) malloc(sizeof(char) * (strlen(symbol_name) + 1));
+    _new_symbol_name = mallocItString(_new_symbol_name, symbol_name); 
     
     /* Give a fatal error if malloc has errors */
     if(_new_symbol_name == NULL){
@@ -427,7 +423,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     }
 
     /* Copy content of the symbol name to this new structure */
-    strcpy(_new_symbol_name, symbol_name);
+    secureStringCopy(_new_symbol_name, symbol_name);
 
     /* Set the new symbol node */
     _new_symbol_node->symbol_name = _new_symbol_name;
@@ -439,6 +435,37 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     
     /* Return pointer to this new node */
     return _new_symbol_node;
+}
+
+/** 
+ * Destroy an already allocated symbol node.
+ * 
+ * @param symbol_node pointer to the symbol node that will be destroyed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteSymbolNode(ptrSymbolNode *symbol_node){
+    /* Check if token node exists */
+    if(symbol_node == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*symbol_node) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!\n");
+        return false;
+    }
+    
+    /* Check if there are a symbol name allocated and remove it */
+    if((*symbol_node)->symbol_name != NULL){
+        secureFree((*symbol_node)->symbol_name);
+    }
+    
+    /* Free token list  */
+    secureFree((*symbol_node));
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -601,47 +628,6 @@ InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
 
 /* ------------- Symbol Table Methods ------------- */
 
-/** 
- * Create a new global Symbol Table.
- * 
- * @return A new global symbol table.
- */
-SymbolTable* newGlobalSymbolTable(){
-    SymbolTable *_new_global_symbol_table;
-    SymbolNode **_items_table;
-    
-    /* Allocate a new symbol table */
-    _new_global_symbol_table = (SymbolTable*) malloc(sizeof(SymbolTable));
-    
-    /* Give a fatal error if cannot allocate new symbol table */
-    if(_new_global_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!\n");
-        exit(EXIT_FAILURE);
-    }
-    
-    /* Allocate item symbols */
-    _items_table = (SymbolNode **) malloc(sizeof(SymbolNode *) * DEFAULT_BLOCK_SIZE);
-    
-     /* Give a fatal error if cannot allocate items of the table */
-    if(_items_table == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ARRAY OF SYMBOLS FOR GLOBAL SYMBOL TABLE!\n");
-        exit(EXIT_FAILURE);
-    }
-    
-    /* Global Symbol Table Start Address */
-    _new_global_symbol_table->start_address = GLOBAL_START_ADRESS;
-    
-    /* Set the new symbol table */
-    _new_global_symbol_table->size = DEFAULT_BLOCK_SIZE;
-    _new_global_symbol_table->length = 0;
-    _new_global_symbol_table->shift_address = 0;
-    _new_global_symbol_table->previous_scope = NULL;
-    _new_global_symbol_table->items = _items_table;
-    
-    /* Return pointer of the new symbol table */
-    return _new_global_symbol_table;
-}
-
 /**
  * Create a new SymbolTable.
  * 
@@ -653,7 +639,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     SymbolNode **_items_table;
     
     /* Allocate a new symbol table */
-    _new_symbol_table = (SymbolTable*) malloc(sizeof(SymbolTable));
+    _new_symbol_table = mallocIt(_new_symbol_table);
     
     /* Give a fatal error if cannot allocate new symbol table */
     if(_new_symbol_table == NULL){
@@ -662,7 +648,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     }
     
     /* Allocate item symbols */
-    _items_table = (SymbolNode **) malloc(sizeof(SymbolNode *) * DEFAULT_BLOCK_SIZE);
+    _items_table = mallocItArray(_items_table, DEFAULT_BLOCK_SIZE);
     
      /* Give a fatal error if cannot allocate items of the table */
     if(_items_table == NULL){
@@ -687,6 +673,70 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     
     /* Return pointer of the new symbol table */
     return _new_symbol_table;
+}
+
+/** 
+ * Create a new global Symbol Table.
+ * 
+ * @return A new global symbol table.
+ */
+SymbolTable* newGlobalSymbolTable(){
+    SymbolTable *_new_global_symbol_table;
+
+    /* Allocate a new symbol table */
+    _new_global_symbol_table = newSymbolTable(NULL);
+    
+    /* Give a fatal error if cannot allocate new symbol table */
+    if(_new_global_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Global Symbol Table Start Address */
+    _new_global_symbol_table->start_address = GLOBAL_START_ADRESS;
+    
+    /* Return pointer of the new symbol table */
+    return _new_global_symbol_table;
+}
+
+/** 
+ * Destroy an already allocated symbol table.
+ * 
+ * @param symbol_table pointer to the symbol table that will be destroyed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteSymbolTable(ptrSymbolTable *symbol_table){
+    int i;
+    
+    /* Check if token node exists */
+    if(symbol_table == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL SYMBOL TABLE VARIABLE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*symbol_table) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL SYMBOL TABLE!\n");
+        return false;
+    }
+    
+    /* Check if there are items on this symbol table */
+    if((*symbol_table)->items != NULL){
+        
+        /* Delete every symbol node on this table */
+        for(i = 0; i < (*symbol_table)->length; i++){
+            deleteSymbolNode(&(*symbol_table)->items[i]);
+        }
+        
+        /* Remove this array */
+        secureFree((*symbol_table)->items);
+    }
+    
+    /* Free symbol_table  */
+    secureFree((*symbol_table));
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -719,9 +769,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
         symbol_table->size += DEFAULT_BLOCK_SIZE;
         
         /* Try reallocate array of symbol_table items */
-        _reallocated_items = (SymbolNode**) realloc( symbol_table->items,
-                                                    (symbol_table->size)
-                                                        * sizeof(SymbolNode *));
+        _reallocated_items = reallocItArray(symbol_table->items, symbol_table->size);
         
         /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
@@ -744,7 +792,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     
     /* Increase address of previous nodes */
     for(i = 0; i < symbol_table->length; i++){
-        symbol_table->items[0]->symbol_address += BYTE_VARIABLE_SIZE;
+        symbol_table->items[i]->symbol_address += BYTE_VARIABLE_SIZE;
     }
     
     /* Increase shift */
@@ -870,7 +918,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
     char *_new_instruction_string;
     
     /* Try allocate this new instruction */
-    _new_instruction_node = (InstructionNode*) malloc(sizeof(InstructionNode));
+    _new_instruction_node = mallocIt(_new_instruction_node);
     
     /* Give a fatal error if malloc has errors */
     if(_new_instruction_node == NULL){
@@ -881,7 +929,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
     /* Check if the user wants to copy the instruction or use old pointer */
     if(copyInstruction){
         /* Try allocate the name of the new instruction */
-        _new_instruction_string = (char*) malloc(sizeof(char) * (strlen(instruction_string) + 1));
+        _new_instruction_string = mallocItString(_new_instruction_string, instruction_string);
         
         /* Give a fatal error if malloc has errors */
         if(_new_instruction_string == NULL){
@@ -890,7 +938,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
         }
         
         /* Copy content to the new instruction */
-        strcpy(_new_instruction_string, instruction_string);
+        secureStringCopy(_new_instruction_string, instruction_string);
     }
     else{
         /* Store the new pointer into parameter */
@@ -903,6 +951,40 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
 
     /* Return pointer to the new instruction node */
     return _new_instruction_node;
+}
+
+/** 
+ * Destroy an already allocated instruction node.
+ * 
+ * @param instruction_node pointer to the instruction node that will be destroyed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteInstructionNode(ptrInstructionNode *instruction_node){
+    
+    /* Check if token node exists */
+    if(instruction_node == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL INSTRUCTION NODE VARIABLE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*instruction_node) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL INSTRUCTION NODE!\n");
+        return false;
+    }
+    
+    /* Check if there are a instruction string on this node */
+    if((*instruction_node)->instruction != NULL){
+        
+       /* Remove this string */
+        secureFree((*instruction_node)->instruction);
+    }
+    
+    /* Free instruction node  */
+    secureFree((*instruction_node));
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -975,7 +1057,7 @@ InstructionQueue *newInstructionQueue(){
     InstructionNode **_new_instruction_nodes;
     
     /* Try to malloc a new Instruction queue */
-    _new_instruction_queue = (InstructionQueue *) malloc(sizeof(InstructionQueue));
+    _new_instruction_queue = mallocIt(_new_instruction_queue);
     
     /* Give a fatal error if malloc failled */
     if(_new_instruction_queue == NULL){
@@ -984,7 +1066,7 @@ InstructionQueue *newInstructionQueue(){
     }
     
     /* Mallocate array of instruction nodes */
-    _new_instruction_nodes = (InstructionNode **) malloc(sizeof(InstructionNode *) * DEFAULT_BLOCK_SIZE);
+    _new_instruction_nodes = mallocItArray(_new_instruction_nodes, DEFAULT_BLOCK_SIZE);
     
     /* Give a fatal error if malloc failed */
     if(_new_instruction_nodes == NULL){
@@ -999,6 +1081,46 @@ InstructionQueue *newInstructionQueue(){
     
     /* Return pointer to the new instruction queue object */
     return _new_instruction_queue;
+}
+
+/** 
+ * Destroy an already allocated instruction queue.
+ * 
+ * @param instruction_queue pointer to the symbol table that will be destroyed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue){
+    int i;
+    
+    /* Check if token node exists */
+    if(instruction_queue == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL INSTRUCTION QUEUE VARIABLE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*instruction_queue) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL INSTRUCTION QUEUE!\n");
+        return false;
+    }
+    
+    /* Check if there are instructions on this instruction queue */
+    if((*instruction_queue)->instructions != NULL){
+        
+        /* Delete every instruction on this instruction queue */
+        for(i = 0; i < (*instruction_queue)->length; i++){
+            deleteInstructionNode(&(*instruction_queue)->instructions[i]);
+        }
+        
+        /* Remove this array */
+        secureFree((*instruction_queue)->instructions);
+    }
+    
+    /* Free instruction queue  */
+    secureFree((*instruction_queue));
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -1028,7 +1150,7 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
         instruction_queue->size += DEFAULT_BLOCK_SIZE;
         
         /* Try to reallocate instructions array */
-        _reallocated_instructions = (InstructionNode **) realloc(instruction_queue->instructions, sizeof(InstructionNode *) * instruction_queue->size);
+        _reallocated_instructions = reallocItArray(instruction_queue->instructions, instruction_queue->size);
         
         /* Give fatal error if malloc has failled */
         if(_reallocated_instructions == NULL){
@@ -1067,7 +1189,7 @@ bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
         instruction_queue->size += DEFAULT_BLOCK_SIZE;
         
         /* Try to reallocate instructions array */
-        _reallocated_instructions = (InstructionNode **) realloc(instruction_queue->instructions, sizeof(InstructionNode *) * instruction_queue->size);
+        _reallocated_instructions = reallocItArray(instruction_queue->instructions, instruction_queue->size);
         
         /* Give fatal error if malloc has failled */
         if(_reallocated_instructions == NULL){
@@ -1119,4 +1241,17 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
     return true;
 }
 
+/* ------------------------------------------------ */
+
+/** 
+ * After write this code for three long weaks, every day and night and morning and another time
+ * that I had forgot, I need to say that write this was a pain, C is good for processor, but not
+ * for programming, after this job, I wish at least one weak of rest, because I'm too near of
+ * being insane. Congratulations dude, you fixed a big code, never forget this...
+ * 
+ * NEVER FORGET THAT DAY DUDE!
+ * 
+ *                                                      Jeferson Lima de Almeida - 03/11/2016
+ */
+ 
 /* ------------------------------------------------ */

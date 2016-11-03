@@ -182,9 +182,22 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for blocks of commands
-    fprintf(stderr, "[TODO] 'cgenCommandBlock' - NOT IMPLEMENTED YET!\n");
-    return false;    
+    /* Check if command list token is null */
+    if(command_block_token == NULL){
+        fprintf(stderr, "[ERROR] COMMAND BLOCK IS INVALID!\n");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        return false;
+    }
+    
+    /* Generate Code for the T_DO [bloco] T_END */
+    cgenBlockCode(listGetTokenByIndex(command_block_token->child_list, 2), actual_symbol_table);
+    
+    return true;
 }
 
 /** 
@@ -233,10 +246,34 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
-bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for 'function' definition
-    fprintf(stderr, "[TODO] 'cgenFunction' - NOT IMPLEMENTED YET!\n");
-    return false;    
+bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
+    /* New scope symbol_table */
+    SymbolTable *new_table = newSymbolTable(NULL);
+    
+    /* Generate code with params for new scope symbol table */
+    cgenNameList(listGetTokenByIndex(function_def_token->child_list, 4), new_table);
+    
+    /* Start code for function definition */
+    addInstructionMainQueue(mips_start_function_def);
+    
+    /* Generate code for block */
+    cgenBlockCode(listGetTokenByIndex(function_def_token->child_list, 6), new_table);
+    
+    /* Finish function definition poping Record Activation */
+    addInstructionMainQueue(formatedInstruction(mips_end_function_def, new_table->shift_address + 8));
+}
+
+/** 
+ * Generate code for name list.
+ * 
+ * @param _token
+ * @param actual_symbol_table The actual or previous symbol table.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool cgenNameList(TokenNode *name_list_token, SymbolTable *actual_symbol_table){
+    // TODO! Implement codegenerator for name list
+    fprintf(stderr, "[TODO] 'cgenNameLi]' - NOT IMPLEMENTED YET!\n");
+    return false;
 }
 
 /** 
@@ -443,7 +480,7 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         cgenExpression(token_node, symbol_table);
         
         /* push a0 */
-        addInstructionMainQueue(mips_else);
+        addInstructionMainQueue(mips_push_a0);
     }
     
     /* Return success */

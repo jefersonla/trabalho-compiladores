@@ -26,7 +26,7 @@
 #define NIL_TYPE_VALUE                          "0x7FFFFFFF"
 
 /* Standar way to add itens to main queue */
-#define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, (char *) VAR, false)
+#define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, VAR, false)
 
 /* ------------------------------------------------------------- */
 /*                         Global Structures                     */
@@ -92,6 +92,9 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table);
 
 /* Generate code for list expression */
 bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table);
+
+/* Generate code for name list */
+bool cgenNameList(TokenNode *list_exp_token, SymbolTable *symbol_table);
 
 /* ------------------------------------------------------------- */
 /*                      Code Generator Models                    */
@@ -178,17 +181,27 @@ extern const char mips_gte_a0_t1_a0[];
 /* Check if $a0 is less or equal $t1 */
 extern const char mips_lte_a0_t1_a0[];
     
- /* Conditional type If-elseif */
-extern const char mips_if[];
+/* Conditional type If-elseif-else */
+extern const char mips_start_if[];
 
-extern const char mips_elseif[];
-    
- /* Conditional type Else */
-extern const char mips_else[];
+/* Check if condition */
+extern const char mips_check_if[];
+
+/* Check the next if condition */
+extern const char mips_next_if[];
+
+/* If end condition */
+extern const char mips_end_if[];
 
 /* Loop type while */
-extern const char mips_while[];
-    
+extern const char mips_start_while[];
+
+/* While loop check while condition */
+extern const char mips_check_while[];
+
+/* While end loop */
+extern const char mips_end_while[];
+
 /* Loop type for */
 extern const char mips_for[];
 
@@ -197,6 +210,12 @@ extern const char mips_start_function_call[];
 
 /* Function Call end model */
 extern const char mips_end_function_call[];
+
+/* Start of function definition */
+extern const char mips_start_function_def[];
+
+/* End of function definition */
+extern const char mips_end_function_def[];
 
 /* Nil variable value */
 extern const char mips_nil[];

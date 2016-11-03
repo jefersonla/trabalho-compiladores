@@ -194,7 +194,7 @@ bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node
     }
     
     /* Delete src token */
-    deleteTokenNode(token_node_src);
+    deleteTokenNode(token_node_src, false);
     
     /* Return success */
     return true;

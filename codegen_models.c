@@ -273,7 +273,6 @@ const char mips_lte_a0_t1_a0[] =
     "\txori $a0, $a0, 1\n"
     "\t# ----------------------------------------------- #\n";
 
-
 /* ------------------------------------------------------------- */
 /*               Conditional Operations Template                 */
 /* ------------------------------------------------------------- */
@@ -282,77 +281,187 @@ const char mips_lte_a0_t1_a0[] =
  * Model for conditional operations
  * 
  *  Default Model:
- *      CGEN(if exp1 then bloco1 else bloco2) ->
- *          CGEN(exp1)
- *          push_a0 
- *          li t1 1
- *          bne a0 t1 else
- *          CGEN(bloco1)
- *          j end
- *  label   else
- *             CGEN(bloco2)
- *  label   end    
+ *      CGEN(if exp_list1 then block1 {elseif exp_list2 then bloco_i} [else block2] end) ->
+ *          CGEN(exp_list1)          
+ *          beq $a0, $0, end_if_n_exp_i
+ *          CGEN(block1)
+ *          j end_if_n
+ *          end_if_n_exp_i:
+ *          {
+ *              CGEN(exp_list2)
+ *              beq $a0, $0, end_if_n_exp_(i + 1)
+ *              CGEN(bloco_i)
+ *              j end_if_n
+ *              end_if_n_exp_(i + 1):
+ *          }+
+ *          [
+ *              CGEN(block2)
+ *          ]*
+ *          end_if_n:
  */
     
- /* Conditional type If-elseif */
-const char mips_if[] =
-    "\t# -------------------- If ----------------------- #\n"
-    "\tbne $a0, $t1, endif%d\n"
-    "\t%s\n"
-    "\tjal endif\n"
-    "endif:\n"
-    "\t# ----------------------------------------------- #\n";
+/* Conditional type If-elseif-else */
+const char mips_start_if[] =
+    "\t# -------------------- If ----------------------- #\n";
 
-const char mips_elseif[] =
-    "\t# -------------------- Elseif ------------------- #\n"
-    "\tbne $a0, $t1, elseif%d\n"
-    "\t%s\n"
-    "\tjal end\n"
-    "elseif%d\n"
-    "\t# ----------------------------------------------- #\n";
-    
- /* Conditional type Else */
-const char mips_else[] =
-    "\t# --------------------- Else -------------------- #\n"
-    "\telse%d:\n"
-    "\t%s\n"
-    "end%d:\n"
+/* Check if condition */
+const char mips_check_if[] =
+    "\tbeq $a0, $0, end_if_%d_exp_%d\n";
+
+/* Check the next if condition */
+const char mips_next_if[] =
+    "\tj end_if_%d\n"
+    "end_if_%d_exp_%d:\n";
+
+/* If end condition */
+const char mips_end_if[] =
+    "end_if_%d:\n"
     "\t# ----------------------------------------------- #\n";
  
 /* ------------------------------------------------------------- */
-/*                   Loops Operations Template                   */
+/*                      While Loop Template                      */
 /* ------------------------------------------------------------- */
 
 /**
- * Model for loop operations
+ * Model for while loop operations.
+ * 
  *     Default Model While:
  *        CGEN(while(exp1) do bloco end) ->
- *  label   while  
+ *          start_while_n:
  *          CGEN(exp1)
- *          beq $a0, $a0, end
+ *          beq $a0, $0, end_while_n
  *          CGEN(bloco)
- *          b while
- *   label      end
- * 
- * Default Model For:
- *       
+ *          b start_while_n
+ *          end_while_n:
+ *
  */
 
 /* Loop type while */
-const char mips_while[] =
+const char mips_start_while[] =
     "\t# -------------------- While -------------------- #\n"
-    "while%d:\n"
-    "\t%s\n"
-    "\tbeq $a0, $ao, end_while\n"
-    "\t%s\n"
-    "\tb while%d\n"
-    "end_while%d:"
+    "start_while_%d:\n";
+
+/* While loop check while condition */
+const char mips_check_while[] =
+    "\tbeq $a0, $0, end_while_%d\n";
+
+/* While end loop */
+const char mips_end_while[] =
+    "\tb start_while_%d\n"
+    "end_while_%d:\n"
     "\t# ----------------------------------------------- #\n";
-    
+
+/* ------------------------------------------------------------- */
+/*                       For Loop Template                       */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for 'for' loop operations.
+ *
+ *  Exemplo com sintax c-like
+ *  for(x = exp; x <= exp; x += [exp] | 1)
+ * 
+ *  | > INICIALIZACAO, CONDICAO, INCREMENTO
+ * 
+ *     Default Model for:
+ *          CGEN(for name = exp_ini, exp_cond [, exp_inc] do block end)
+ *              CGEN(ASSIGN(local name = exp_ini))
+ *              start_for_n:
+ *              CGEN(exp_cond)
+ *              beq $a0, $0, end_for_n
+ *              CGEN(block)
+ *              CGEN(exp_inc) | li $a0, 1
+ *              lw $t1, $a0
+ *              CGEN(name)        -- esse cara carrega o valor do name que inicializamos no começo
+ *              add $a0, $a0, $t1 -- executa a expressao normal jogar em a0 se for default faz li $a0, 1
+ *              CGEN(name = $a0)  -- esse salva de novo
+ *              j start_for_n
+ *              end_for_n:
+ * 
+ */
+
 /* Loop type for */
-const char mips_for[] =
-    "\t# ---------------------- For -------------------- #\n"
+const char mips_for_ini[] =
+    "\t# ---------------------- For -------------------- #\n";
+
+/* Begin of for */
+const char mips_start_for[] =
+    "start_for_%d:\n";
+
+/* For condition check */
+const char mips_for_con[] =
+    "\tbeq $a0, $0, end_for_%d\n";
+    
+/* Store */
+const char mips_for_load_inc[] =
+    "\tlw $t1, $a0\n";
+
+/* Mips default for inc */
+const char mips_for_inc[] =
+    "\tadd $a0, $a0, $t1\n";
+
+/* End of for defition */
+const char mips_end_for[]=
+    "\tj start_for_%d"
+    "end_for_%d:\n"
     "\t# ----------------------------------------------- #\n";
+
+/* ------------------------------------------------------------- */
+/*                    Function Definitions                       */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for function call.
+ * 
+ * x = newSymbolTable(NULL)
+ * for param in x1, ..., xn
+ *      addSymbolNode(x, x1)
+ * 
+ * x - 4
+ * y - 8
+ * z - 12
+ * 
+ * u = 0
+ * k(0, 1, 2)
+ * 
+ * 0 - 4
+ * 1 - 8
+ * 2 - 12
+ * 
+ * function k(x, y, z)
+ *      local t = 0
+ *      print(x)
+ * end
+ * 
+ *  Default Model for functions declaration:
+ *      CGEN(function f(x1, ..., xn) bloco end)
+ *          move $fp, $sp
+ *          sw $ra, 0($sp)
+ *          addiu $sp, $sp, -4
+ *          CGEN(bloco)
+ *          lw $ra, 4($sp)
+ *          addiu $sp, $sp, z
+ *          lw $fp, 0($sp)
+ *          jr $ra
+ * 
+ */
+
+/* Start of function definition */
+const char mips_start_function_def[] =
+    "\t# ------------- Function Definition ------------- #\n"
+    "\tmove $fp, $sp\n"
+    "\tsw $ra, 0($sp)\n"
+    "\taddiu $sp, $sp, -4\n";
+
+/* End of function definition */
+const char mips_end_function_def[] =
+    "\tlw $ra, 0($fp)\n"
+    "\taddiu $sp, $sp, %d\n"
+    "\tlw $fp, 0($sp)\n"
+    "\tjr $ra\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* ------------------------------------------------------------- */
     
 /* ------------------------------------------------------------- */
 /*                        Function Calls                         */

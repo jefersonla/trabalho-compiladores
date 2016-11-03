@@ -49,9 +49,6 @@ void yyerror(const char *);
 char output_filename[MAX_OUTPUT_FILENAME];
 FILE *output_file;
 
-/* Contain actual token */
-char *string_addr;
-
 /* Token Data */
 char *all_tokens;
 int last_char;
@@ -250,6 +247,13 @@ programa        : bloco                                 {
                                                                     $1->token_str, all_tokens);
                                                             #endif
                                                             
+                                                            /* Free all objects */
+                                                            secureFree(all_tokens);
+                                                            deleteTokenNode(&abstract_sintatic_tree, true);
+                                                            deleteSymbolTable(&global_symbol_table);
+                                                            deleteInstructionQueue(&main_instruction_queue);
+                                                            deleteInstructionQueue(&header_instruction_queue);
+                                                            
                                                             /* Close Output File */
                                                             fclose(output_file);
                                                         }
@@ -283,6 +287,9 @@ comando_list    : comando_list comando                  {
                                                             /* If the last type wasn't empty copy childs of this node */
                                                             if($1->token_type != TI_EMPTY){
                                                                 concatenateChildTokens($$, &$1);
+                                                            }
+                                                            else{
+                                                                deleteTokenNode(&$1, false);
                                                             }
                                                             
                                                             /* Check if there are errors with the actual node */
@@ -532,6 +539,9 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             /* If the last type wasn't empty copy childs of this node */
                                                             if($1->token_type != TI_EMPTY){
                                                                 concatenateChildTokens($$, &$1);
+                                                            }
+                                                            else{
+                                                                deleteTokenNode(&$1, false);
                                                             }
                                                             
                                                             /* Check if there are errors with the actual node */

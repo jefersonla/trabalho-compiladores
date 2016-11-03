@@ -128,6 +128,9 @@ typedef struct strSymbolNode{
 SymbolNode* newSymbolNode(  SymbolTable *root_symbol_table, char *symbol_name, 
                             int symbol_address, int symbol_type);
 
+/* Free a symbol node */
+bool deleteSymbolNode(ptrSymbolNode *symbol_node);
+
 /* Compare symbol name */
 bool symbolEqualsName(SymbolNode *symbol, char *symbol_name);
 
@@ -184,6 +187,9 @@ SymbolTable* newGlobalSymbolTable();
 /* Create a new SymbolTable */
 SymbolTable* newSymbolTable(SymbolTable *symbol_table);
 
+/* Free a symbol table */
+bool deleteSymbolTable(ptrSymbolTable *symbol_table);
+
 /* Add a new symbol to symbol table */
 bool symbolTableAddSymbol(  SymbolTable *symbol_table, char *symbol_name, 
                             int symbol_type);
@@ -212,6 +218,9 @@ typedef struct strInstructionNode{
 /* Return a new Instruction Node  */
 InstructionNode *newInstructionNode(char* instruction_string, bool copyInstruction);
 
+/* Free a instruction node */
+bool deleteInstructionNode(ptrInstructionNode *instruction_node);
+
 /* Print a instruction node on a given file */
 bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction);
 
@@ -237,6 +246,9 @@ typedef struct strInstructionQueue{
 
 /* Return a new Instruction Queue */
 InstructionQueue* newInstructionQueue();
+
+/* Free a instruction queue */
+bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue);
 
 /* Add a new instruction to instruction queue */
 bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue,
