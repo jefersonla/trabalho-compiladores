@@ -1,7 +1,7 @@
 # LUA MIPS COMPILER
 ## 1ª Parte - Analisador Léxico - Completa
-## 2ª Parte - Analisador Sintático e Semântico - Finalizando
-## 3ª Parte - Gerador de Código - Em progresso
+## 2ª Parte - Analisador Sintático e Semântico - Completa
+## 3ª Parte - Gerador de Código - Finalizando
 ---
 
 ### Desenvolvido por
@@ -12,9 +12,8 @@
 ## Introdução
 
 ### Version 0.1
-Este é a primeira etapa do processo de desenvolvimento do compilador da linguagem LUA
-para o código de máquina MIPS, implementando um subset da linguagem LUA em sua atual
-versão 5.3.
+Compilador da linguagem LUA para o código de máquina MIPS, implementando um subset da
+linguagem LUA formalizado pelo professor doutor Vinicius Petrucci, da Universidade Federal da Bahia.
 
 ### Version 0.2
 Implementação do Analisador Sintático e Semântico. Foram adicionados os arquivos do Bison
@@ -22,6 +21,19 @@ com nome analisador-semantico.y, e foram feitas as integrações com o arquivo p
 
 Este projeto contém o analisador léxico em formato Flex e analisador sintático em formato Bison
 com integração com o compilador GCC.
+
+### Version 0.3
+
+Implmenetação do analisador sintatico, com alguns bindings para analise semantica
+
+### Version 0.4
+
+Impelementadas AST e iniciado geração de código
+
+### Version 0.6
+
+Implementação do geardor de código, ainda instável devido a leaks of memory visualizados pelo
+Valgrind, com integração com o GDB.
 
 ## Instruções para build
 
@@ -50,6 +62,15 @@ Para compilar o projeto todo basta usar a rota principal main, ou apenas executa
 * **parser-debug**      : Compila o analisador sintático semântico com flags de debug
 * **parser-test**       : Realiza o teste de integração básico do analisador sintático/semântico
 * **parser-all-tests**  : Realiza todos os teste de integração para o analisador sintático/semântico
+* **check-extra** 		: Realiza testes exaustivos de integração
+
+### Gerador de código
+
+* **codegen**			: Compila apenas o gerador de código
+* **codegen-debug** 	: Compila o gerador de código com flags de debug
+* **codegen-test** 		: Realiza o teste básico de integração para o gerador de código com o spim
+* **codegen-all-tests** : Realiza todos os testes de integração para o gerador de código -- TODO!
+* **check-final** 		: Realiza testes exaustivos de integração -- TODO!
 
 Os arquivos a serem criados pelas rotas tem nome `analisador_lexico`, `analisador_semantico`
 e `gerador_codigo`, aonde cada função utiliza das funções presentes no projeto anterior,
