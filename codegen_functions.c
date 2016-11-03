@@ -391,17 +391,55 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
 }
 
 /**
+ * Generate code for list of expressions.
+ * 
+ * @param list_exp_token Receive a list of expressions token.
+ * @param actual_symbol_table Actual table symbol escope.
+ * @return true if there's no error on execution and false otherwise.
+ */
+void cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
+    int i;
+    
+    /*
+    
+        Saque só essa estrutura é da seguinte forma
+        
+       ___1_______________2_______________3_______________4___
+       | exp | T_COMMA | exp | T_COMMA | exp | T_COMMA | exp |
+       ¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
+        Ela tem o tipo TI_LISTADENOMES sempre então você não precisa olhar o tipo dela
+        precisa percorrer a lista e empilhar os valores de forma que seja possível 
+        recuperar essas expressões posteriormente
+        
+        Modelo:
+            cgenExpression(exp[1])
+            push
+            ...
+    
+    */
+
+    for(i = list_exp_token->child_list->length - 1; i >= 0; i--) {
+        cgenExpression(listGetTokenByIndex(list_exp_token->child_list, i), symbol_table);
+        addInstructionMainQueue(mips_push_a0);
+    }
+    
+    /* Return success */
+    return true;
+}
+
+/**
  * Generate code for expressions.
  * 
  * @param exp_token receive an expression token.
  * @param previous_scope Previous table symbol escope.
  * @return true if there's no error on execution and false otherwise.
  */
-void cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
-    int i;
+bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
     TokenNode *token_left;
     TokenNode *token_right;
     TokenNode *token_operand;
+    TokenNode *token_terminal;
+    TokenNode *token_name;
     
     /* Check if the operand is unary */
     if(IS_UNARY_OPERAND(exp_token->token_type)){
@@ -497,30 +535,49 @@ void cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         /* pop */
         addInstructionMainQueue(mips_pop);
     }
+    /* Other possible expressions */
     else{
-        TokenNode * first_root_child = listGetTokenByIndex(exp_token->root_token->child_list, 1);
+        /* Get the terminal */
+        token_terminal = exp_token;
         
-        switch (exp_token->token_type) {
-            case TI_LISTAEXP:
-                if (exp_token->root_token->token_type == TI_CALL_FUNCTION) {
-                    addInstructionMainQueue(mips_start_function_call);
-                    
-                    for(i = exp_token->child_list->length - 1; i >= 0; i--) {
-                        cgenExpression(listGetTokenByIndex(exp_token->child_list, i), symbol_table);
-                        addInstructionMainQueue(mips_push_a0);
-                    }
-                    
-                    //jal f_entry
-                    addInstructionMainQueue(formatedInstruction(mips_end_function_call, first_root_child->lex_str));
-                }
-            
-                break;
-                
+        switch (token_terminal->token_type) {
             case T_NUMBER:
-                addInstructionMainQueue(formatedInstruction(mips_static_number_load, first_root_child->lex_str));
+                /* Add constant number load instruction */
+                addInstructionMainQueue(formatedInstruction(mips_static_number_load, token_terminal->lex_str));
                 break;
+            case T_NIL:
+                /* Nil value load */
+                addInstructionMainQueue(mips_nil);
+                break;
+            case T_NAME:
+                /* Look for this token inside the symbol table */
+                token_name = symbolTableGetSymbolNodeByName(symbol_table, token_terminal->lex_str);
                 
+                /* If token name is inside the symbol table so this t_name is local otherwise is global */
+                if(token_name == NULL){
+                    token_name = symbolTableGetSymbolNodeByName(global_symbol_table, token_terminal->lex_str);
+                }
+                
+                /* If this symbol is not on symbol table, so it's nil */
+                if(token_name == NULL){
+                    addInstructionMainQueue(mips_nil);
+                }
+                else{
+                    /* Store the correct load instruction */
+                    addInstructionMainQueue(symbolNodeGetLoadInstruction(token_name));
+                }
+                break;
+            case TI_CALL_FUNCTION:
+                addInstructionMainQueue(mips_start_function_call);
+                cgenListExpression(listGetTokenByIndex(exp_token->child_list, 3));
+                break;
+            case TI_CALL_FUNCTION_PAR:
+                // TODO
+                /fprintf(stderr, "[TODO] 'TI_CALL_FUNCTION_PAR' - NOT IMPLEMENTED YET!\n");
+                break;
             default:
+                /* For types not  */
+                fprintf(stderr, "[WARNING] TYPE NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
                 break;
         }
     }

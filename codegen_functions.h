@@ -87,6 +87,9 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
 /* Generate code for local variable operation */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table);
 
+/* Generate code for expressions. */
+bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table);
+
 /* ------------------------------------------------------------- */
 /*                      Code Generator Models                    */
 /* ------------------------------------------------------------- */
@@ -191,6 +194,9 @@ extern const char mips_start_function_call[];
 
 /* Function Call end model */
 extern const char mips_end_function_call[];
+
+/* Nil variable value */
+extern const char mips_nil[];
 
 /* ------------------------------------------------------------- */
 

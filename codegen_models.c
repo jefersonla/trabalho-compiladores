@@ -69,7 +69,7 @@ const char mips_footer[] =
         "\tj end_print\n"
         "\n"
     "print_nil_value:\n"
-    "   	# Print Value nil"
+        "# Print Value nil\n"
         "\tli $v0, 4\n"
         "\tla $a0, _nil_str\n"
         "\tsyscall\n"
@@ -404,6 +404,11 @@ const char mips_end_function_call[] =
 
 /* ------------------------------------------------------------- */
 
+/* Load a nil into $a0 */
+const char mips_nil[] =
+    "\t# --------- Load global variable in $a0 --------- #\n"
+    "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "nil_val\n"
+    "\t# ----------------------------------------------- #\n";
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */

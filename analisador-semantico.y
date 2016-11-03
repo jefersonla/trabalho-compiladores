@@ -808,7 +808,7 @@ exp             : T_NIL                                 {
                                                         }
                 | T_OPENPAR exp T_CLOSEPAR              {
                                                             /* Copy pointer of the terminal or last token since this token is intermediary */
-                                                            $$ = $1;
+                                                            $$ = $2;
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[exp [T_OPENPAR (] ", $2->token_str, " [T_CLOSEPAR )]]");
