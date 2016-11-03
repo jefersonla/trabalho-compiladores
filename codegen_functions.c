@@ -169,7 +169,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator assign
     fprintf(stderr, "[TODO] 'cgenAssign' - NOT IMPLEMENTED YET!\n");
     return false;
 }
@@ -182,7 +182,7 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for blocks of commands
     fprintf(stderr, "[TODO] 'cgenCommandBlock' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -195,7 +195,7 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for 'while' loop structure
     fprintf(stderr, "[TODO] 'cgenWhile' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -208,7 +208,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for 'for' loop structure
     fprintf(stderr, "[TODO] 'cgenFor' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -221,7 +221,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for 'if' structure
     fprintf(stderr, "[TODO] 'cgenIf' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -234,7 +234,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for 'function' definition
     fprintf(stderr, "[TODO] 'cgenFunction' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -247,7 +247,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for local variables assign and declaration
     fprintf(stderr, "[TODO] 'cgenLocalVariable' - NOT IMPLEMENTED YET!\n");
     return false;    
 }
@@ -330,7 +330,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
-    // TODO!
+    // TODO! Implement codegenerator for return of commands 
     fprintf(stderr, "[TODO] 'cgenCommandReturn' - NOT IMPLEMENTED YET!\n");
     return false;
 }
@@ -428,6 +428,7 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         /* Get the token i */
         token_node = listGetTokenByIndex(list_exp_token->child_list, i);
         
+        /* Check if this token is null */
         if(token_node == NULL){
             fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
             continue;
@@ -597,7 +598,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 cgenCallFunction(token_terminal, symbol_table);
                 break;
             default:
-                /* For types not  */
+                /* For types not implemented yet */
                 fprintf(stderr, "[WARNING] TYPE NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
                 break;
         }
