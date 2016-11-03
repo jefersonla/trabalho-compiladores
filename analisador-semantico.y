@@ -882,8 +882,14 @@ listadenomes    : T_NAME                                {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 4, $1->token_str, " [T_COMMA ,] [T_NAME ", $3->lex_str, "]");
                                                             
-                                                            /* Concatenate the first elements with the actual node */
-                                                            concatenateChildTokens($$, &$1);
+                                                            /* Concatenate the first elements with the actual node if */
+                                                            if($1->token_type == TI_LISTADENOMES){
+                                                                concatenateChildTokens($$, &$1);
+                                                            }
+                                                            /* Add the first child if the last child was a token */
+                                                            else{
+                                                                listAddToken($$->child_list, $1);
+                                                            }
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
@@ -914,8 +920,14 @@ listaexp        : exp                                   {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, $1->token_str, " [T_COMMA ,] ", $3->token_str);
                                                             
-                                                            /* Concatenate the first elements with the actual node */
-                                                            concatenateChildTokens($$, &$1);
+                                                            /* Concatenate the first elements with the actual node if */
+                                                            if($1->token_type == TI_LISTAEXP){
+                                                                concatenateChildTokens($$, &$1);
+                                                            }
+                                                            /* Add the first child if the last child was a token */
+                                                            else{
+                                                                listAddToken($$->child_list, $1);
+                                                            }
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){

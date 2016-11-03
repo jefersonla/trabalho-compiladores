@@ -151,12 +151,11 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     
     /* Check what is the type of the function call */
     if(call_function_token->token_type == TI_CALL_FUNCTION_PAR){
-        printf("\n\nNODE call_function_token: %s (TYPE: %d) | Node expressionList: %s\n\n", listGetTokenByIndex(call_function_token->child_list, 2)->lex_str, listGetTokenByIndex(call_function_token->child_list, 2)->token_type, listGetTokenByIndex(call_function_token->child_list, 3)->token_str);
         cgenExpressionList(listGetTokenByIndex(call_function_token->child_list, 3), actual_symbol_table);
     }
 
     /* Add the end of the function call */
-    addInstructionMainQueueFormated(mips_end_function_call, call_function_token->lex_str);
+    addInstructionMainQueueFormated(mips_end_function_call, listGetTokenByIndex(call_function_token->child_list, 1)->lex_str);
     
     /* Return success */
     return true;
@@ -480,22 +479,40 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
     int i;
     TokenNode *token_node;
     
-    /* Execute from right to left child list that is non T_COMMA */
-    for(i = list_exp_token->child_list->length; i > 0; i--) {
-        /* Get the token i */
-        token_node = listGetTokenByIndex(list_exp_token->child_list, i);
+    if(list_exp_token->token_type == TI_LISTAEXP){
+        /* Execute from right to left child list that is non T_COMMA */
+        for(i = list_exp_token->child_list->length; i > 0; i--) {
+            /* Get the token i */
+            token_node = listGetTokenByIndex(list_exp_token->child_list, i);
+            
+            /* Check if this token is null */
+            if(token_node == NULL){
+                fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
+                continue;
+            }
+            
+            /* Ignore comma  */
+            if(token_node->token_type == T_COMMA){
+                continue;
+            }
+            
+            /* CGEN(exp) */
+            cgenExpression(token_node, symbol_table);
+            
+            /* push a0 */
+            addInstructionMainQueue(mips_push_a0);
+        }
+    }
+    else{
+        /* If this is not an expression list, so it could be only a expression */
+        token_node = list_exp_token;
         
         /* Check if this token is null */
         if(token_node == NULL){
             fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
-            continue;
+            return false;
         }
-        
-        /* Ignore comma  */
-        if(token_node->token_type == T_COMMA){
-            continue;
-        }
-        
+
         /* CGEN(exp) */
         cgenExpression(token_node, symbol_table);
         
