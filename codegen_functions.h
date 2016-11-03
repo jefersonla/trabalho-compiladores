@@ -90,6 +90,9 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
 /* Generate code for expressions. */
 bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table);
 
+/* Generate code for list expression */
+bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table);
+
 /* ------------------------------------------------------------- */
 /*                      Code Generator Models                    */
 /* ------------------------------------------------------------- */
