@@ -55,7 +55,7 @@ typedef struct strToken{
 TokenNode* newTokenNode(int token_type);
 
 /* Free a token */
-bool deleteTokenNode(ptrTokenNode *token_node);
+bool deleteTokenNode(ptrTokenNode *token_node, bool deleteChilds);
 
 /* Add Token String */
 bool nodeAddTokenStr(TokenNode *token_node, char *token_str);
@@ -85,6 +85,9 @@ typedef struct strTokenList{
 
 /* Initialize a list of tokens */
 TokenList* newTokenList();
+
+/* Free a token list */
+bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds);
 
 /* Add an item to a list of tokens */
 bool listAddToken(TokenList *token_list, TokenNode *token);

@@ -12,6 +12,15 @@
 /* Max size of a 32Bit Number */
 #define MAX_SIZE_32BIT_STRING       11
 
+/* Max size of the secure bufer size */
+#define SECURE_BUFFER_SIZE          100
+
+/* Correct way of call malloc */
+#define mallocIt(VAR)               malloc(sizeof(*VAR))
+
+/* Correct way of call malloc for arrays */
+#define mallocItArray(VAR, SIZE)          malloc(sizeof(*VAR) * SIZE)
+
 /* Utility to allocate text of tokens */
 bool allocateTokenText(TokenNode *token_node, int qtd_params, ...);
 

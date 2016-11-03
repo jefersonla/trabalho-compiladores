@@ -216,6 +216,7 @@ char* formatedInstruction(const char *format_string, ...){
     
     /* Get size of the printed string */
     size_t str_len = snprintf(NULL, 0, format_string, params);
+    str_len += SECURE_BUFFER_SIZE;
 
     /* Check if the size received is invalid */
     if(str_len <= 0){

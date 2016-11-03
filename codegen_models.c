@@ -340,7 +340,7 @@ const char mips_else[] =
 
 /* Loop type while */
 const char mips_while[] =
-    "\t# -------------------- WHILE -------------------- #\n"
+    "\t# -------------------- While -------------------- #\n"
     "while%d:\n"
     "\t%s\n"
     "\tbeq $a0, $ao, end_while\n"
@@ -351,7 +351,7 @@ const char mips_while[] =
     
 /* Loop type for */
 const char mips_for[] =
-    "\t# ---------------------- FOR -------------------- #\n"
+    "\t# ---------------------- For -------------------- #\n"
     "\t# ----------------------------------------------- #\n";
     
 /* ------------------------------------------------------------- */
@@ -370,7 +370,7 @@ const char mips_for[] =
  *      jal function_name
  */
  const char mips_start_function_call[] =
-    "\t# ---------------- CALL FUNCTION ---------------- #\n"
+    "\t# ---------------- Call Function ---------------- #\n"
     "\tsw $fp, 0($sp)\n"
     "\taddiu $sp, $sp, -4\n";
     

@@ -19,9 +19,9 @@ TokenNode* newTokenNode(int token_type){
     TokenNode *_new_token_node;
     
     /* Malloc new token node */
-    _new_token_node = (TokenNode*) malloc(sizeof(TokenNode));
+    _new_token_node = mallocIt(_new_token_node);
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_new_token_node == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE A NEW TOKEN!\n");
         exit(EXIT_FAILURE);
@@ -39,12 +39,13 @@ TokenNode* newTokenNode(int token_type){
 }
 
 /** 
- * Destroy a already allocated token node.
+ * Destroy an already allocated token node.
  * 
  * @param token that will be destroyed.
+ * @param deleteChilds if this flag is true it will destroy all childs related to this token.
  * @return true if there's no error on execution and false otherwise.
  */
-bool deleteTokenNode(ptrTokenNode *token_node){
+bool deleteTokenNode(ptrTokenNode *token_node, bool deleteChilds){
     /* Check if token node exists */
     if(token_node == NULL){
         fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN VARIABLE NODE!\n");
@@ -67,7 +68,10 @@ bool deleteTokenNode(ptrTokenNode *token_node){
         free((*token_node)->lex_str);
     }
     
-    /* Free toke_node pointer */
+    /* Delete child list, and childs if destroyChild is true */
+    deleteTokenList((*token_node)->child_list, deleteChilds);
+    
+    /* Free tokne_node pointer */
     free((*token_node));
 
     /* Null the pointer apponted by token_node */
@@ -100,6 +104,11 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     if(_new_token_str == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
         return false;
+    }
+    
+    /* Check if this token already has token str */
+    if(token_node->token_str != NULL){
+        free(toke_node->token_str);
     }
     
     /* Store the new token_str array pointer */
@@ -137,6 +146,11 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
         return false;
     }
     
+    /* Check if this token already has token str */
+    if(token_node->lex_str != NULL){
+        free(toke_node->lex_str);
+    }
+    
     /* Store the new lex_str array pointer */
     token_node->lex_str = _new_lex_str;
     
@@ -148,7 +162,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
 }
 
 /**
- * Add Token String.
+ * Add Root Token.
  *
  * @param token_node Token which lex_str will be appended.
  * @param token_root Token root pointer value to be copied to TokenNode.
@@ -185,18 +199,18 @@ TokenList* newTokenList(){
     TokenNode **_items_list;
     
     /* Try allocate a new token list */
-    _new_token_list = (TokenList*) malloc(sizeof(TokenList));
+    _new_token_list = mallocIt(_new_token_list);
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_new_token_list == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE TOKEN LIST!\n");
         exit(EXIT_FAILURE);
     }
     
     /* Try to allocate an array of tokens */
-    _items_list = (TokenNode**) malloc(sizeof(TokenNode*) * DEFAULT_BLOCK_SIZE);
+    _items_list = mallocItArray(_items_list, DEFAULT_BLOCK_SIZE);
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_items_list == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ITEMS OF THE TOKEN LIST!\n");
         exit(EXIT_FAILURE);
@@ -209,6 +223,57 @@ TokenList* newTokenList(){
     
     /* Return the new token list */
     return _new_token_list;
+}
+
+/** 
+ * Destroy an already allocated token list.
+ * 
+ * @param token pointer to the token list that will be destroyed.
+ * @param deleteChilds if this flag is true it will delete childs recursively.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
+    int i;
+    TokenNode *token_child;
+   
+    /* Check if token node exists */
+    if(token_list == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!\n");
+        return false;
+    }
+    
+    /* Check if token node exists */
+    if((*token_list) == NULL){
+        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!\n");
+        return false;
+    }
+    
+    /* If deleteChild is set to true it will delete all token childs related to this token */
+    if(deleteChilds){
+        for(i = 1; i <= (*token_list)->length; i++){
+            
+            /* Get the actual node */
+            token_child = listGetTokenByIndex((*token_list), i);
+            
+            /* Check if for some reason token child is null */
+            if(token_child == NULL){
+                fprintf(stderr, "[WARNING] CHILD TOKEN IS NULL!\n");
+                continue;
+            }
+            
+            /* Delete all childs recursively */
+            deleteTokenNode(&token_child, deleteChilds);
+        }
+    }
+    
+    /* Free token list  */
+    free((*token_list));
+
+    /* Null the pointer apponted by token_list */
+    (*token_list) = NULL;
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -243,7 +308,7 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
                                                     (token_list->size)
                                                         * sizeof(TokenNode *));
         
-        /* Give a falta error if malloc has errors */
+        /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
             fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE TOKEN LIST ITEMS!\n");
             exit(EXIT_FAILURE);
@@ -346,7 +411,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     /* Try allocate this new symbol */
     _new_symbol_node = (SymbolNode*) malloc(sizeof(SymbolNode));
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_new_symbol_node == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
         exit(EXIT_FAILURE);
@@ -355,7 +420,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     /* Try allocate the name of the new symbol */
     _new_symbol_name = (char*) malloc(sizeof(char) * (strlen(symbol_name) + 1));
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_new_symbol_name == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
         exit(EXIT_FAILURE);
@@ -658,7 +723,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
                                                     (symbol_table->size)
                                                         * sizeof(SymbolNode *));
         
-        /* Give a falta error if malloc has errors */
+        /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
             fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE SYMBOL TABLE ITEMS!\n");
             exit(EXIT_FAILURE);
@@ -807,7 +872,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
     /* Try allocate this new instruction */
     _new_instruction_node = (InstructionNode*) malloc(sizeof(InstructionNode));
     
-    /* Give a falta error if malloc has errors */
+    /* Give a fatal error if malloc has errors */
     if(_new_instruction_node == NULL){
         fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
         exit(EXIT_FAILURE);
@@ -818,7 +883,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
         /* Try allocate the name of the new instruction */
         _new_instruction_string = (char*) malloc(sizeof(char) * (strlen(instruction_string) + 1));
         
-        /* Give a falta error if malloc has errors */
+        /* Give a fatal error if malloc has errors */
         if(_new_instruction_string == NULL){
             fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
             exit(EXIT_FAILURE);
