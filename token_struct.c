@@ -108,7 +108,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if this token already has token str */
     if(token_node->token_str != NULL){
-        free(toke_node->token_str);
+        free(token_node->token_str);
     }
     
     /* Store the new token_str array pointer */
