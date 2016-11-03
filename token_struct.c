@@ -148,7 +148,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if this token already has token str */
     if(token_node->lex_str != NULL){
-        free(toke_node->lex_str);
+        free(token_node->lex_str);
     }
     
     /* Store the new lex_str array pointer */
