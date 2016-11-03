@@ -151,11 +151,12 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     
     /* Check what is the type of the function call */
     if(call_function_token->token_type == TI_CALL_FUNCTION_PAR){
+        printf("\n\nNODE call_function_token: %s (TYPE: %d) | Node expressionList: %s\n\n", listGetTokenByIndex(call_function_token->child_list, 2)->lex_str, listGetTokenByIndex(call_function_token->child_list, 2)->token_type, listGetTokenByIndex(call_function_token->child_list, 3)->token_str);
         cgenExpressionList(listGetTokenByIndex(call_function_token->child_list, 3), actual_symbol_table);
     }
 
     /* Add the end of the function call */
-    addInstructionMainQueue(formatedInstruction(mips_end_function_call, call_function_token->lex_str));
+    addInstructionMainQueueFormated(mips_end_function_call, call_function_token->lex_str);
     
     /* Return success */
     return true;
@@ -247,6 +248,12 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
+    /* Check if function def is null */
+    if(function_def_token){
+        fprintf(stderr, "[ERROR] FUNCTION DEF TOKEN IS NULL");
+        return false;
+    }
+    
     /* New scope symbol_table */
     SymbolTable *new_table = newSymbolTable(NULL);
     
@@ -260,7 +267,10 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     cgenBlockCode(listGetTokenByIndex(function_def_token->child_list, 6), new_table);
     
     /* Finish function definition poping Record Activation */
-    addInstructionMainQueue(formatedInstruction(mips_end_function_def, new_table->shift_address + 8));
+    addInstructionMainQueueFormated(mips_end_function_def, new_table->shift_address + 8);
+    
+    /* Return success */
+    return true;
 }
 
 /** 
@@ -271,9 +281,19 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenNameList(TokenNode *name_list_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for name list
-    fprintf(stderr, "[TODO] 'cgenNameLi]' - NOT IMPLEMENTED YET!\n");
-    return false;
+    /* Get first_child from name_list_token */
+    TokenNode *first_child = listGetTokenByIndex(name_list_token->child_list, 1);
+    
+    /* Check if still has TI_LISTADENOMES to code gen */
+    if(first_child->token_type == TI_LISTADENOMES) {
+        cgenNameList(first_child, actual_symbol_table);
+        cgenExpression(listGetTokenByIndex(name_list_token->child_list, 3), actual_symbol_table);
+    } else {
+        cgenExpression(listGetTokenByIndex(name_list_token->child_list, 1), actual_symbol_table);
+    }
+    
+    /* Return success */
+    return true;
 }
 
 /** 
@@ -499,7 +519,6 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
     TokenNode *token_right;
     TokenNode *token_operand;
     TokenNode *token_terminal;
-    TokenNode *token_name;
     SymbolNode *symbol_node;
     
     /* Check if the operand is unary */
@@ -605,7 +624,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         switch (token_terminal->token_type) {
             case T_NUMBER:
                 /* Add constant number load instruction */
-                addInstructionMainQueue(formatedInstruction(mips_static_number_load, token_terminal->lex_str));
+                addInstructionMainQueueFormated(mips_static_number_load, token_terminal->lex_str);
                 break;
             case T_NIL:
                 /* Nil value load */
@@ -636,7 +655,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* For types not implemented yet */
-                fprintf(stderr, "[WARNING] TYPE NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
+                fprintf(stderr, "[WARNING] TYPE [%s] NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n", token_terminal->token_str);
                 break;
         }
     }

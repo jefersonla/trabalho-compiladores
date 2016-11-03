@@ -82,35 +82,31 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
     va_list _params_list;
     size_t param_str_size;
     
-    /* Initialize arguments list */
-    va_start(_params_list, no_params);
-    
     /* Check if token_node is not null */
     if(token_node == NULL){
         fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
         return false;
     }
     
-    /* Get size of the params list concatenated string */
-    for(i = 0, param_str_size = 2; i < no_params; i++){
+    /* Initialize arguments list */
+    va_start(_params_list, no_params);
+
+    /* Initialize params size */
+    param_str_size = SECURE_BUFFER_SIZE;
+    
+    for(i = 0; i < no_params; i++){
         /* Get next token */
         _str_param = va_arg(_params_list, char*);
         
-        /* Check if param is null */
-        if(_str_param == NULL){
-            fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
-            return false;
-        }
-        
-        /* Increase size of the token string */
-        param_str_size += strlen(_str_param);
+        /* Get size of the printed string */
+        param_str_size += snprintf(NULL, 0, "%s", _str_param);
     }
     
     /* Initialize arguments list again */
     va_start(_params_list, no_params);
     
     /* Allocate string size */
-    _new_token_string = (char *) malloc(sizeof(char) * param_str_size);
+    _new_token_string = malloc(param_str_size);
     
     /* Check if malloc failled */
     if(_new_token_string == NULL){
@@ -133,7 +129,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         }
         
         /* Concatenate string */
-        strcat(_new_token_string, _str_param);
+        strncat(_new_token_string, _str_param, param_str_size);
     }
     
     /* Store the new string */
@@ -225,7 +221,7 @@ char* formatedInstruction(const char *format_string, ...){
     }
     
     /* Allocate formated string buffer */
-    _new_formated_instruction = (char *) malloc(sizeof(char) * (str_len + 2));
+    _new_formated_instruction = malloc(str_len);
     
     /* Check if the malloc hasn't failed */
     if(_new_formated_instruction == NULL){
@@ -235,7 +231,8 @@ char* formatedInstruction(const char *format_string, ...){
     
     /* Store the formated instruction */
     va_start (params, format_string);
-    vsprintf (_new_formated_instruction, format_string, params);
+    vsnprintf (_new_formated_instruction, str_len, format_string, params);
+    _new_formated_instruction[str_len - 1] = 0;
     va_end (params);
     
     /* Return the new formated instruction */

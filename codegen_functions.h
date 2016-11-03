@@ -25,8 +25,11 @@
 #define NIL_TYPE_MASK                           "0x80000000"
 #define NIL_TYPE_VALUE                          "0x7FFFFFFF"
 
-/* Standar way to add itens to main queue */
-#define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, VAR, false)
+/* Standard way to add itens to main queue */
+#define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR), false)
+
+/* New array of instructions with variadic parameters */
+#define addInstructionMainQueueFormated(VAR, ...)  instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR, ##__VA_ARGS__), false)
 
 /* ------------------------------------------------------------- */
 /*                         Global Structures                     */

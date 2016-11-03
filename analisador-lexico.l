@@ -63,16 +63,18 @@
 #define yycheckstate(VAR)               (VAR == yyerrorfound ? 1 : 0)
 
 /* Concat all tokens */
-#define CONCAT_ALL_TOKENS(TOKEN)        all_tokens = (char *)   realloc(all_tokens, (strlen(all_tokens) + strlen(#TOKEN) + strlen(yytext) + 10) * sizeof(char)); \
-                                        sprintf(&all_tokens[last_char], "[" #TOKEN ", \"%s\"], " , yytext); \
-                                        last_char = strlen(all_tokens)
+#define CONCAT_ALL_TOKENS(TOKEN)        do { \
+                                            all_tokens = (char *)   realloc(all_tokens, (strlen(all_tokens) + strlen(#TOKEN) + strlen(yytext) + 10) * sizeof(char)); \
+                                            sprintf(&all_tokens[last_char], "[" #TOKEN ", \"%s\"], " , yytext); \
+                                            last_char = strlen(all_tokens); \
+                                        }while(0)
 
 /* Ignore first letters of literal strings */
-#define IGNORE_FIRST_LETTERS_LITERAL()  yytext++; yytext[strlen(yytext)-1] = 0
+#define IGNORE_FIRST_LETTERS_LITERAL()  do{ yytext++; yytext[strlen(yytext)-1] = 0; } while(0)
 
 /* Initialize Node */
-#define INITIALIZE_NODE(TOKEN)          yylval.token_node = newTokenNode(TOKEN); \
-                                        nodeAddLexStr(yylval.token_node, yytext)
+#define INITIALIZE_NODE(TOKEN)          do{ yylval.token_node = newTokenNode(TOKEN); \
+                                            nodeAddLexStr(yylval.token_node, yytext); } while(0)
                                             
 /* **************************************************************************************** */
 

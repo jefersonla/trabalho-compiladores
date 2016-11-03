@@ -249,10 +249,10 @@ programa        : bloco                                 {
                                                             
                                                             /* Free all objects */
                                                             secureFree(all_tokens);
-                                                            deleteTokenNode(&abstract_sintatic_tree, true);
-                                                            deleteSymbolTable(&global_symbol_table);
-                                                            deleteInstructionQueue(&main_instruction_queue);
                                                             deleteInstructionQueue(&header_instruction_queue);
+                                                            deleteInstructionQueue(&main_instruction_queue);
+                                                            deleteSymbolTable(&global_symbol_table);
+                                                            deleteTokenNode(&abstract_sintatic_tree, true);
                                                             
                                                             /* Close Output File */
                                                             fclose(output_file);
@@ -948,6 +948,14 @@ void yyerror(const char *s) {
     fprintf(stderr, "\nFailled to compile this file. An error has occurred.\n");
     fprintf(stderr, "%s\n", s);
     fclose(output_file);
+    
+    /* Free all objects */
+    secureFree(all_tokens);
+    deleteTokenNode(&abstract_sintatic_tree, true);
+    deleteSymbolTable(&global_symbol_table);
+    deleteInstructionQueue(&header_instruction_queue);
+    deleteInstructionQueue(&main_instruction_queue);
+    
     free(all_tokens);
     exit(EXIT_FAILURE);
 }

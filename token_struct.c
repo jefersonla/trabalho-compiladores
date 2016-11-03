@@ -263,7 +263,10 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
         }
     }
     
-    /* Free token list  */
+    /* Free array */
+    secureFree((*token_list)->items);
+
+    /* Free array */
     secureFree((*token_list));
 
     /* Null the pointer apponted by token_list */
@@ -296,7 +299,7 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
     }
     
     /* If array is full, add more empty spaces */
-    if(token_list->length == token_list->size){
+    if((token_list->length + 1) == token_list->size){
         /* Increase structure size */
         token_list->size += DEFAULT_BLOCK_SIZE;
         
@@ -764,7 +767,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Check if there are space on symbol table */
-    if(symbol_table->length == symbol_table->size){
+    if((symbol_table->length + 1) == symbol_table->size){
         /* Increase structure size */
         symbol_table->size += DEFAULT_BLOCK_SIZE;
         
@@ -976,7 +979,7 @@ bool deleteInstructionNode(ptrInstructionNode *instruction_node){
     /* Check if there are a instruction string on this node */
     if((*instruction_node)->instruction != NULL){
         
-       /* Remove this string */
+        /* Remove this string */
         secureFree((*instruction_node)->instruction);
     }
     
@@ -1091,6 +1094,7 @@ InstructionQueue *newInstructionQueue(){
  */
 bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue){
     int i;
+    InstructionNode *tmp_node;
     
     /* Check if token node exists */
     if(instruction_queue == NULL){
@@ -1109,7 +1113,8 @@ bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue){
         
         /* Delete every instruction on this instruction queue */
         for(i = 0; i < (*instruction_queue)->length; i++){
-            deleteInstructionNode(&(*instruction_queue)->instructions[i]);
+            tmp_node = (*instruction_queue)->instructions[i];
+            deleteInstructionNode(&tmp_node);
         }
         
         /* Remove this array */
@@ -1145,7 +1150,7 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
     }
     
     /* Check if there are left spaces on instruction queue */
-    if(instruction_queue->length == instruction_queue->size){
+    if((instruction_queue->length + 2) >= instruction_queue->size){
         /* Increase block size */
         instruction_queue->size += DEFAULT_BLOCK_SIZE;
         
@@ -1184,7 +1189,7 @@ bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
     }
     
     /* Check if there are left spaces on instruction queue */
-    if(instruction_queue->length == instruction_queue->size){
+    if((instruction_queue->length + 1) == instruction_queue->size){
         /* Increase block size */
         instruction_queue->size += DEFAULT_BLOCK_SIZE;
         

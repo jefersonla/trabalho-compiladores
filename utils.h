@@ -25,7 +25,7 @@
 #define secureStringSize(VAR)               (strlen(VAR) + SECURE_STRING_TERMINATOR)
 
 /* Secure  String Copy */
-#define secureStringCopy(DEST, SRC)         do{ DEST[secureStringSize(SRC)] = 0; strncpy(DEST, SRC, secureStringSize(SRC)); }while(false)
+#define secureStringCopy(DEST, SRC)         do{ strncpy(DEST, SRC, secureStringSize(SRC)); DEST[secureStringSize(SRC) - 1] = 0; }while(false)
 
 /* Correct way of call malloc */
 #define mallocIt(VAR)                       malloc(sizeof(*VAR))
@@ -34,7 +34,7 @@
 #define mallocItArray(VAR, SIZE)            malloc(sizeof(*VAR) * (SIZE))
 
 /* Correct way of call malloc for strings */
-#define mallocItString(VAR, VAR_LENGTH)     mallocItArray(VAR, secureStringSize(VAR_LENGTH))
+#define mallocItString(VAR, VAR_LENGTH)     malloc(secureStringSize(VAR_LENGTH))
 
 /* Correct way of realloc an array */
 #define reallocItArray(VAR, NEW_SIZE)       realloc(VAR, sizeof(*VAR) * (NEW_SIZE))
