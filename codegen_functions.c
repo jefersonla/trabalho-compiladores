@@ -482,6 +482,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
             case TI_NOT:
                 /* Add a negation transform operation to the instruction queue */
                 addInstructionMainQueue(mips_not_a0);
+                break;
             default:
                 /* Binary expression not found or not implemented yet */
                 fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
