@@ -132,6 +132,11 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         strncat(_new_token_string, _str_param, param_str_size);
     }
     
+    /* Free the old string if it exists */
+    if(token_node->token_str != NULL){
+        secureFree(token_node->token_str);
+    }
+    
     /* Store the new string */
     token_node->token_str = _new_token_string;
     

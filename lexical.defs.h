@@ -6,7 +6,4 @@
 #define UNCLOSED_LITERAL_SQUOTE     '\''
 #define UNCLOSED_LITERAL_DQUOTE     '"'
 
-/* Remove lex buffer */
-void deleteLexBuffer();
-
 #endif

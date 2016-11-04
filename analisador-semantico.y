@@ -827,6 +827,10 @@ exp             : T_NIL                                 {
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[exp [T_OPENPAR (] ", $2->token_str, " [T_CLOSEPAR )]]");
+                                                            
+                                                            /* Remove the two other tokens */
+                                                            deleteTokenNode(&$1, true);
+                                                            deleteTokenNode(&$3, true);
                                                         }
                 /*
                 | T_TRUE                                { 

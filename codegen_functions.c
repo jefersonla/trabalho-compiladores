@@ -285,6 +285,9 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     /* Finish function definition poping Record Activation */
     addInstructionMainQueueFormated(mips_end_function_def, t_name->lex_str, new_table->shift_address + 8);
     
+    /* Delete local symbol table */
+    deleteSymbolTable(&new_table);
+    
     /* Return success */
     return true;
 }
@@ -458,6 +461,9 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
         /* Generate command return code */
         cgenCommandReturn(command_return_token, actual_symbol_table);
     }
+    
+    /* Delete local symbol table */
+    deleteSymbolTable(&actual_symbol_table);
     
     /* Return success */
     return true;
