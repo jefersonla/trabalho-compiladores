@@ -1,0 +1,5 @@
+-- Def func
+function x()
+print(2 + 4 / 2)
+end
+x()

@@ -240,7 +240,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
 }
 
 /** 
- * Generate code for function definition call.
+ * Generate code for function definition.
  * 
  * @param function_def_token function definition token.
  * @param actual_symbol_table The actual or previous symbol table.
@@ -596,7 +596,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* Binary expression not found or not implemented yet */
-                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
+                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
                 break;
         }
     }
@@ -661,9 +661,17 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 /* Add a '~=' operation to the instruction queue */
                 addInstructionMainQueue(mips_neq_a0_t1_a0);
                 break;
+            case TI_AND:
+                /* Add a 'or' operation to the instruction queue */
+                addInstructionMainQueue(mips_and_a0_t1_a0);
+                break;
+            case TI_OR:
+                /* Add a 'and' operation to the instruction queue */
+                addInstructionMainQueue(mips_or_a0_t1_a0);
+                break;
             default:
                 /* Binary expression not found or not implemented yet */
-                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n");
+                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
                 break;
         }
         
