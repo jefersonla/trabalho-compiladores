@@ -5,7 +5,7 @@
 
 -- me ajuda a criar o teste só aceita expressoes nada de variavel :p-
 print(4 / 2)   -- 2
-print(7)       -- 1
+print(7)       -- 7
 print(2 + 1)   -- 3
 print(2 * 2)   -- 4
 print(not 1)   -- 0
@@ -18,10 +18,17 @@ print(5>3)     -- 1
 print(4<2)     -- 0
 print(5>=8)    -- 0
 print(8<=10)   -- 1
---print(not nil)             --- VISH 
---print(not not nil)         -- isso é vish
---print(0 and 0 and 1)         -- 0
---print((1 + 3) + (2 * (3+1))) -- 12
+print(not nil)             --- VISH 
+print(not not nil)         -- isso é vish
+print(0 and 0 and 1)         -- 0
+print((1 + 3) + (2 * (3+1))) -- 12
+
+
+function x()
+    print(888)
+end
+
+x()
 
 --[[
 

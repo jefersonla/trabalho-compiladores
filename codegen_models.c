@@ -71,7 +71,7 @@ const char mips_footer[] =
     "print_nil_value:\n"
         "# Print Value nil\n"
         "\tli $v0, 4\n"
-        "\tla $a0, _nil_str\n"
+        "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str\n"
         "\tsyscall\n"
         "\n"
     "end_print:\n"
@@ -211,7 +211,7 @@ const char mips_sub_a0_t1_a0[] =
 /* Div value of $t1 with $a0 and store in $a0 */
 const char mips_div_a0_t1_a0[] =
     "\t# ------------- Div $a0 = $t1 / $a0 ------------- #\n"
-    "\tdiv $a0, $t1, $a0\n"
+    "\tdiv $a0, $a0, $t1 \n"
     "\t# ----------------------------------------------- #\n";
 
 /* Mul value of $t1 with $a0 and store in $a0 */
@@ -434,11 +434,13 @@ const char mips_end_for[]=
  * end
  * 
  *  Default Model for functions declaration:
- *      CGEN(function f(x1, ..., xn) bloco end)
+ *      CGEN(function f(x1, ..., xn) bloco [retorno]* end)
+ *          function_name:
  *          move $fp, $sp
  *          sw $ra, 0($sp)
  *          addiu $sp, $sp, -4
  *          CGEN(bloco)
+ *          end_function_name:
  *          lw $ra, 4($sp)
  *          addiu $sp, $sp, z
  *          lw $fp, 0($sp)
@@ -449,12 +451,14 @@ const char mips_end_for[]=
 /* Start of function definition */
 const char mips_start_function_def[] =
     "\t# ------------- Function Definition ------------- #\n"
+    "function_%s:\n"
     "\tmove $fp, $sp\n"
     "\tsw $ra, 0($sp)\n"
     "\taddiu $sp, $sp, -4\n";
 
 /* End of function definition */
 const char mips_end_function_def[] =
+    "end_function_%s:\n"
     "\tlw $ra, 0($fp)\n"
     "\taddiu $sp, $sp, %d\n"
     "\tlw $fp, 0($sp)\n"
@@ -516,7 +520,7 @@ const char mips_end_function_call[] =
 /* Load a nil into $a0 */
 const char mips_nil[] =
     "\t# --------- Load global variable in $a0 --------- #\n"
-    "\tlw $a0, " GLOBAL_VARIABLE_PREFIX "nil_val\n"
+    "\tlw $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val\n"
     "\t# ----------------------------------------------- #\n";
  
 /* ------------------------------------------------------------- */

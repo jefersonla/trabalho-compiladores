@@ -107,7 +107,7 @@ bool cgenAllCode(TokenNode *root_token){
     }
     
     /* Add header on header instruction queue */
-    instructionQueueEnqueueInstruction(header_instruction_queue, (char *) mips_header, false);
+    instructionQueueEnqueueInstruction(header_instruction_queue, formatedInstruction(mips_header), false);
     
     /* Add header on main instruction queue */
     addInstructionMainQueue(mips_main);
@@ -242,31 +242,48 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
 /** 
  * Generate code for function definition call.
  * 
- * @param _token
+ * @param function_def_token function definition token.
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
+    SymbolTable *new_table;
+    TokenNode *t_name;
+     
     /* Check if function def is null */
-    if(function_def_token){
-        fprintf(stderr, "[ERROR] FUNCTION DEF TOKEN IS NULL");
+    if(function_def_token == NULL){
+        fprintf(stderr, "[ERROR] FUNCTION DEF TOKEN IS NULL!\n");
         return false;
     }
     
     /* New scope symbol_table */
-    SymbolTable *new_table = newSymbolTable(NULL);
+    new_table = newSymbolTable(NULL);
+    
+    /* Check if the new table is null */
+    if(new_table == NULL){
+        fprintf(stderr,"[ERROR] NEW SYMBOL TABLE IS NULL!\n");
+        return false;
+    }
     
     /* Generate code with params for new scope symbol table */
     cgenNameList(listGetTokenByIndex(function_def_token->child_list, 4), new_table);
     
+    /* Get Token name */
+    t_name = listGetTokenByIndex(function_def_token->child_list, 2); 
+    
+    /* Check it if for some reason t_name is NULL */
+    if(t_name == NULL){
+        fprintf(stderr, "[ERROR] T_NAME GOT IT, IS NULL!\n");
+    }
+    
     /* Start code for function definition */
-    addInstructionMainQueue(mips_start_function_def);
+    addInstructionMainQueueFormated(mips_start_function_def, t_name->lex_str);
     
     /* Generate code for block */
     cgenBlockCode(listGetTokenByIndex(function_def_token->child_list, 6), new_table);
     
     /* Finish function definition poping Record Activation */
-    addInstructionMainQueueFormated(mips_end_function_def, new_table->shift_address + 8);
+    addInstructionMainQueueFormated(mips_end_function_def, t_name->lex_str, new_table->shift_address + 8);
     
     /* Return success */
     return true;
@@ -275,6 +292,10 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
 /** 
  * Generate code for name list.
  * 
+ * JEFF...
+ * 
+ * ISSO É UM VETOR FAZ UM FOR ;)
+ * 
  * @param _token
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
@@ -282,6 +303,16 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
 bool cgenNameList(TokenNode *name_list_token, SymbolTable *actual_symbol_table){
     /* Get first_child from name_list_token */
     TokenNode *first_child = listGetTokenByIndex(name_list_token->child_list, 1);
+    
+    if(first_child == NULL){
+        fprintf(stderr, "[ERROR] FIRST CHILD IS NULL!\n");
+        return false;
+    }
+    
+    if(name_list_token == NULL){
+        fprintf(stderr, "[ERROR] INVALID NAME LIST TOKEN!\n");
+        return false;
+    }
     
     /* Check if still has TI_LISTADENOMES to code gen */
     if(first_child->token_type == TI_LISTADENOMES) {
