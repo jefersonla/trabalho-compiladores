@@ -60,19 +60,19 @@ bool deleteTokenNode(ptrTokenNode *token_node, bool deleteChilds){
     
     /* Free token_str if it exists */
     if((*token_node)->token_str != NULL){
-        secureFree((*token_node)->token_str);
+        //secureFree((*token_node)->token_str);
     }
     
     /* Free lex_str if it exists */
     if((*token_node)->lex_str != NULL){
-        secureFree((*token_node)->lex_str);
+        //secureFree((*token_node)->lex_str);
     }
     
     /* Delete child list, and childs if destroyChild is true */
     deleteTokenList(&(*token_node)->child_list, deleteChilds);
     
     /* Free tokne_node pointer */
-    secureFree((*token_node));
+    //secureFree((*token_node));
     
     /* Return success */
     return true;
@@ -105,7 +105,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if this token already has token str */
     if(token_node->token_str != NULL){
-        secureFree(token_node->token_str);
+        //secureFree(token_node->token_str);
     }
     
     /* Store the new token_str array pointer */
@@ -145,7 +145,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if this token already has token str */
     if(token_node->lex_str != NULL){
-        secureFree(token_node->lex_str);
+        //secureFree(token_node->lex_str);
     }
     
     /* Store the new lex_str array pointer */
@@ -264,10 +264,10 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
     }
     
     /* Free array */
-    secureFree((*token_list)->items);
+    //secureFree((*token_list)->items);
 
     /* Free array */
-    secureFree((*token_list));
+    //secureFree((*token_list));
 
     /* Null the pointer apponted by token_list */
     (*token_list) = NULL;
@@ -461,11 +461,11 @@ bool deleteSymbolNode(ptrSymbolNode *symbol_node){
     
     /* Check if there are a symbol name allocated and remove it */
     if((*symbol_node)->symbol_name != NULL){
-        secureFree((*symbol_node)->symbol_name);
+        //secureFree((*symbol_node)->symbol_name);
     }
     
     /* Free token list  */
-    secureFree((*symbol_node));
+    //secureFree((*symbol_node));
     
     /* Return success */
     return true;
@@ -732,11 +732,11 @@ bool deleteSymbolTable(ptrSymbolTable *symbol_table){
         }
         
         /* Remove this array */
-        secureFree((*symbol_table)->items);
+        //secureFree((*symbol_table)->items);
     }
     
     /* Free symbol_table  */
-    secureFree((*symbol_table));
+    //secureFree((*symbol_table));
     
     /* Return success */
     return true;
@@ -980,11 +980,11 @@ bool deleteInstructionNode(ptrInstructionNode *instruction_node){
     if((*instruction_node)->instruction != NULL){
         
         /* Remove this string */
-        secureFree((*instruction_node)->instruction);
+        //secureFree((*instruction_node)->instruction);
     }
     
     /* Free instruction node  */
-    secureFree((*instruction_node));
+    //secureFree((*instruction_node));
     
     /* Return success */
     return true;
@@ -1118,11 +1118,11 @@ bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue){
         }
         
         /* Remove this array */
-        secureFree((*instruction_queue)->instructions);
+        //secureFree((*instruction_queue)->instructions);
     }
     
     /* Free instruction queue  */
-    secureFree((*instruction_queue));
+    //secureFree((*instruction_queue));
     
     /* Return success */
     return true;
@@ -1162,6 +1162,14 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
             fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
             exit(EXIT_FAILURE);
         }
+        
+        /**
+         * Thanks for Roderick Gibson (GH @kniteli) from https://hackhands.com
+         * for helping with found the bug on instruction queue enqueue,
+         * now I'l never forget to replace the reallocated pointer after a reallocation
+         * process. 
+         */
+        instruction_queue->instructions = _reallocated_instructions;
     }
     
     /* Store the new instruction node */
@@ -1201,6 +1209,9 @@ bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
             fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
             exit(EXIT_FAILURE);
         }
+        
+        /* Assign the reallocated pointer array */
+        instruction_queue->instructions = _reallocated_instructions;
     }
     
     /* Store the new instruction node */
