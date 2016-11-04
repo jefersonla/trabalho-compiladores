@@ -1,9 +1,6 @@
 #ifndef PARSER_DEFS_H
 #define PARSER_DEFS_H
 
-/* Global defines */
-#define MAX_OUTPUT_FILENAME     350
-
 /* Non Terminals Defines */
 #define TI_PROGRAMA             0xCAF1
 #define TI_BLOCO                0xCAF2

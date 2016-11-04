@@ -33,6 +33,9 @@
 /* Definições dos tipos */
 #include "parser.defs.h"
 
+/* Lexical definitions */
+#include "lexical.defs.h"
+
 /* Token Structure */
 #include "token_struct.h"
 
@@ -245,17 +248,19 @@ programa        : bloco                                 {
                                                                     "::: LEXICAL PARSER :::\n"
                                                                     "%s",
                                                                     $1->token_str, all_tokens);
-                                                            #endif
                                                             
-                                                            /* Free all objects */
-                                                            secureFree(all_tokens);
+                                                            /* Delete instruction queue and symbol table */
                                                             deleteInstructionQueue(&header_instruction_queue);
                                                             deleteInstructionQueue(&main_instruction_queue);
                                                             deleteSymbolTable(&global_symbol_table);
+                                                            #endif
+                                                            
+                                                            /* Free tokens and AST */
+                                                            secureFree(all_tokens);
                                                             deleteTokenNode(&abstract_sintatic_tree, true);
                                                             
-                                                            /* Close Output File */
-                                                            fclose(output_file);
+                                                            /* Assign null to the current token */
+                                                            $$ = NULL;
                                                         }
                 ;
 
@@ -957,18 +962,21 @@ listaexp        : exp                                   {
  * @param s String with error informated.
  */
 void yyerror(const char *s) {
-    fprintf(stderr, "\nFailled to compile this file. An error has occurred.\n");
+    /* Print the error message */
+    fprintf(stderr, "\n[ERROR]\tFailled to compile this file. Check the message \n"
+                    "\tbelow to solve this problem before try again.\n");
     fprintf(stderr, "%s\n", s);
+    
+    /* Free all tokens read by the lexical */
+    secureFree(all_tokens);
+    
+    /* Destroy ambient */
+    yylex_destroy();
+    
+    /* Close output file */
     fclose(output_file);
     
-    /* Free all objects */
-    secureFree(all_tokens);
-    deleteTokenNode(&abstract_sintatic_tree, true);
-    deleteSymbolTable(&global_symbol_table);
-    deleteInstructionQueue(&header_instruction_queue);
-    deleteInstructionQueue(&main_instruction_queue);
-    
-    free(all_tokens);
+    /* Exit application with failure */
     exit(EXIT_FAILURE);
 }
 
@@ -993,7 +1001,8 @@ void showHelpUsage(){
 
 /* Main Execution Code */
 int main(int argc, char *argv[]){
-    ++argv, --argc; /* skip over program name */
+    /* Remove program name */
+    ++argv; --argc;
 
 #ifdef DEBUG
     /* Debug Configuration */
@@ -1026,7 +1035,8 @@ int main(int argc, char *argv[]){
             printf(":: STDIN COMMAND MODE SELECTED ::\n\n");
 
             /* The output will be a.out*/
-            strcpy(output_filename, "stdin.out");
+            strncpy(output_filename, "stdin.out", MAX_OUTPUT_FILENAME);
+            output_filename[MAX_OUTPUT_FILENAME-1] = 0;
             break;
         /* Default output filename */
         case 1:
@@ -1037,8 +1047,9 @@ int main(int argc, char *argv[]){
             printf( ":: SPECIFIED INPUT FILE MODE SELECTED ::\n");
 
             /* Output filename will be input_name+.out */
-            strcpy(output_filename, argv[0]);
-            strcpy(&output_filename[strlen(output_filename)], ".out");
+            strncpy(output_filename, argv[0], MAX_OUTPUT_FILENAME);
+            strncat(output_filename,  ".out", MAX_OUTPUT_FILENAME);
+            output_filename[MAX_OUTPUT_FILENAME-1] = 0;
 
             break;
         /* Both parameters specified */
@@ -1047,7 +1058,8 @@ int main(int argc, char *argv[]){
             yyin = fopen(argv[0], "r");
 
             /* Output filename */
-            strcpy(output_filename, argv[1]);
+            strncpy(output_filename, argv[1], MAX_OUTPUT_FILENAME);
+            output_filename[MAX_OUTPUT_FILENAME-1] = 0;
 
             break;
         default:
@@ -1092,9 +1104,12 @@ int main(int argc, char *argv[]){
     int yyparse_return = yyparse();
     printf("\n\n::: COMPILATION END :::\n");
 
+    /* Close output file */
+    fclose(output_file);
+    
     /* Free List of tokens since, it's not necessary anymore */
     free(all_tokens);
-
+    
     /* Process entire file */
     return yyparse_return;
 }

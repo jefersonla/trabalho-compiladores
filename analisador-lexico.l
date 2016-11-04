@@ -50,6 +50,9 @@
 /* Estruturas de Token */
 #include "token_struct.h"
 
+/* Utilities */
+#include "utils.h"
+
 /* Change name of the import if debug mode is enabled */
 #ifdef DEBUG_MODE
 #include "debug.y.tab.h"
@@ -425,6 +428,14 @@ T_UNTIL		until
             /* Just tell that the program has ended */
             all_tokens[last_char - 2] = 0;
             #endif
+            
+            /* Close input file */
+            fclose(yyin);
+
+            /* Destroy ambient */
+            yylex_destroy();
+            
+            /* Return success */
             return EXIT_SUCCESS;
 		}
 
@@ -445,14 +456,26 @@ T_UNTIL		until
                 printf(">> %s\n", yytext);
                 printf("INVALID CHARACTER!\n");
         }
-        // Stop Application
-        //return yyerrorfound;
+
+        /* Close input file */
+        fclose(yyin);
+
+        /* Remove buffer stack */
+        yylex_destroy();
+        
+        /* Stop Application */
         exit(EXIT_FAILURE);
 	}
 
 %%
 
 	/*** **** C Code Section **** ***/
+
+/* Remove lex buffer */
+void deleteLexBuffer(){
+    /* Remove buffer stack */
+    yy_delete_buffer(YY_CURRENT_BUFFER);
+}
 
 /* Main is only necessary when lexical analyser is being compiled */
 #ifdef LEXICAL_ANALYSER

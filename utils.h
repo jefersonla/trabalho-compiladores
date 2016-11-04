@@ -5,6 +5,9 @@
 #include <stdbool.h>
 #include "token_struct.h"
 
+/* Global defines */
+#define MAX_OUTPUT_FILENAME     350
+
 /* Convert a constant to a string */
 #define QUOTE(_VAR)                         #_VAR
 #define TO_STRING(VAR)                      QUOTE(VAR)

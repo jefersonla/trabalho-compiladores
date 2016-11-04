@@ -1264,6 +1264,7 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
  * that I had forgot, I need to say that write this was a pain, C is good for processor, but not
  * for programming, after this job, I wish at least one weak of rest, because I'm too near of
  * being insane. Congratulations dude, you fixed a big code, never forget this...
+ * And thanks Roderick Gibson to point me out where is the error.
  * 
  * NEVER FORGET THAT DAY DUDE!
  * 
