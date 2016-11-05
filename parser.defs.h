@@ -37,7 +37,7 @@
 #define TI_BIT_NOT			    0xCB0D
 
 /* Binary Operands */
-#define IS_BINARY_OPERAND(X)    (X >= 0xCB0E && X <= 0xCB22)
+#define IS_BINARY_OPERAND(X)    (X >= 0xCB0E && X <= 0xCB20)
 #define TI_PLUS				    0xCB0E
 #define TI_MINUS			    0xCB0F
 #define TI_TIMES			    0xCB10
@@ -56,6 +56,9 @@
 #define TI_GTEQ				    0xCB1E
 #define TI_EQ				    0xCB1F
 #define TI_NEQ				    0xCB20
+
+/* Short-circuit evaluation for 'and' and 'or' */
+#define IS_SHORT_CIRCUIT_OP(X)  (X >= 0xCB21 && X <= 0xCB22)
 #define TI_AND				    0xCB21
 #define TI_OR				    0xCB22
 

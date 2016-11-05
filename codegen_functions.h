@@ -25,6 +25,9 @@
 #define NIL_TYPE_MASK                           "0x80000000"
 #define NIL_TYPE_VALUE                          "0x7FFFFFFF"
 
+/* Integer type */
+#define NUMBER_TYPE                             1
+
 /* Standard way to add itens to main queue */
 #define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR), false)
 
@@ -217,11 +220,20 @@ extern const char mips_end_function_call[];
 /* Start of function definition */
 extern const char mips_start_function_def[];
 
+/* Continuation of function definition */
+extern const char mips_start_function_def2[];
+
 /* End of function definition */
 extern const char mips_end_function_def[];
 
+/* End of function definition */
+extern const char mips_end_function_def2[];
+
 /* Nil variable value */
 extern const char mips_nil[];
+
+/* Check if a given variable is nil */
+extern const char mips_check_a0_nil[];
 
 /* ------------------------------------------------------------- */
 

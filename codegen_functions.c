@@ -247,8 +247,12 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
+    int i;
     SymbolTable *new_table;
     TokenNode *t_name;
+    TokenNode *parameters_list_token;
+    TokenNode *parameter_token;
+    TokenNode *block_token;
      
     /* Check if function def is null */
     if(function_def_token == NULL){
@@ -265,25 +269,71 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         return false;
     }
     
-    /* Generate code with params for new scope symbol table */
-    cgenNameList(listGetTokenByIndex(function_def_token->child_list, 4), new_table);
-    
     /* Get Token name */
     t_name = listGetTokenByIndex(function_def_token->child_list, 2); 
     
-    /* Check it if for some reason t_name is NULL */
+    /* Check if t name is null */
     if(t_name == NULL){
-        fprintf(stderr, "[ERROR] T_NAME GOT IT, IS NULL!\n");
+        fprintf(stderr, "[ERROR] TOKEN NAME IS NUJLL!\n");
+        return false;
+    }
+    
+    if(function_def_token->token_type == TI_FUNCTION_PARAM){
+        /* Get parameters list */
+        parameters_list_token = listGetTokenByIndex(function_def_token->child_list, 4);
+        
+        /* Check if parameters list it's not null */
+        if(parameters_list_token == NULL){
+            fprintf(stderr, "[ERROR] PARAMETERS LIST TOKEN IS NULL!\n");
+            return false;
+        }
+        
+        /* Parameters list could be only one name on this case we skip this part */
+        if(parameters_list_token->token_type == TI_LISTADENOMES){
+            /* If we have a list of names we need to start from the last one to the first */
+            for(i = parameters_list_token->child_list->length; i > 0; i++){
+                
+                /* Get the token */
+                parameter_token = listGetTokenByIndex(parameters_list_token->child_list, i);
+                
+                /* Add this token as a symbol in the symbol table */
+                symbolTableAddSymbol(new_table, parameter_token->lex_str, NUMBER_TYPE);
+            }
+        }
+        else{
+            /* If we have only one name we just add this name to the new table */
+            parameter_token = parameters_list_token;
+            symbolTableAddSymbol(new_table, parameter_token->lex_str, NUMBER_TYPE);
+        }
+        
+        /* Get the block token */
+        block_token = listGetTokenByIndex(function_def_token->child_list, 6);
+    }
+    else if(function_def_token->token_type == TI_FUNCTION){
+        /* Store the block token on functions that don't have a parameters list */
+        block_token = listGetTokenByIndex(function_def_token->child_list, 5);
+    }
+    else{
+        fprintf(stderr, "[ERROR] THIS TOKEN IS NOT A FUNCTION DEFINITION! -- 0x%X : %d\n", function_def_token->token_type, function_def_token->token_type);
+        return false;
+    }
+    
+    /* Check if block token is not null */
+    if(block_token == NULL){
+        fprintf(stderr, "[ERROR] BLOCK TOKEN IS NULL!\n");
+        return false;
     }
     
     /* Start code for function definition */
-    addInstructionMainQueueFormated(mips_start_function_def, t_name->lex_str);
+    addInstructionMainQueueFormated(mips_start_function_def, (t_name->lex_str));
+    addInstructionMainQueueFormated(mips_start_function_def2, (t_name->lex_str));
     
     /* Generate code for block */
-    cgenBlockCode(listGetTokenByIndex(function_def_token->child_list, 6), new_table);
+    cgenBlockCode(block_token, new_table);
     
     /* Finish function definition poping Record Activation */
-    addInstructionMainQueueFormated(mips_end_function_def, t_name->lex_str, new_table->shift_address + 8);
+    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str), (new_table->shift_address + 8));
+    addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     
     /* Delete local symbol table */
     deleteSymbolTable(&new_table);
@@ -584,6 +634,9 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         /* CGEN(exp) */
         cgenExpression(token_operand, symbol_table);
         
+        /* mips_check_a0_nil() */
+        addInstructionMainQueue(mips_check_a0_nil);
+        
         /* CGEN(operand) */
         switch(exp_token->token_type){
             case TI_UMINUS:
@@ -591,7 +644,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 addInstructionMainQueue(mips_neg_a0);
                 break;
             case TI_NOT:
-                /* Add a negation transform operation to the instruction queue */
+                /* Add a boolean negation transform operation to the instruction queue */
                 addInstructionMainQueue(mips_not_a0);
                 break;
             default:
@@ -604,17 +657,29 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
     else if(IS_BINARY_OPERAND(exp_token->token_type)) {
         
         /* Get left and right childs of the expression */
-        token_right = listGetTokenByIndex(exp_token->child_list, 1);
-        token_left = listGetTokenByIndex(exp_token->child_list, 3);
+        token_left = listGetTokenByIndex(exp_token->child_list, 1);
+        token_right = listGetTokenByIndex(exp_token->child_list, 3);
     
         /* CGEN(exp1) */
         cgenExpression(token_left, symbol_table);
+        
+        /* if the operand is different of equal and different symbols, we can assign nil as 0 */
+        if(exp_token->token_type){
+            /* mips_check_a0_nil() */
+            addInstructionMainQueue(mips_check_a0_nil);
+        }
         
         /* push_a0 */
         addInstructionMainQueue(mips_push_a0);
         
         /* CGEN(exp2) */
         cgenExpression(token_right, symbol_table);
+        
+        /* if the operand is different of equal and different symbols, we can assign nil as 0 */
+        if(exp_token->token_type != TI_EQ && exp_token->token_type != TI_NEQ){
+            /* mips_check_a0_nil() */
+            addInstructionMainQueue(mips_check_a0_nil);
+        }
         
         /* top_t1 */
         addInstructionMainQueue(mips_top_t1);
@@ -661,14 +726,6 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 /* Add a '~=' operation to the instruction queue */
                 addInstructionMainQueue(mips_neq_a0_t1_a0);
                 break;
-            case TI_AND:
-                /* Add a 'or' operation to the instruction queue */
-                addInstructionMainQueue(mips_and_a0_t1_a0);
-                break;
-            case TI_OR:
-                /* Add a 'and' operation to the instruction queue */
-                addInstructionMainQueue(mips_or_a0_t1_a0);
-                break;
             default:
                 /* Binary expression not found or not implemented yet */
                 fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
@@ -677,6 +734,19 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         
         /* pop */
         addInstructionMainQueue(mips_pop);
+    }
+    /* And & Or should use short-circuit evaluation */
+    else if(IS_SHORT_CIRCUIT_OP(exp_token->token_type)){
+        /* In short circuit evaluation we check if one of the sides or both of the sentence are true or not */
+        
+        /* In short circuit 'and' we check if both sides of this binary operation are valid */
+        if(exp_token->token_type == TI_AND){
+            
+        }
+        /* In short circuit 'or' we check if at least one of the sentences are true */
+        else{
+            
+        }
     }
     /* Other possible expressions */
     else{
