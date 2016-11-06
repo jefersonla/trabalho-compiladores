@@ -191,6 +191,12 @@ const char mips_static_number_load[] =
     "\tli $a0, %s\n"
     "\t# ----------------------------------------------- #\n";
 
+/* Move from $a0 to $t1 */
+const char mips_move_a0_t1[] =
+    "\t# --------------- Move $t1 = $a0 ---------------- #\n"
+    "\tmove $t1, $a0\n"
+    "\t# ----------------------------------------------- #\n";
+
 /* ------------------------------------------------------------- */
 /*                  Unary Operations Template                    */
 /* ------------------------------------------------------------- */
@@ -437,11 +443,14 @@ const char mips_end_while[] =
  *          CGEN(for name = exp_ini, exp_cond [, exp_inc] do block end)
  *              CGEN(ASSIGN(local name = exp_ini))
  *              start_for_n:
+ *              CGEN(load name)
+ *              move $t1, $a0
  *              CGEN(exp_cond)
+ *              sle $a0, $t1, $a0
  *              beq $a0, $0, end_for_n
  *              CGEN(block)
  *              CGEN(exp_inc) | li $a0, 1
- *              lw $t1, $a0
+ *              move $t1, $a0
  *              CGEN(name)        -- esse cara carrega o valor do name que inicializamos no começo
  *              add $a0, $a0, $t1 -- executa a expressao normal jogar em a0 se for default faz li $a0, 1
  *              CGEN(name = $a0)  -- esse salva de novo
@@ -460,19 +469,22 @@ const char mips_start_for[] =
 
 /* For condition check */
 const char mips_for_check[] =
-    "\tbeq $a0, $0, end_for_%d\n";
+    "\t# -------------- Condition achieved ------------- #\n"
+    "\tsle $a0, $t1, $a0\n"
+    "\tbeq $a0, $0, end_for_%d # Check iterator\n"
+    "\t# ----------------------------------------------- #\n";
     
 /* Store */
 const char mips_for_load_inc[] =
-    "\tlw $t1, $a0\n";
+    "\tmove $t1, $a0 # Copy value of $a0 into $t1\n";
 
 /* Mips default for inc */
 const char mips_for_inc[] =
-    "\tadd $a0, $a0, $t1\n";
+    "\tadd $a0, $a0, $t1 # Increment iterator\n";
 
 /* End of for defition */
 const char mips_end_for[]=
-    "\tj start_for_%d"
+    "\tj start_for_%d\n"
     "end_for_%d:\n"
     "\t# ^----------------- End of For ----------------^ #\n";
 
