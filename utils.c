@@ -26,7 +26,7 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int no_par
     
     /* Check if token_node is not null */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        printError("TOKEN NODE IS NULL!");
         return false;
     }
     
@@ -35,7 +35,7 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int no_par
     
     /* Check if the new token node is null */
     if(_new_token_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR ALLOCATING NEW TOKEN NODE!\n");
+        printFatalError("ERROR ALLOCATING NEW TOKEN NODE!");
         exit(EXIT_FAILURE);
     }
     
@@ -46,7 +46,7 @@ bool allocateTokenAndChilds(ptrTokenNode *token_node, int token_type, int no_par
         
         /* Check if param is null */
         if(_token_param == NULL){
-            fprintf(stderr, "[ERROR] TOKEN PARAMETER IS NULL!\n");
+            printError("TOKEN PARAMETER IS NULL!");
             return false;
         }
         
@@ -84,7 +84,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
     
     /* Check if token_node is not null */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        printError("TOKEN NODE IS NULL!");
         return false;
     }
     
@@ -110,7 +110,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
     
     /* Check if malloc failled */
     if(_new_token_string == NULL){
-        fprintf(stderr,"[ERROR] CANNOT ALLOCATE NEW TOKEN STRING");
+        printError("CANNOT ALLOCATE NEW TOKEN STRING");
         return false;
     }
     
@@ -124,7 +124,7 @@ bool allocateTokenText(TokenNode *token_node, int no_params, ...){
         
         /* Check if param is null */
         if(_str_param == NULL){
-            fprintf(stderr, "[ERROR] TOKEN STRING IS NULL!\n");
+            printError("TOKEN STRING IS NULL!");
             return false;
         }
         
@@ -160,25 +160,25 @@ bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node
     
     /* Check if dest token is null */
     if(token_node_dest == NULL){
-        fprintf(stderr, "[ERROR] DESTINATION TOKEN IS NULL!\n");
+        printError("DESTINATION TOKEN IS NULL!");
         return false;
     }
     
     /* Check if src token is null */
     if(token_node_src == NULL){
-        fprintf(stderr, "[ERROR] SOURCE TOKEN IS NULL!\n");
+        printError("SOURCE TOKEN IS NULL!");
         return false;
     }
     
     /* Check if src token is null */
     if((*token_node_src) == NULL){
-        fprintf(stderr, "[ERROR] SOURCE TOKEN IS NULL!\n");
+        printError("SOURCE TOKEN IS NULL!");
         return false;
     }
     
     /* Can only concat if the dest is empty */
     if(token_node_dest->child_list->length != 0){
-        fprintf(stderr, "[ERROR] DESTINATION TOKEN IS NOT EMPTY!\n");
+        printError("DESTINATION TOKEN IS NOT EMPTY!");
         return false;
     }
     
@@ -189,7 +189,7 @@ bool concatenateChildTokens(TokenNode *token_node_dest, ptrTokenNode *token_node
         
         /* Check if the add token method has worked */
         if(!_comand_status){
-            fprintf(stderr, "[ERROR] DURING CONCATENATION!\n");
+            printError("DURING CONCATENATION!");
             return false;
         }
     }
@@ -221,7 +221,7 @@ char* formatedInstruction(const char *format_string, ...){
 
     /* Check if the size received is invalid */
     if(str_len <= 0){
-        fprintf(stderr, "[ERROR] ERROR GETING FORMATED INSTRUCTION SIZE!\n");
+        printError("ERROR GETING FORMATED INSTRUCTION SIZE!");
         return NULL;
     }
     
@@ -230,7 +230,7 @@ char* formatedInstruction(const char *format_string, ...){
     
     /* Check if the malloc hasn't failed */
     if(_new_formated_instruction == NULL){
-        fprintf(stderr, "[ERROR] ERROR ALLOCATING NEW FORMATED INSTRUCTION BUFFER!\n");
+        printError("ERROR ALLOCATING NEW FORMATED INSTRUCTION BUFFER!");
         return NULL;
     }
     

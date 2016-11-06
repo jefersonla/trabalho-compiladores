@@ -4,6 +4,10 @@
 /*                         System Templates                      */
 /* ------------------------------------------------------------- */
 
+#define SYSCALL_PRINT_INT           "1"
+#define SYSCALL_PRINT_STRING        "4"
+#define SYSCALL_EXIT_PROG           "10"
+
 /* Generated code Header */
 const char mips_header[] = 
     "# ### START OF GENERATED CODE ### #\n"
@@ -12,9 +16,6 @@ const char mips_header[] =
     "# LUA MIPS Compiler Version 0.6 \n"
     "\n"
     "# System constants\n"
-    "SYSCALL_PRINT_INT    = 1\n"
-    "SYSCALL_PRINT_STRING = 4\n"
-    "SYSCALL_EXIT_PROG    = 10\n"
     "\n"
     "# Variable Declarations\n"
     ".data\n"
@@ -45,7 +46,7 @@ const char mips_footer[] =
     "\n"
     "# Close Main Declaration\n"
     "end_main:\n"
-        "\tli $v0, SYSCALL_EXIT_PROG\n"
+        "\tli $v0, " SYSCALL_EXIT_PROG "\n"
         "\tsyscall\n"
     "\n"
     "# -- End of Main -- #\n"
@@ -74,7 +75,7 @@ const char mips_footer[] =
         "\n"
     "end_check_nil:\n"
         "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 4\n"
+        "\taddiu $sp, $sp, 8\n"
         "\tlw $fp, 0($sp)\n"
         "\tjr $ra\n"
     "# -- End Check Nil -- #\n"
@@ -96,25 +97,25 @@ const char mips_footer[] =
         "\tbeq $t0, $0, print_nil_value\n"
         "\n"
         "\t# Print number if it's not nil\n"
-        "\tli $v0, SYSCALL_PRINT_INT\n"
+        "\tli $v0, " SYSCALL_PRINT_INT "\n"
         "\tsyscall\n"
         "\tj end_print\n"
         "\n"
     "print_nil_value:\n"
         "\t# Print Value nil\n"
-        "\tli $v0, SYSCALL_PRINT_STRING\n"
+        "\tli $v0, " SYSCALL_PRINT_STRING "\n"
         "\tla $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_str\n"
         "\tsyscall\n"
         "\n"
     "end_print:\n"
         "\t# Print linefeed\n"
-        "\tli $v0, SYSCALL_PRINT_STRING\n"
+        "\tli $v0, " SYSCALL_PRINT_STRING "\n"
         "\tla $a0, _newline\n"
         "\tsyscall\n"
         "\n"
         "\t# Close Print Function \n"
         "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 4\n"
+        "\taddiu $sp, $sp, 8\n"
         "\tlw $fp, 0($sp)\n"
         "\tjr $ra\n"
     "# -- End Print Function -- #\n"
@@ -267,10 +268,16 @@ const char mips_or_a0_t1_a0[] =
     "\tor $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
+/** 
+ * History of this command:
+ *  > 1.0 : slt $a0, $a0, $t1
+ *          xori $a0, $a0, 1
+ */
+
 /* Check if is greater than, the value of $t1 with $a0 and store in $a0 */
 const char mips_gt_a0_t1_a0[] =
     "\t# ------------- Gt $a0 = $t1 > $a0 -------------- #\n"
-    "\tslt $a0, $a0, $t1\n"
+    "\tsgt $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Check if is less than, the value of $t1 with $a0 and store in $a0 */
@@ -296,12 +303,27 @@ const char mips_neq_a0_t1_a0[] =
     "\txor $a0, $a0, $t0\n"
     "\t# ----------------------------------------------- #\n";
 
+/** 
+ * History of this command:
+ *  > 1.0 : slt $a0, $t1, $a0
+ *          xori $a0, $a0, 1
+ *  > 2.0 : slt $t0, $a0, $t1
+            slt $t2, $t1, $a0
+            sub $a0, $t0, $t2
+            sltiu $a0, $a0, -1
+ */
+
 /* Check if $a0 is greater or equal $t1 */
 const char mips_gte_a0_t1_a0[] =
     "\t# ------------- Gte $a0 = $t1 >= $a0 ------------ #\n"
-    "\tslt $a0, $t1, $a0\n"
-    "\txori $a0, $a0, 1\n"
+    "\tsge $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
+
+/** 
+ * History of this command:
+ *  > 1.0 : slt $a0, $t1, $a0
+ *          xori $a0, $a0, 1
+ */
     
 /* Check if $a0 is less or equal $t1 */
 const char mips_lte_a0_t1_a0[] =
@@ -362,9 +384,9 @@ const char mips_end_if[] =
  * Model for while loop operations.
  * 
  *     Default Model While:
- *        CGEN(while(exp1) do bloco end) ->
+ *        CGEN(while(exp) do bloco end) ->
  *          start_while_n:
- *          CGEN(exp1)
+ *          CGEN(exp)
  *          beq $a0, $0, end_while_n
  *          CGEN(bloco)
  *          b start_while_n
@@ -552,9 +574,9 @@ const char mips_end_function_call[] =
  *      if this value is used it will interpreted as a nil number
  * 
  *  Warning:
- *      Operations should test if this number can be subtracted,
- *      multiplied, addition and division is possible but should
- *      be avoided as much as it's possible.
+ *      Arithmetic operations should don't use nil as a value since
+ *      nil is not a number, nil is a type used to define that a
+ *      variable hasn't received a value or it's 'NULL'.
  */
 
 /* Load a nil into $a0 */
@@ -612,7 +634,7 @@ const char mips_and_sc_footer[] =
 const char mips_or_sc_header[] =
     "\t# v------------- Short Circuit 'or' -----------v #\n";
     
-/* Skip the next evaluation if the first has failed */
+/* Skip the next evaluation if the first has success */
 const char mips_or_sc_skip[] =
     "\tsltiu $a0, $a0, 1\n"
     "\txori $a0, $a0, 1\n"

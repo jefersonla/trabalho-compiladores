@@ -23,7 +23,7 @@ TokenNode* newTokenNode(int token_type){
     
     /* Give a fatal error if malloc has errors */
     if(_new_token_node == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE A NEW TOKEN!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE A NEW TOKEN!");
         exit(EXIT_FAILURE);
     }
     
@@ -48,13 +48,13 @@ TokenNode* newTokenNode(int token_type){
 bool deleteTokenNode(ptrTokenNode *token_node, bool deleteChilds){
     /* Check if token node exists */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN VARIABLE NODE!\n");
+        printError("CANNOT DESTROY A NULL TOKEN VARIABLE NODE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*token_node) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN NODE!\n");
+        printError("CANNOT DESTROY A NULL TOKEN NODE!");
         return false;
     }
     
@@ -90,7 +90,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if token_node isn't null */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        printError("TOKEN NODE IS NULL!");
         return false;
     }
     
@@ -99,7 +99,7 @@ bool nodeAddTokenStr(TokenNode *token_node, char *token_str){
     
     /* Check if malloc has succeed */
     if(_new_token_str == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
+        printError("FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!");
         return false;
     }
     
@@ -130,7 +130,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if token_node isn't null */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        printError("TOKEN NODE IS NULL!");
         return false;
     }
     
@@ -139,7 +139,7 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
     
     /* Check if malloc has succeed */
     if(_new_lex_str == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!\n");
+        printError("FATAL ERROR CANNOT ALLOCATE STRING FOR TOKEN!");
         return false;
     }
     
@@ -168,13 +168,13 @@ bool nodeAddLexStr(TokenNode *token_node, char *lex_str){
 bool nodeAddRootToken(TokenNode *token_node, TokenNode *root_token){
     /* Check if token_node isn't null */
     if(token_node == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NODE IS NULL!\n");
+        printError("TOKEN NODE IS NULL!");
         return false;
     }
     
     /* Check if token_node isn't null */
     if(root_token == NULL){
-        fprintf(stderr, "[INFO] ROOT TOKEN IS NULL!\n");
+        fprintf(stderr, "[INFO] ROOT TOKEN IS NULL!");
     }
     
     /* Store the new token_str array pointer */
@@ -200,7 +200,7 @@ TokenList* newTokenList(){
     
     /* Give a fatal error if malloc has errors */
     if(_new_token_list == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE TOKEN LIST!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE TOKEN LIST!");
         exit(EXIT_FAILURE);
     }
     
@@ -209,7 +209,7 @@ TokenList* newTokenList(){
     
     /* Give a fatal error if malloc has errors */
     if(_items_list == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ITEMS OF THE TOKEN LIST!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE ITEMS OF THE TOKEN LIST!");
         exit(EXIT_FAILURE);
     }
     
@@ -235,13 +235,13 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
    
     /* Check if token node exists */
     if(token_list == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!\n");
+        printError("CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*token_list) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!\n");
+        printError("CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!");
         return false;
     }
     
@@ -254,7 +254,7 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
             
             /* Check if for some reason token child is null */
             if(token_child == NULL){
-                fprintf(stderr, "[WARNING] CHILD TOKEN IS NULL!\n");
+                fprintf(stderr, "[WARNING] CHILD TOKEN IS NULL!");
                 continue;
             }
             
@@ -288,13 +288,13 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
     
     /* Check if token isn't null */
     if(token_list == NULL){
-        fprintf(stderr, "[ERROR] TOKEN LIST IS NULL!\n");
+        printError("TOKEN LIST IS NULL!");
         return false;
     }
     
     /* Check if token isn't null */
     if(token == NULL){
-        fprintf(stderr, "[ERROR] TOKEN IS NULL!\n");
+        printError("TOKEN IS NULL!");
         return false;
     }
     
@@ -308,7 +308,7 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
         
         /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
-            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE TOKEN LIST ITEMS!\n");
+            printFatalError("FATAL ERROR CANNOT REALLOCATE TOKEN LIST ITEMS!");
             exit(EXIT_FAILURE);
         }
         
@@ -336,19 +336,19 @@ bool listAddToken(TokenList *token_list, TokenNode *token){
 TokenNode* listGetTokenByIndex(TokenList *token_list, int index){
     /* Check if either token or token_list isn't null */
     if(token_list == NULL){
-        fprintf(stderr, "[ERROR] TOKEN LIST IS NULL!\n");
+        printError("TOKEN LIST IS NULL!");
         return NULL;
     }
     
     /* Invalid index used */
     if(index <= 0){
-        fprintf(stderr, "[ERROR] INVALID INDEX!\n");
+        printError("INVALID INDEX!");
         return NULL;
     }
     
     /* Out of bounds access */
     if(index > token_list->length){
-        fprintf(stderr, "[ERROR] INDEX OUT OF BOUNDS!\n");
+        printError("INDEX OUT OF BOUNDS!");
         return NULL;
     }
     
@@ -403,7 +403,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     
     /* Check if root symbol table is valid */
     if(root_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] INVALID ROOT SYMBOL TABLE!\n");
+        printError("INVALID ROOT SYMBOL TABLE!");
         return NULL;
     }
     
@@ -412,7 +412,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     
     /* Give a fatal error if malloc has errors */
     if(_new_symbol_node == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!");
         exit(EXIT_FAILURE);
     }
     
@@ -421,7 +421,7 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
     
     /* Give a fatal error if malloc has errors */
     if(_new_symbol_name == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!");
         exit(EXIT_FAILURE);
     }
 
@@ -449,13 +449,13 @@ SymbolNode* newSymbolNode(SymbolTable *root_symbol_table, char *symbol_name, int
 bool deleteSymbolNode(ptrSymbolNode *symbol_node){
     /* Check if token node exists */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!\n");
+        printError("CANNOT DESTROY A NULL TOKEN LIST VARIABLE NODE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*symbol_node) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!\n");
+        printError("CANNOT DESTROY AN ALREADY NULL TOKEN LIST NODE!");
         return false;
     }
     
@@ -481,13 +481,13 @@ bool deleteSymbolNode(ptrSymbolNode *symbol_node){
 bool symbolEqualsName(SymbolNode *symbol, char *symbol_name){
     /* Check if symbol is not NULL */
     if(symbol == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL IS NULL!\n");
+        printError("SYMBOL IS NULL!");
         return false;
     }
     
     /* Check if symbol_name is not NULL */
     if(symbol_name == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        printError("SYMBOL NAME IS NULL!");
         return false;
     }
     
@@ -504,7 +504,7 @@ bool symbolEqualsName(SymbolNode *symbol, char *symbol_name){
 int symbolNodeGetSymbolAdress(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return -1;
     }
     
@@ -521,7 +521,7 @@ int symbolNodeGetSymbolAdress(SymbolNode *symbol_node){
 int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return -1;
     }
     
@@ -538,7 +538,7 @@ int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
 InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
 
@@ -560,7 +560,7 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
 InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
 
@@ -582,7 +582,7 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
 InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
     
@@ -604,7 +604,7 @@ InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
 InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
     
@@ -621,7 +621,7 @@ InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
 InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
-        fprintf(stderr, "[ERROR] ERROR SYMBOL NODE IS NULL!\n");
+        printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
     
@@ -646,7 +646,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     
     /* Give a fatal error if cannot allocate new symbol table */
     if(_new_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL TABLE!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE NEW SYMBOL TABLE!");
         exit(EXIT_FAILURE);
     }
     
@@ -655,7 +655,7 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     
      /* Give a fatal error if cannot allocate items of the table */
     if(_items_table == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE ARRAY OF SYMBOLS!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE ARRAY OF SYMBOLS!");
         exit(EXIT_FAILURE);
     }
     
@@ -691,7 +691,7 @@ SymbolTable* newGlobalSymbolTable(){
     
     /* Give a fatal error if cannot allocate new symbol table */
     if(_new_global_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!");
         exit(EXIT_FAILURE);
     }
     
@@ -713,13 +713,13 @@ bool deleteSymbolTable(ptrSymbolTable *symbol_table){
     
     /* Check if token node exists */
     if(symbol_table == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL SYMBOL TABLE VARIABLE!\n");
+        printError("CANNOT DESTROY A NULL SYMBOL TABLE VARIABLE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*symbol_table) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL SYMBOL TABLE!\n");
+        printError("CANNOT DESTROY AN ALREADY NULL SYMBOL TABLE!");
         return false;
     }
     
@@ -757,7 +757,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     
     /* Check if symbol name is null or incorrect */
     if((symbol_name == NULL) || (strlen(symbol_name) == 0)){
-        fprintf(stderr, "[ERROR] SYMBOL NAME EMPTY OR INVALID !\n");
+        printError("SYMBOL NAME EMPTY OR INVALID !");
         return false;
     }
     
@@ -776,7 +776,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
         
         /* Give a fatal error if malloc has errors */
         if(_reallocated_items == NULL){
-            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT REALLOCATE SYMBOL TABLE ITEMS!\n");
+            printFatalError("FATAL ERROR CANNOT REALLOCATE SYMBOL TABLE ITEMS!");
             exit(EXIT_FAILURE);
         }
         
@@ -789,7 +789,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     
     /* Check if we can't allocate a new symbol node has returned no errors */
     if(_new_symbol_node == NULL){
-        fprintf(stderr, "[ERROR] CANNOT CREATE NEW SYMBOL NODE!\n");
+        printFatalError("CANNOT CREATE NEW SYMBOL NODE!");
         exit(EXIT_FAILURE);
     }
     
@@ -824,13 +824,13 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
     
     /* Check if symbol table is not NULL */
     if(symbol_table == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        printError("SYMBOL TABLE IS NULL!");
         return false;
     }
     
     /* Check if symbol_name is not NULL */
     if(symbol_name == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        printError("SYMBOL NAME IS NULL!");
         return false;
     }
     
@@ -872,13 +872,13 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
     
     /* Check if symbol table is not NULL */
     if(symbol_table == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL TABLE IS NULL!\n");
+        printError("SYMBOL TABLE IS NULL!");
         return false;
     }
     
     /* Check if symbol_name is not NULL */
     if(symbol_name == NULL){
-        fprintf(stderr, "[ERROR] SYMBOL NAME IS NULL!\n");
+        printError("SYMBOL NAME IS NULL!");
         return false;
     }
 
@@ -925,7 +925,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
     
     /* Give a fatal error if malloc has errors */
     if(_new_instruction_node == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+        printFatalError("FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!");
         exit(EXIT_FAILURE);
     }
     
@@ -936,7 +936,7 @@ InstructionNode *newInstructionNode(char* instruction_string, bool copyInstructi
         
         /* Give a fatal error if malloc has errors */
         if(_new_instruction_string == NULL){
-            fprintf(stderr, "[ERROR] FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!\n");
+            printFatalError("FATAL ERROR CANNOT ALLOCATE NEW SYMBOL!");
             exit(EXIT_FAILURE);
         }
         
@@ -966,13 +966,13 @@ bool deleteInstructionNode(ptrInstructionNode *instruction_node){
     
     /* Check if token node exists */
     if(instruction_node == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL INSTRUCTION NODE VARIABLE!\n");
+        printError("CANNOT DESTROY A NULL INSTRUCTION NODE VARIABLE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*instruction_node) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL INSTRUCTION NODE!\n");
+        printError("CANNOT DESTROY AN ALREADY NULL INSTRUCTION NODE!");
         return false;
     }
     
@@ -1002,13 +1002,13 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
     
     /* Check if instruction node is not NULL */
     if(instruction_node == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION IS NULL!\n");
+        printError("INSTRUCTION IS NULL!");
         return false;
     }
     
     /* Check if _output_file is not NULL */
     if(_output_file == NULL){
-        fprintf(stderr, "[ERROR] OUTPUT FILE IS NULL!\n");
+        printError("OUTPUT FILE IS NULL!");
         return false;
     }
     
@@ -1017,7 +1017,7 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
     
     /* Check if fprintf has worked */
     if(_fprintf_status < 0){
-        fprintf(stderr, "[ERROR] CANNOT WRITE TO OUTPUT FILE, ERROR %d!\n", _fprintf_status);
+        printError("CANNOT WRITE TO OUTPUT FILE, ERROR %d!", _fprintf_status);
         return false;
     }
     
@@ -1034,13 +1034,13 @@ bool instructionNodeFilePrint(FILE *_output_file, InstructionNode *instruction_n
 int instructionNodeLength(InstructionNode *instruction){
     /* Check if instruction node is not NULL */
     if(instruction == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION IS NULL!\n");
+        printError("INSTRUCTION IS NULL!");
         return -1;
     }
     
     /* Check if instruction value is not NULL */
     if(instruction->instruction == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION VALUE IS NULL!\n");
+        printError("INSTRUCTION VALUE IS NULL!");
         return -1;
     }
     
@@ -1064,7 +1064,7 @@ InstructionQueue *newInstructionQueue(){
     
     /* Give a fatal error if malloc failled */
     if(_new_instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] CANNOT ALLOCATE NEW INSTRUCTION QUEUE\n");
+        printFatalError("CANNOT ALLOCATE NEW INSTRUCTION QUEUE");
         exit(EXIT_FAILURE);
     }
     
@@ -1073,7 +1073,7 @@ InstructionQueue *newInstructionQueue(){
     
     /* Give a fatal error if malloc failed */
     if(_new_instruction_nodes == NULL){
-        fprintf(stderr, "[ERROR] CANNOT ALLOCATE ARRAY OF INSTRUCTIONS NODE\n");
+        printFatalError("CANNOT ALLOCATE ARRAY OF INSTRUCTIONS NODE");
         exit(EXIT_FAILURE);
     }
     
@@ -1098,13 +1098,13 @@ bool deleteInstructionQueue(ptrInstructionQueue *instruction_queue){
     
     /* Check if token node exists */
     if(instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY A NULL INSTRUCTION QUEUE VARIABLE!\n");
+        printError("CANNOT DESTROY A NULL INSTRUCTION QUEUE VARIABLE!");
         return false;
     }
     
     /* Check if token node exists */
     if((*instruction_queue) == NULL){
-        fprintf(stderr, "[ERROR] CANNOT DESTROY AN ALREADY NULL INSTRUCTION QUEUE!\n");
+        printError("CANNOT DESTROY AN ALREADY NULL INSTRUCTION QUEUE!");
         return false;
     }
     
@@ -1145,7 +1145,7 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
     
     /* Check if for some reason new instruction node is null */
     if(_new_instruction_node == NULL){
-        fprintf(stderr, "[ERROR] RECEIVED A NULL NEW INSTRUCTION NODE!\n");
+        printFatalError("RECEIVED A NULL NEW INSTRUCTION NODE!");
         exit(EXIT_FAILURE);
     }
     
@@ -1159,7 +1159,7 @@ bool instructionQueueEnqueueInstruction(InstructionQueue *instruction_queue, cha
         
         /* Give fatal error if malloc has failled */
         if(_reallocated_instructions == NULL){
-            fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
+            printFatalError("WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!");
             exit(EXIT_FAILURE);
         }
         
@@ -1186,13 +1186,13 @@ bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
     
     /* Check if instruction queue is null */
     if(instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION QUEUE IS NULL!\n");
+        printError("INSTRUCTION QUEUE IS NULL!");
         return false;
     }
     
     /* Check if instruction node is null */
     if(instruction_node == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION NODE IS NULL!\n");
+        printError("INSTRUCTION NODE IS NULL!");
         return false;
     }
     
@@ -1206,7 +1206,7 @@ bool instructionQueueEnqueueInstructionNode(InstructionQueue *instruction_queue,
         
         /* Give fatal error if malloc has failled */
         if(_reallocated_instructions == NULL){
-            fprintf(stderr, "[ERROR] WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!\n");
+            printFatalError("WHEN TRY TO REALLOCATE NEW INSTRUCTION NODE ARRAY!");
             exit(EXIT_FAILURE);
         }
         
@@ -1235,13 +1235,13 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
     
     /* Check if _output_file is not null */
     if(_output_file == NULL){
-        fprintf(stderr,"[ERROR] OUTPUT FILE IS NULL!\n");
+        fprintf(stderr,"[ERROR] OUTPUT FILE IS NULL!");
         return false;
     }
     
     /* Check if instruction_queue is not null */
     if(instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] INSTRUCTION QUEUE IS NULL!\n");
+        printError("INSTRUCTION QUEUE IS NULL!");
         return false;
     }
     

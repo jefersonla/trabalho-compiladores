@@ -556,6 +556,18 @@ int main( int argc, char **argv ) {
 	/* Output File for Flex */
 	output_file = fopen(output_filename, "w");
 
+    /* Check if input file has not failed */
+    if(yyin == NULL){
+        printFatalError("CANNOT OPEN INPUT FILE!");
+        return EXIT_FAILURE;
+    }
+
+    /* Check if output file has not failed */
+    if(output_file == NULL){
+        printFatalError("CANNOT OPEN INPUT FILE!");
+        return EXIT_FAILURE;
+    }
+
     /* While there are tokens to process */
     int yylex_state;
     for(yylex_state = yylex() ; (yylex_state) && (yylex_state != yyerrorfound) ; yylex_state = yylex());

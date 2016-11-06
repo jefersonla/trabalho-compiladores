@@ -1,6 +1,10 @@
 /* Codegen header */
 #include "codegen_functions.h"
 
+/* Includes */
+#include <stdio.h>
+#include <stdlib.h>
+
 /* Terminals define */
 #ifdef DEBUG_MODE
 #include "debug.y.tab.h"
@@ -26,6 +30,23 @@ InstructionQueue *main_instruction_queue;
 /* Global Symbol Table */
 SymbolTable *global_symbol_table;
 
+/* *** Counter for operations *** */
+
+/* Short Circuit 'and' counter */
+int sc_and_counter;
+
+/* Short Circuit 'or' counter */
+int sc_or_counter;
+
+/* Loop 'while' counter */
+int loop_while_counter;
+
+/* Loop 'for' counter */
+int loop_for_counter;
+
+/* Conditional 'if' counter */
+int cond_if_counter;
+
 /** 
  * Copy global variables into header instruction queue.
  * 
@@ -36,13 +57,13 @@ bool copyGlobalVariables(){
     
     /* Check if header instruction queue is null */
     if(header_instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] HEADER INSTRUCTION QUEUE, NOT INITIALIZED!\n");
+        printError("HEADER INSTRUCTION QUEUE, NOT INITIALIZED!");
         return false;
     }
     
     /* Check if global symbol table is null */
     if(global_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] GLOBAL SYMBOL TABLE, NOT INITIALIZED!\n");
+        printError("GLOBAL SYMBOL TABLE, NOT INITIALIZED!");
         return false;
     }
     
@@ -67,12 +88,19 @@ bool copyGlobalVariables(){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAllCode(TokenNode *root_token){
+    /* Initialize global operation counters */
+    sc_or_counter = 0;
+    sc_and_counter = 0;
+    cond_if_counter = 0;
+    loop_for_counter = 0;
+    loop_while_counter = 0;
+    
     /* Initialize Header Instruction Queue */
     header_instruction_queue = newInstructionQueue();
     
     /* Check if the header instruction queue was corrected initialized */
     if(header_instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] CANNOT INITIALIZE HEADER INSTRUCTION QUEUE.\n");
+        printError("CANNOT INITIALIZE HEADER INSTRUCTION QUEUE.");
         return false;
     }
     
@@ -81,7 +109,7 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the header instruction queue was corrected initialized */
     if(main_instruction_queue == NULL){
-        fprintf(stderr, "[ERROR] CANNOT INITIALIZE MAIN INSTRUCTION QUEUE.\n");
+        printError("CANNOT INITIALIZE MAIN INSTRUCTION QUEUE.");
         return false;
     }
     
@@ -90,7 +118,7 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the global symbol was correct initialized */
     if(global_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] CANNOT CREATE GLOBAL SYMBOL TABLE.\n");
+        printError("CANNOT CREATE GLOBAL SYMBOL TABLE.");
         return false;
     }
     
@@ -102,7 +130,7 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the block token really exists */
     if(block_token == NULL){
-        fprintf(stderr, "[ERROR] CANNOT GET BLOCK TOKEN NODE.\n");
+        printError("CANNOT GET BLOCK TOKEN NODE.");
         return false;
     }
     
@@ -136,13 +164,13 @@ bool cgenAllCode(TokenNode *root_token){
 bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol_table){
     /* Check if command list token is null */
     if(call_function_token == NULL){
-        fprintf(stderr, "[ERROR] COMMAND LIST IS INVALID!\n");
+        printError("COMMAND LIST IS INVALID!");
         return false;
     }
     
     /* Check if symbol table is null */
     if(actual_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        printError("INVALID SYMBOL TABLE!");
         return false;
     }
     
@@ -170,7 +198,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
     // TODO! Implement codegenerator assign
-    fprintf(stderr, "[TODO] 'cgenAssign' - NOT IMPLEMENTED YET!\n");
+    printTodo("'cgenAssign' - NOT IMPLEMENTED YET!");
     return false;
 }
 
@@ -184,13 +212,13 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
 bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
     /* Check if command list token is null */
     if(command_block_token == NULL){
-        fprintf(stderr, "[ERROR] COMMAND BLOCK IS INVALID!\n");
+        printError("COMMAND BLOCK IS INVALID!");
         return false;
     }
     
     /* Check if symbol table is null */
     if(actual_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        printError("INVALID SYMBOL TABLE!");
         return false;
     }
     
@@ -203,13 +231,55 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
 /** 
  * Generate code for while.
  * 
- * @param _token
+ * @param while_token token with while structure.
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
-bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for 'while' loop structure
-    fprintf(stderr, "[TODO] 'cgenWhile' - NOT IMPLEMENTED YET!\n");
+bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
+    SymbolTable *new_symbol_table;
+    TokenNode *block_token;
+    TokenNode *exp_token;
+    
+    /* Check if while token is null */
+    if(while_token == NULL){
+        printError("WHILE COMMAND IS INVALID!");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(previous_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Create a new symbol table */
+    new_symbol_table = newSymbolTable(previous_symbol_table);
+    
+    /* Check the new symbol table */
+    if(new_symbol_table == NULL){
+        printError("CANNOT CREATE A NEW SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Get expression */
+    exp_token = listGetTokenByIndex(while_token->child_list, 2);
+    
+    /* Check if this expression is null */
+    if(exp_token == NULL){
+        printError("EXPRESSION TOKEN IS NULL!");
+        return false;
+    }
+    
+    /* Get bloco */
+    block_token = listGetTokenByIndex(while_token->child_list, 4);
+    
+    /* Check if block token is null */
+    if(block_token == NULL){
+        printError("BLOCK TOKEN IS NULL!");
+    }
+    
+    /*  */
+    
     return false;    
 }
 
@@ -222,7 +292,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *actual_symbol_table){
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     // TODO! Implement codegenerator for 'for' loop structure
-    fprintf(stderr, "[TODO] 'cgenFor' - NOT IMPLEMENTED YET!\n");
+    printTodo("'cgenFor' - NOT IMPLEMENTED YET!");
     return false;    
 }
 
@@ -235,7 +305,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
  */
 bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     // TODO! Implement codegenerator for 'if' structure
-    fprintf(stderr, "[TODO] 'cgenIf' - NOT IMPLEMENTED YET!\n");
+    printTodo("'cgenIf' - NOT IMPLEMENTED YET!");
     return false;    
 }
 
@@ -256,7 +326,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
      
     /* Check if function def is null */
     if(function_def_token == NULL){
-        fprintf(stderr, "[ERROR] FUNCTION DEF TOKEN IS NULL!\n");
+        printError("FUNCTION DEF TOKEN IS NULL!");
         return false;
     }
     
@@ -265,7 +335,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     
     /* Check if the new table is null */
     if(new_table == NULL){
-        fprintf(stderr,"[ERROR] NEW SYMBOL TABLE IS NULL!\n");
+        fprintf(stderr,"[ERROR] NEW SYMBOL TABLE IS NULL!");
         return false;
     }
     
@@ -274,7 +344,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     
     /* Check if t name is null */
     if(t_name == NULL){
-        fprintf(stderr, "[ERROR] TOKEN NAME IS NUJLL!\n");
+        printError("TOKEN NAME IS NULL!");
         return false;
     }
     
@@ -284,12 +354,13 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         
         /* Check if parameters list it's not null */
         if(parameters_list_token == NULL){
-            fprintf(stderr, "[ERROR] PARAMETERS LIST TOKEN IS NULL!\n");
+            printError("PARAMETERS LIST TOKEN IS NULL!");
             return false;
         }
         
         /* Parameters list could be only one name on this case we skip this part */
         if(parameters_list_token->token_type == TI_LISTADENOMES){
+            
             /* If we have a list of names we need to start from the last one to the first */
             for(i = parameters_list_token->child_list->length; i > 0; i++){
                 
@@ -314,13 +385,13 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         block_token = listGetTokenByIndex(function_def_token->child_list, 5);
     }
     else{
-        fprintf(stderr, "[ERROR] THIS TOKEN IS NOT A FUNCTION DEFINITION! -- 0x%X : %d\n", function_def_token->token_type, function_def_token->token_type);
+        printError("THIS TOKEN IS NOT A FUNCTION DEFINITION! -- 0x%X : %d\n", function_def_token->token_type, function_def_token->token_type);
         return false;
     }
     
     /* Check if block token is not null */
     if(block_token == NULL){
-        fprintf(stderr, "[ERROR] BLOCK TOKEN IS NULL!\n");
+        printError("BLOCK TOKEN IS NULL!");
         return false;
     }
     
@@ -332,48 +403,11 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     cgenBlockCode(block_token, new_table);
     
     /* Finish function definition poping Record Activation */
-    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str), (new_table->shift_address + 8));
+    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str), (new_table->shift_address + 4));
     addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     
     /* Delete local symbol table */
     deleteSymbolTable(&new_table);
-    
-    /* Return success */
-    return true;
-}
-
-/** 
- * Generate code for name list.
- * 
- * JEFF...
- * 
- * ISSO É UM VETOR FAZ UM FOR ;)
- * 
- * @param _token
- * @param actual_symbol_table The actual or previous symbol table.
- * @return true if there's no error on execution and false otherwise.
- */
-bool cgenNameList(TokenNode *name_list_token, SymbolTable *actual_symbol_table){
-    /* Get first_child from name_list_token */
-    TokenNode *first_child = listGetTokenByIndex(name_list_token->child_list, 1);
-    
-    if(first_child == NULL){
-        fprintf(stderr, "[ERROR] FIRST CHILD IS NULL!\n");
-        return false;
-    }
-    
-    if(name_list_token == NULL){
-        fprintf(stderr, "[ERROR] INVALID NAME LIST TOKEN!\n");
-        return false;
-    }
-    
-    /* Check if still has TI_LISTADENOMES to code gen */
-    if(first_child->token_type == TI_LISTADENOMES) {
-        cgenNameList(first_child, actual_symbol_table);
-        cgenExpression(listGetTokenByIndex(name_list_token->child_list, 3), actual_symbol_table);
-    } else {
-        cgenExpression(listGetTokenByIndex(name_list_token->child_list, 1), actual_symbol_table);
-    }
     
     /* Return success */
     return true;
@@ -388,7 +422,7 @@ bool cgenNameList(TokenNode *name_list_token, SymbolTable *actual_symbol_table){
  */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
     // TODO! Implement codegenerator for local variables assign and declaration
-    fprintf(stderr, "[TODO] 'cgenLocalVariable' - NOT IMPLEMENTED YET!\n");
+    printTodo("'cgenLocalVariable' - NOT IMPLEMENTED YET!");
     return false;    
 }
 
@@ -402,13 +436,13 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
 bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
     /* Check if command list token is null */
     if(command_token == NULL){
-        fprintf(stderr, "[ERROR] COMMAND LIST IS INVALID!\n");
+        printError("COMMAND LIST IS INVALID!");
         return false;
     }
     
     /* Check if symbol table is null */
     if(actual_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        printError("INVALID SYMBOL TABLE!");
         return false;
     }
     
@@ -455,7 +489,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
             cgenLocalVariable(command_token, actual_symbol_table);
             break;
         default:
-            fprintf(stderr, "[WARNING] NOT IMPLEMENTED YET, TODO!\n");
+            printWarning("NOT IMPLEMENTED YET, TODO!");
             return false;
     }
     
@@ -471,7 +505,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     // TODO! Implement codegenerator for return of commands 
-    fprintf(stderr, "[TODO] 'cgenCommandReturn' - NOT IMPLEMENTED YET!\n");
+    printTodo("'cgenCommandReturn' - NOT IMPLEMENTED YET!");
     return false;
 }
 
@@ -489,7 +523,7 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
     
     /* Check if the actual block_token is not NULL */
     if(block_token == NULL){
-        fprintf(stderr, "[ERROR] BLOCK TOKEN IS NULL!\n");
+        printError("BLOCK TOKEN IS NULL!");
         return false;
     }
     
@@ -531,13 +565,13 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
     
     /* Check if command list token is null */
     if(command_list_token == NULL){
-        fprintf(stderr, "[ERROR] COMMAND LIST IS INVALID!\n");
+        printError("COMMAND LIST IS INVALID!");
         return false;
     }
     
     /* Check if symbol table is null */
     if(actual_symbol_table == NULL){
-        fprintf(stderr, "[ERROR] INVALID SYMBOL TABLE!\n");
+        printError("INVALID SYMBOL TABLE!");
         return false;
     }
     
@@ -574,7 +608,7 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
             
             /* Check if this token is null */
             if(token_node == NULL){
-                fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
+                printError("INVALID TOKEN NODE!");
                 continue;
             }
             
@@ -596,7 +630,7 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         
         /* Check if this token is null */
         if(token_node == NULL){
-            fprintf(stderr, "[ERROR] INVALID TOKEN NODE!\n");
+            printError("INVALID TOKEN NODE!");
             return false;
         }
 
@@ -649,7 +683,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* Binary expression not found or not implemented yet */
-                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
+                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
                 break;
         }
     }
@@ -728,7 +762,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* Binary expression not found or not implemented yet */
-                fprintf(stderr, "[WARNING] OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
+                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
                 break;
         }
         
@@ -737,15 +771,69 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
     }
     /* And & Or should use short-circuit evaluation */
     else if(IS_SHORT_CIRCUIT_OP(exp_token->token_type)){
+        
         /* In short circuit evaluation we check if one of the sides or both of the sentence are true or not */
+        
+        /* Get left and right childs of the expression */
+        token_left = listGetTokenByIndex(exp_token->child_list, 1);
+        token_right = listGetTokenByIndex(exp_token->child_list, 3);
         
         /* In short circuit 'and' we check if both sides of this binary operation are valid */
         if(exp_token->token_type == TI_AND){
+            /* Add begin of the and sc verification */
+            addInstructionMainQueue(mips_and_sc_header);
             
+            /* CGEN(exp1) */
+            cgenExpression(token_left, symbol_table);
+            
+            /* mips_check_a0_nil */
+            addInstructionMainQueue(mips_check_a0_nil);
+            
+            /* Add check or skip with counter */
+            addInstructionMainQueueFormated(mips_and_sc_skip, sc_and_counter);
+            
+            /* CGEN(exp2) */
+            cgenExpression(token_right, symbol_table);
+            
+            /* mips_check_a0_nil */
+            addInstructionMainQueue(mips_check_a0_nil);
+            
+            /* Add footer of this instruction */
+            addInstructionMainQueueFormated(mips_and_sc_footer, sc_and_counter);
+            
+            /* Increment counter */
+            sc_and_counter += 1;
         }
         /* In short circuit 'or' we check if at least one of the sentences are true */
-        else{
+        else if(exp_token->token_type == TI_OR){
+            /* Add begin of the and sc verification */
+            addInstructionMainQueue(mips_or_sc_header);
             
+            /* CGEN(exp1) */
+            cgenExpression(token_left, symbol_table);
+            
+            /* mips_check_a0_nil */
+            addInstructionMainQueue(mips_check_a0_nil);
+            
+            /* Add check or skip with counter */
+            addInstructionMainQueueFormated(mips_or_sc_skip, sc_or_counter);
+            
+            /* CGEN(exp2) */
+            cgenExpression(token_right, symbol_table);
+            
+            /* mips_check_a0_nil */
+            addInstructionMainQueue(mips_check_a0_nil);
+            
+            /* Add footer of this instruction */
+            addInstructionMainQueueFormated(mips_or_sc_footer, sc_or_counter);
+            
+            /* Increment counter */
+            sc_or_counter += 1;
+        }
+        /* This should never occur */
+        else{
+            printFatalError("SOMETHING UNBELIVABLE HAPPENED, EXITING NOW!");
+            exit(EXIT_FAILURE);
         }
     }
     /* Other possible expressions */
@@ -787,7 +875,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* For types not implemented yet */
-                fprintf(stderr, "[WARNING] TYPE [%s] NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n", token_terminal->token_str);
+                printWarning("TYPE [%s] NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n", token_terminal->token_str);
                 break;
         }
     }

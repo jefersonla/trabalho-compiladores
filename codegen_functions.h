@@ -235,6 +235,24 @@ extern const char mips_nil[];
 /* Check if a given variable is nil */
 extern const char mips_check_a0_nil[];
 
+/* Begin of the and check */
+extern const char mips_and_sc_header[];
+
+/* Skip the next evaluation if the first has failed */
+extern const char mips_and_sc_skip[];
+
+/* End of mips sc */
+extern const char mips_and_sc_footer[];
+
+/* Begin of the and check */
+extern const char mips_or_sc_header[];
+
+/* Skip the next evaluation if the first has failed */
+extern const char mips_or_sc_skip[];
+
+/* End of mips sc */
+extern const char mips_or_sc_footer[];
+
 /* ------------------------------------------------------------- */
 
 #endif

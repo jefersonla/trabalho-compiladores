@@ -299,13 +299,13 @@ comando_list    : comando_list comando                  {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                printFatalError("FATAL ERROR ON ACTUAL NODE!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
                                                              /* Check if there are errors with the actual node */
                                                             if($$->child_list == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
+                                                                printFatalError("FATAL ERROR ON CHILD LIST!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -551,13 +551,13 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                printFatalError("FATAL ERROR ON ACTUAL NODE!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
                                                              /* Check if there are errors with the actual node */
                                                             if($$->child_list == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
+                                                                printFatalError("FATAL ERROR ON CHILD LIST!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -902,13 +902,13 @@ listadenomes    : T_NAME                                {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                printFatalError("FATAL ERROR ON ACTUAL NODE!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
                                                              /* Check if there are errors with the actual node */
                                                             if($$->child_list == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
+                                                                printFatalError("FATAL ERROR ON CHILD LIST!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -940,13 +940,13 @@ listaexp        : exp                                   {
                                                             
                                                             /* Check if there are errors with the actual node */
                                                             if($$ == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON ACTUAL NODE!\n");
+                                                                printFatalError("FATAL ERROR ON ACTUAL NODE!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
                                                              /* Check if there are errors with the actual node */
                                                             if($$->child_list == NULL){
-                                                                fprintf(stderr, "[ERROR] FATAL ERROR ON CHILD LIST!\n");
+                                                                printFatalError("FATAL ERROR ON CHILD LIST!");
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
@@ -1077,13 +1077,13 @@ int main(int argc, char *argv[]){
     
     /* Check if fopen has succeed */
     if(yyin == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT OPEN FILE!\n");
+        printFatalError("FATAL ERROR CANNOT OPEN FILE!");
         return EXIT_FAILURE;
     }
     
     /* Check if we can write */
     if(output_filename == NULL){
-        fprintf(stderr, "[ERROR] FATAL ERROR CANNOT WRITE TO FILE!\n");
+        printFatalError("FATAL ERROR CANNOT WRITE TO FILE!");
         return EXIT_FAILURE;
     }
 

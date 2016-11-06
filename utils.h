@@ -42,6 +42,24 @@
 /* Correct way of realloc an array */
 #define reallocItArray(VAR, NEW_SIZE)       realloc(VAR, sizeof(*VAR) * (NEW_SIZE))
 
+/* Print debug messages */
+#define printMsg(TYPE, FORMAT, ...)         fprintf(stderr, "[" TYPE "] [%s:%d] " FORMAT "\n", __FILE__, __LINE__, ##__VA_ARGS__)
+
+/* Print a nice formated error msg */
+#define printFatalError(FORMAT, ...)        printMsg("FATAL ERROR", FORMAT, ##__VA_ARGS__)
+
+/* Print a nice formated error msg */
+#define printError(FORMAT, ...)             printMsg("ERROR", FORMAT, ##__VA_ARGS__)
+
+/* Print a nice formated warning msg */
+#define printWarning(FORMAT, ...)           printMsg("WARNING", FORMAT, ##__VA_ARGS__)
+
+/* Print a nice formated info msg */
+#define printInfo(FORMAT, ...)              printMsg("INFO", FORMAT, ##__VA_ARGS__)
+
+/* Print a nice formated info msg */
+#define printTodo(FORMAT, ...)              printMsg("TODO", FORMAT, ##__VA_ARGS__)
+
 /* Utility to allocate text of tokens */
 bool allocateTokenText(TokenNode *token_node, int qtd_params, ...);
 
