@@ -698,7 +698,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         cgenExpression(token_left, symbol_table);
         
         /* if the operand is different of equal and different symbols, we can assign nil as 0 */
-        if(exp_token->token_type){
+        if(exp_token->token_type != TI_EQ && exp_token->token_type != TI_NEQ){
             /* mips_check_a0_nil() */
             addInstructionMainQueue(mips_check_a0_nil);
         }
