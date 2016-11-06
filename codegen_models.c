@@ -632,7 +632,7 @@ const char mips_and_sc_footer[] =
 
 /* Begin of the and check */
 const char mips_or_sc_header[] =
-    "\t# v------------- Short Circuit 'or' -----------v #\n";
+    "\t# v------------- Short Circuit 'or' ------------v #\n";
     
 /* Skip the next evaluation if the first has success */
 const char mips_or_sc_skip[] =
@@ -645,7 +645,7 @@ const char mips_or_sc_footer[] =
     "\tsltiu $a0, $a0, 1\n"
     "\txori $a0, $a0, 1\n"
 	"\tend_or_%d:\n"
-	"\t# ^-------- End of 'or' short-circuit ---------^ #\n";
+	"\t# ^-------- End of 'or' short-circuit ----------^ #\n";
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */

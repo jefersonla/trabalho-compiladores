@@ -108,6 +108,8 @@ print(2 <= 0)           -- 0
 print(3 == 3)           -- 1
 print(1 ~= 1)           -- 0
 
+--a = 2
+--print(a)
 -- Bugged operators should be treated in semantic --
 --print(nil + nil)      -- nil
 --print(nil / nil)      -- nil

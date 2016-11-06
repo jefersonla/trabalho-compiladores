@@ -276,11 +276,29 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     /* Check if block token is null */
     if(block_token == NULL){
         printError("BLOCK TOKEN IS NULL!");
+        return false;
     }
     
-    /*  */
+    /* Add header message */
+    addInstructionMainQueue(mips_start_while, loop_while_counter);
     
-    return false;    
+    /* CGEN(exp) */
+    cgenExpression(exp_token, previous_symbol_table);
+    
+    /* Check condition */
+    addInstructionMainQueue(mips_check_while, loop_while_counter);
+    
+    /* CGEN(bloco) */
+    cgenBlock(block_token, newSymbolTable);
+    
+    /* Add while end */
+    addInstructionMainQueue(mips_end_while, loop_while_counter, loop_while_counter);
+    
+    /* Increment while loop counter */
+    loop_while_counter += 1;
+    
+    /* Return succes */
+    return true;    
 }
 
 /** 
@@ -335,7 +353,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     
     /* Check if the new table is null */
     if(new_table == NULL){
-        fprintf(stderr,"[ERROR] NEW SYMBOL TABLE IS NULL!");
+        printError("NEW SYMBOL TABLE IS NULL!");
         return false;
     }
     
@@ -385,7 +403,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         block_token = listGetTokenByIndex(function_def_token->child_list, 5);
     }
     else{
-        printError("THIS TOKEN IS NOT A FUNCTION DEFINITION! -- 0x%X : %d\n", function_def_token->token_type, function_def_token->token_type);
+        printError("THIS TOKEN IS NOT A FUNCTION DEFINITION! -- 0x%X : %d", function_def_token->token_type, function_def_token->token_type);
         return false;
     }
     
@@ -683,7 +701,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* Binary expression not found or not implemented yet */
-                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
+                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d", exp_token->token_type, exp_token->token_type);
                 break;
         }
     }
@@ -762,7 +780,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* Binary expression not found or not implemented yet */
-                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d\n", exp_token->token_type, exp_token->token_type);
+                printWarning("OPERAND NOT RECOGNIZED OR NOT IMPLEMENTED YET! -- 0x%X : %d", exp_token->token_type, exp_token->token_type);
                 break;
         }
         
@@ -875,7 +893,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                 break;
             default:
                 /* For types not implemented yet */
-                printWarning("TYPE [%s] NOT RECOGNIZED OR NOT IMPLEMENTED YET!\n", token_terminal->token_str);
+                printWarning("TYPE [%s] NOT RECOGNIZED OR NOT IMPLEMENTED YET!", token_terminal->token_str);
                 break;
         }
     }
