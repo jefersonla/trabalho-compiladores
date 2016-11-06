@@ -684,7 +684,7 @@ const char mips_or_sc_footer[] =
 
 /* Begin of a assign */
 const char mips_start_assign[] =
-    "\t# -------------------- Assign ------------------- #\n";
+    "\t# v------------------- Assign ------------------v #\n";
 
 /* Expression Execution marker */
 const char mips_marker_exp[] =
@@ -696,7 +696,7 @@ const char mips_marker_assign[] =
 
 /* End of a assign */
 const char mips_end_assign[] =
-	"\t# ---------------- End of Assign ---------------- #\n";
+	"\t# ^--------------- End of Assign ---------------^ #\n";
  
  
 /* ------------------------------------------------------------- */

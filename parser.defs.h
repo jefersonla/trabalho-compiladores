@@ -31,7 +31,11 @@
 #define TI_RETURN               0xCB0A
 
 /* Expressions */
-#define IS_EXPRESSION(X)        ((X >= 0xCB0B) && (X <= 0xCB24))
+#define IS_FUNCTION(X)          ((X == TI_CALL_FUNCTION) || (X == TI_CALL_FUNCTION_PAR))
+#define IS_NUMBER(X)            (X == T_NUMBER) 
+#define IS_NAME(X)              (X == T_NAME)
+#define IS_NIL(X)               (X == T_NIL)
+#define IS_EXPRESSION(X)        (((X >= 0xCB0B) && (X <= 0xCB24)) || IS_FUNCTION(X) || IS_NUMBER(X) || IS_NAME(X) || IS_NIL(X))
 
 /* Unary Operands */
 #define IS_UNARY_OPERAND(X)     ((X >= 0xCB0B) && (X <= 0xCB0D))

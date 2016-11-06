@@ -352,7 +352,7 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         }
         
         /* Execute list of names and assign values for each symbol name */
-        for(i = 0; i < list_names->length; i++){
+        for(i = 1; i <= list_names->length; i++){
             
             /* Get token name */
             token_name = listGetTokenByIndex(list_names, i);
@@ -395,6 +395,9 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
             
             /* Store the correct store instruction */
             instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
+            
+            /* pop */
+            addInstructionMainQueue(mips_pop);
         }
     }
     

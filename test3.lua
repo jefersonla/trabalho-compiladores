@@ -69,3 +69,12 @@ elseif x == 340 then
 else
     print(2400)
 end
+
+-- Print separator
+print(1515151515)
+
+-- Testing multiple assigns
+x = 1
+x, y = 10, 20
+print(x)
+print(y)
