@@ -526,6 +526,13 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
+    TokenNode *token_exp;
+    TokenNode *token_name;
+    TokenNode *token_block;
+    TokenNode *token_assign;
+    TokenNode *token_increment;
+    SymbolNode *symbol_node;
+    SymbolTable *new_symbol_table;
     
     /* Check if for token is null */
     if(for_token == NULL){
@@ -539,10 +546,136 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
         return false;
     }
     
-    printTodo("NOT IMPLEMENTED YET!");
+    /* Get token_name */
+    token_name = listGetTokenByIndex(for_token->child_list, 2);
+    
+    /* Check if token name is valid */
+    if(token_name == NULL){
+        printError("INVALID TOKEN NAME!");
+        return false;
+    }
+    
+    /* Get assign expression token */
+    token_assign = listGetTokenByIndex(for_token->child_list, 4);
+    
+    /* Check if this expression is valid */
+    if(token_assign == NULL){
+        printError("INVALID EXPRESSION TOKEN!");
+        return false;
+    }
+    
+    /* Get assign expression token */
+    token_exp = listGetTokenByIndex(for_token->child_list, 6);
+    
+    /* Check if this expression is valid */
+    if(token_exp == NULL){
+        printError("INVALID EXPRESSION TOKEN!");
+        return false;
+    }
+    
+    /* Header of the for operation */
+    addInstructionMainQueue(mips_for_ini);
+    
+    /* Initialize a new symbol table */
+    new_symbol_table = newSymbolTable(actual_symbol_table);
+    
+    /* Check if new symbol table hasn't failed */
+    if(new_symbol_table == NULL){
+        printError("CANNOT CREATE A NEW SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Add our token name to the new symbol table */
+    symbolTableAddSymbol(new_symbol_table, token_name->lex_str, NUMBER_TYPE);
+
+    /* Get the symbol node */
+    symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table, token_name->lex_str);
+    
+    /* Check if symbol node is valid */
+    if(symbol_node == NULL){
+        printError("CANNOT RETRIEVE SYMBOL NODE!");
+        return false;
+    }
+    
+    /* Add definition of this token */
+    instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node));
+    
+    /* Execute token exp */
+    cgenExpression(token_assign, actual_symbol_table);
+    
+    /* Assign the local iterator variable */
+    instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
+    
+    /* Add label of for begin */
+    addInstructionMainQueueFormated(mips_start_for, loop_for_counter);
+    
+    /* Execute for expression condition */
+    cgenExpression(token_exp, new_symbol_table);
+    
+    /* Add check expression */
+    addInstructionMainQueueFormated(mips_for_check, loop_for_counter);
+    
+    /* Block token and increment may vary so we first check wat's the type of the 'for' */
+    if(for_token->token_type == TI_FOR_INC){
+        /* Get block token */
+        token_block = listGetTokenByIndex(for_token->child_list, 10);
+    }
+    else{
+        /* Get block token */
+        token_block = listGetTokenByIndex(for_token->child_list, 8);
+    }
+    
+    /* Check if block is valid */
+    if(token_block == NULL){
+        printError("BLOCK TOKEN IS INVALID!");
+        return false;
+    }
+    
+    /* Execute block code */
+    cgenBlockCode(token_block, new_symbol_table);
+    
+    /* Check if the for have an increment expression */
+    if(for_token->token_type == TI_FOR_INC){
+        
+        /* Get expression increment */
+        token_increment = listGetTokenByIndex(for_token->child_list, 8);
+        
+        /* Check if this token is valid */
+        if(token_increment == NULL){
+            printError("INVALID TOKEN EXPRESSION FOR INCREMENT!");
+            return false;
+        }
+        
+        /* Execute increment expression */
+        cgenExpression(token_increment, new_symbol_table);
+    }
+    else{
+        /* Add 1 into a0, this is the same as increment of 1 */
+        addInstructionMainQueueFormated(mips_static_number_load, 1);
+    }
+    
+    /* Store in $t1 returned by expression */
+    addInstructionMainQueue(mips_for_load_inc);
+    
+    /* Load old value of the iterator */
+    instructionQueueEnqueueInstructionNode( main_instruction_queue,
+                                            symbolNodeGetLoadInstruction(symbol_node));
+    
+    /* Increment the iterator */
+    addInstructionMainQueue(mips_for_inc);
+    
+    /* Store the new value of the iterator */
+    instructionQueueEnqueueInstructionNode( main_instruction_queue,
+                                            symbolNodeGetStoreInstruction(symbol_node));
+    
+    /* Add the footer of the for instruction */
+    addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
+    
+    /* Increment for counter */
+    loop_for_counter += 1;
     
     /* Return success */
-    return false;
+    return true;
 }
 
 /** 

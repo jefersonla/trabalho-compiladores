@@ -218,7 +218,22 @@ extern const char mips_check_while[];
 extern const char mips_end_while[];
 
 /* Loop type for */
-extern const char mips_for[];
+extern const char mips_for_ini[];
+
+/* Begin of for */
+extern const char mips_start_for[];
+
+/* For condition check */
+extern const char mips_for_check[];
+
+/* Store */
+extern const char mips_for_load_inc[];
+
+/* Mips default for inc */
+extern const char mips_for_inc[];
+
+/* End of for defition */
+extern const char mips_end_for[];
 
 /* Function Call start model */
 extern const char mips_start_function_call[];

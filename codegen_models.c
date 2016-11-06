@@ -428,12 +428,12 @@ const char mips_end_while[] =
 /**
  * Model for 'for' loop operations.
  *
- *  Exemplo com sintax c-like
- *  for(x = exp; x <= exp; x += [exp] | 1)
+ *  Example with c-like syntax
+ *  for(x = exp; x <= exp; x += [exp] || 1)
  * 
- *  | > INICIALIZACAO, CONDICAO, INCREMENTO
+ *  | > initialization, condition, increment
  * 
- *     Default Model for:
+ *     Default Model 'for':
  *          CGEN(for name = exp_ini, exp_cond [, exp_inc] do block end)
  *              CGEN(ASSIGN(local name = exp_ini))
  *              start_for_n:
@@ -459,7 +459,7 @@ const char mips_start_for[] =
     "start_for_%d:\n";
 
 /* For condition check */
-const char mips_for_con[] =
+const char mips_for_check[] =
     "\tbeq $a0, $0, end_for_%d\n";
     
 /* Store */
@@ -518,7 +518,7 @@ const char mips_end_for[]=
  * 
  */
 
-/* For some reason I'm receving segfault if i use this two strings concatenated */
+/* For some reason I'm receving segfault if i use these two strings concatenated */
 
 /* Start of function definition */
 const char mips_start_function_def[] = 
@@ -560,11 +560,14 @@ const char mips_end_function_def2[] =
  *      ...
  *      jal function_name
  */
- const char mips_start_function_call[] =
+ 
+/* Start of a function call */
+const char mips_start_function_call[] =
     "\t# v--------------- Call Function ---------------v #\n"
     "\tsw $fp, 0($sp)\n"
     "\taddiu $sp, $sp, -4\n";
     
+/* End of a function call */
 const char mips_end_function_call[] =
     "\tjal function_%s\n"
     "\taddiu $sp, $sp, 4\n"
@@ -668,7 +671,6 @@ const char mips_or_sc_footer[] =
 /**
  * Model for assigns, exp == x {, y}+ = z {, k}.
  * 
- * 
  *  Default Model for assign CGEN(nomes = expressions)
  *      {
  *          CGEN(expressions[n - 1])
@@ -698,6 +700,41 @@ const char mips_marker_assign[] =
 const char mips_end_assign[] =
 	"\t# ^--------------- End of Assign ---------------^ #\n";
  
+/* ------------------------------------------------------------- */
+/*                      Local Variable Model                     */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for assigns, exp == x {, y}+ = z {, k}.
+ * 
+ *  Default Model for assign CGEN(nomes = expressions)
+ *      {
+ *          CGEN(expressions[n - 1])
+ *          push_a0
+ *      }+
+ *      ==
+ *      {
+ *          top_a0
+ *          nome = a0
+ *          pop
+ *      }+
+ */
+
+/* Begin of a assign */
+//const char mips_start_assign[] =
+//    "\t# v------------------- Assign ------------------v #\n";
+//
+///* Expression Execution marker */
+//const char mips_marker_exp[] =
+//    "\t### Expression -- %d ###\n";
+//
+///* Assign marker */
+//const char mips_marker_assign[] =
+//    "\t### Assign -- %s -- %d ###\n";
+//
+///* End of a assign */
+//const char mips_end_assign[] =
+//	"\t# ^--------------- End of Assign ---------------^ #\n";
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */

@@ -542,13 +542,13 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
         return NULL;
     }
 
-    /* If this node belong toa global symbol table */
+    /* If this node belong to global symbol table */
     if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
         return newInstructionNode(formatedInstruction(mips_global_define, symbol_node->symbol_name), false);
     }
 
     /* Return the formated instruction */
-    return newInstructionNode((char *) mips_local_define, false);
+    return newInstructionNode(formatedInstruction(mips_local_define), false);
 }
 
 /**
