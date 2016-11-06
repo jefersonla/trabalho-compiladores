@@ -115,3 +115,30 @@ print(1 ~= 1)           -- 0
 --print(nil / nil)      -- nil
 --print(nil * nil)      -- nil
 --print(nil - nil)      -- nil
+
+-- Separator
+print(1234567890)
+
+-- teste while --
+--[[
+function why()
+  while(0) do
+    print(3)
+  end
+  print(11)
+end
+
+why()]]
+
+while(0) do -- should don't enter here
+    print(3)
+end
+
+while(1) do -- should don't stop
+    print(4)
+end
+
+--[[
+    -- Separator
+    -- print(1234567890)
+]]

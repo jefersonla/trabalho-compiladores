@@ -174,7 +174,7 @@ bool nodeAddRootToken(TokenNode *token_node, TokenNode *root_token){
     
     /* Check if token_node isn't null */
     if(root_token == NULL){
-        fprintf(stderr, "[INFO] ROOT TOKEN IS NULL!");
+        printInfo("ROOT TOKEN IS NULL!");
     }
     
     /* Store the new token_str array pointer */
@@ -254,7 +254,7 @@ bool deleteTokenList(ptrTokenList *token_list, bool deleteChilds){
             
             /* Check if for some reason token child is null */
             if(token_child == NULL){
-                fprintf(stderr, "[WARNING] CHILD TOKEN IS NULL!");
+                printWarning("CHILD TOKEN IS NULL!");
                 continue;
             }
             
@@ -1235,7 +1235,7 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
     
     /* Check if _output_file is not null */
     if(_output_file == NULL){
-        fprintf(stderr,"[ERROR] OUTPUT FILE IS NULL!");
+        printError("OUTPUT FILE IS NULL!");
         return false;
     }
     

@@ -75,8 +75,8 @@ const char mips_footer[] =
         "\n"
     "end_check_nil:\n"
         "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 8\n"
-        "\tlw $fp, 0($sp)\n"
+        "\taddiu $sp, $sp, 4\n"
+        "\tlw $fp, 4($sp)\n"
         "\tjr $ra\n"
     "# -- End Check Nil -- #\n"
     "\n"
@@ -115,8 +115,8 @@ const char mips_footer[] =
         "\n"
         "\t# Close Print Function \n"
         "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 8\n"
-        "\tlw $fp, 0($sp)\n"
+        "\taddiu $sp, $sp, 4\n"
+        "\tlw $fp, 4($sp)\n"
         "\tjr $ra\n"
     "# -- End Print Function -- #\n"
     "\n"
@@ -370,6 +370,14 @@ const char mips_check_if[] =
 const char mips_next_if[] =
     "\tj end_if_%d\n"
     "end_if_%d_exp_%d:\n";
+    
+/* Header for else if */
+const char mips_elseif_start[] =
+    "\t### if - %d -- elseif - %d ###\n";
+    
+/* Header for else */
+const char mips_else_start[] =
+    "\t### if - %d -- else ###\n";
 
 /* If end condition */
 const char mips_end_if[] =
@@ -555,6 +563,7 @@ const char mips_end_function_def2[] =
     
 const char mips_end_function_call[] =
     "\tjal function_%s\n"
+    "\taddiu $sp, $sp, 4\n"
     "\t# ^----------- End of Call Function ------------^ #\n";
 
 /* ------------------------------------------------------------- */
@@ -646,6 +655,19 @@ const char mips_or_sc_footer[] =
     "\txori $a0, $a0, 1\n"
 	"\tend_or_%d:\n"
 	"\t# ^-------- End of 'or' short-circuit ----------^ #\n";
+ 
+/* ------------------------------------------------------------- */
+/*                         Assign Model                          */
+/* ------------------------------------------------------------- */
+
+/**
+ * Model for assigns.
+ * 
+ *  Default Model for assign CGEN():
+ *      ...
+ */
+
+
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */

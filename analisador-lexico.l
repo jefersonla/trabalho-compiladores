@@ -544,7 +544,7 @@ int main( int argc, char **argv ) {
 
 			break;
 		default:
-            printf( "Incorrect number of parrameters used!\n\n");
+            printf( "Incorrect number of parrameters used!\n\n");
             showHelpUsage();
 			return EXIT_FAILURE;
 	}

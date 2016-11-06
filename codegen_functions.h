@@ -199,6 +199,12 @@ extern const char mips_next_if[];
 /* If end condition */
 extern const char mips_end_if[];
 
+/* Header for else if */
+extern const char mips_elseif_start[];
+
+/* Header for else */
+extern const char mips_else_start[];
+
 /* Loop type while */
 extern const char mips_start_while[];
 

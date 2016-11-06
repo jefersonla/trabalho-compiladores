@@ -192,14 +192,27 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
 /** 
  * Generate code for assign.
  * 
- * @param _token
+ * @param assign_token Token with the assign operations
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator assign
-    printTodo("'cgenAssign' - NOT IMPLEMENTED YET!");
-    return false;
+    /* Check if command list token is null */
+    if(assign_token == NULL){
+        printError("ASSIGN TOKEN IS INVALID!");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /*  */
+    
+    /* Return success */
+    return true;
 }
 
 /** 
@@ -280,19 +293,19 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     }
     
     /* Add header message */
-    addInstructionMainQueue(mips_start_while, loop_while_counter);
+    addInstructionMainQueueFormated(mips_start_while, loop_while_counter);
     
     /* CGEN(exp) */
     cgenExpression(exp_token, previous_symbol_table);
     
     /* Check condition */
-    addInstructionMainQueue(mips_check_while, loop_while_counter);
+    addInstructionMainQueueFormated(mips_check_while, loop_while_counter);
     
     /* CGEN(bloco) */
-    cgenBlock(block_token, newSymbolTable);
+    cgenBlockCode(block_token, new_symbol_table);
     
     /* Add while end */
-    addInstructionMainQueue(mips_end_while, loop_while_counter, loop_while_counter);
+    addInstructionMainQueueFormated(mips_end_while, loop_while_counter, loop_while_counter);
     
     /* Increment while loop counter */
     loop_while_counter += 1;
@@ -304,27 +317,235 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
 /** 
  * Generate code for for.
  * 
- * @param _token
+ * @param for_token token for.
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for 'for' loop structure
-    printTodo("'cgenFor' - NOT IMPLEMENTED YET!");
-    return false;    
+    
+    /* Check if for token is null */
+    if(for_token == NULL){
+        printError("IF COMMAND IS INVALID!");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    printTodo("NOT IMPLEMENTED YET!");
+    
+    /* Return success */
+    return false;
 }
 
 /** 
  * Generate code for if.
  * 
- * @param _token
+ * @param if_token If comand token structure.
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for 'if' structure
-    printTodo("'cgenIf' - NOT IMPLEMENTED YET!");
-    return false;    
+    int i;
+    TokenNode *exp_token;
+    TokenNode *block_token;
+    TokenNode *list_elseif;
+    TokenNode *token_node;
+    TokenList *exp_list;
+    TokenList *block_list;
+    SymbolTable *new_symbol_table;
+    
+    /* Check if for token is null */
+    if(if_token == NULL){
+        printError("IF COMMAND IS INVALID!");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Get expression */
+    exp_token = listGetTokenByIndex(if_token->child_list, 2);
+    
+    /* Check if this expression is null */
+    if(exp_token == NULL){
+        printError("EXPRESSION TOKEN IS NULL!");
+        return false;
+    }
+    
+    /* Get bloco */
+    block_token = listGetTokenByIndex(if_token->child_list, 4);
+    
+    /* Check if block token is null */
+    if(block_token == NULL){
+        printError("BLOCK TOKEN IS NULL!");
+        return false;
+    }
+    
+    /* Get list of elseif conditions */
+    list_elseif = listGetTokenByIndex(if_token->child_list, 5);
+    
+    /* Check if block token is null */
+    if(list_elseif == NULL){
+        printError("INVALID TOKEN LIST ESLE IF!");
+        return false;
+    }
+    
+    /* Add header message */
+    addInstructionMainQueue(mips_start_if);
+    
+    /* CGEN(exp) */
+    cgenExpression(exp_token, actual_symbol_table);
+    
+    /* Check condition */
+    addInstructionMainQueueFormated(mips_check_if, cond_if_counter, 0);
+    
+    /* Create a new escope */
+    new_symbol_table = newSymbolTable(actual_symbol_table);
+    
+    /* Check if the new symbol table is correct */
+    if(new_symbol_table == NULL){
+        printError("FAILED TO CREATE LOCAL SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* CGEN(bloco) */
+    cgenBlockCode(block_token, new_symbol_table);
+    
+    /* Delete the temporary escope */
+    deleteSymbolTable(&new_symbol_table);
+    
+    /* Add check for next if condition {else if / else} */
+    addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, 0);
+    
+    /* Check if there are a list of else if */
+    if(list_elseif->token_type == TI_LIST_ELSEIF){
+        
+        /* Get all expressions */
+        exp_list = newTokenList();
+        
+        /* Check if the list of expression list is valid */
+        if(exp_list == NULL){
+            printError("EXPRESSION LIST IS INVALID!");
+            return false;
+        }
+        
+        /* Pick all expressions in elseif */
+        for(i = 1; i <= list_elseif->child_list->length; i++){
+            
+            /* Get the token node */
+            token_node = listGetTokenByIndex(list_elseif->child_list, i);
+            
+            /* If this token is an expression add him to the token list */
+            if(IS_EXPRESSION(token_node->token_type)){
+                listAddToken(exp_list, token_node);
+            }
+        }
+        
+        /* Get all blocks */
+        block_list = listGetTokensByType(list_elseif->child_list, TI_BLOCO);
+        
+        /* Check if block list is valid */
+        if(block_list == NULL){
+            printError("BLOCK LIST IS INVALID!");
+            return false;
+        }
+        
+        /* Add the other 'else if' conditionals */
+        for(i = 1; i <= exp_list->length; i++){
+            
+            /* Get expression[i] */
+            exp_token = listGetTokenByIndex(exp_list, i);
+            
+            /* Check if this expression is null */
+            if(exp_token == NULL){
+                printError("EXPRESSION TOKEN IS NULL!");
+                return false;
+            }
+            
+            /* Get block[i] */
+            block_token = listGetTokenByIndex(block_list, i);
+            
+            /* Check if this expression is null */
+            if(block_token == NULL){
+                printError("BLOCK TOKEN IS NULL!");
+                return false;
+            }
+            
+            /* Header for elseif */
+            addInstructionMainQueueFormated(mips_elseif_start, cond_if_counter, i);
+            
+            /* CGEN(exp) */
+            cgenExpression(exp_token, actual_symbol_table);
+            
+            /* Check condition */
+            addInstructionMainQueueFormated(mips_check_if, cond_if_counter, i);
+            
+            /* Create a new escope */
+            new_symbol_table = newSymbolTable(actual_symbol_table);
+            
+            /* Check if the new symbol table is correct */
+            if(new_symbol_table == NULL){
+                printError("FAILED TO CREATE LOCAL SYMBOL TABLE!");
+                return false;
+            }
+            
+            /* CGEN(bloco) */
+            cgenBlockCode(block_token, new_symbol_table);
+            
+            /* Delete the temporary escope */
+            deleteSymbolTable(&new_symbol_table);
+            
+            /* Add check for next if condition {else if / else} */
+            addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, i);
+        }
+    }
+    
+    /* Check if 'if token' has a else condition */
+    if(if_token->token_type == TI_IF_ELSE){
+        
+        /* Get block else */
+        block_token = listGetTokenByIndex(if_token->child_list, 7);
+        
+        /* Check if this expression is null */
+        if(block_token == NULL){
+            printError("BLOCK TOKEN IS NULL!");
+            return false;
+        }
+        
+        /* Create a new escope */
+        new_symbol_table = newSymbolTable(actual_symbol_table);
+        
+        /* Check if the new symbol table is correct */
+        if(new_symbol_table == NULL){
+            printError("FAILED TO CREATE LOCAL SYMBOL TABLE!");
+            return false;
+        }
+        
+        /* Header for else */
+        addInstructionMainQueueFormated(mips_else_start, cond_if_counter);
+        
+        /* CGEN(bloco) */
+        cgenBlockCode(block_token, new_symbol_table);
+        
+        /* Delete the temporary escope */
+        deleteSymbolTable(&new_symbol_table);
+    }
+    
+    /* Add if footer */
+    addInstructionMainQueueFormated(mips_end_if, cond_if_counter);
+    
+    /* Increment if counter */
+    cond_if_counter += 1;
+    
+    /* Return success */
+    return true;
 }
 
 /** 
