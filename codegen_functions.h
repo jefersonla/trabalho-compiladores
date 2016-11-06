@@ -142,6 +142,9 @@ extern const char mips_pop[];
 /* Load top value to $t1 */
 extern const char mips_top_t1[];
 
+/* Load top value to $a0 */
+extern const char mips_top_a0[];
+
 /* Load a static number into $a0 */
 extern const char mips_static_number_load[];
 
@@ -258,6 +261,18 @@ extern const char mips_or_sc_skip[];
 
 /* End of mips sc */
 extern const char mips_or_sc_footer[];
+
+/* Begin of a assign */
+extern const char mips_start_assign[];
+
+/* Expression Execution marker */
+extern const char mips_marker_exp[];
+
+/* Assign marker */
+extern const char mips_marker_assign[];
+
+/* End of a assign */
+extern const char mips_end_assign[];
 
 /* ------------------------------------------------------------- */
 
