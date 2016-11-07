@@ -171,9 +171,11 @@ check-final:
 	awk '{ \
 			for(i = 1; i <= NF; i++) { \
 				split($$1,a,"-"); \
-				param2="testing-"a[2] ;\
-				param3="output-"a[2] ; \
-				command="./test.sh $(PARSER_EXECUTABLE) tests/input/"$$1" tests/testing/"param2" tests/output/"param3; \
+				param2="test-"a[2] ;\
+				param3="exec-"a[2] ; \
+				param4="code-"a[2] ; \
+				command="./$(EXECUTABLE) tests/input/"$$1" tests/testing/"param2" > /dev/null 2>&1 && "\
+						"./test.sh spim tests/testing/"param2" tests/testing/"param3" tests/executed/"param4; \
 				system(command); \
 			} \
 		}'
