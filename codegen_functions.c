@@ -537,6 +537,9 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     /* Increment while loop counter */
     loop_while_counter += 1;
     
+    /* Delete Scope */
+    deleteSymbolTable(&new_symbol_table);
+    
     /* Return succes */
     return true;    
 }
