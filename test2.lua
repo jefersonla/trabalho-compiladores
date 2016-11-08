@@ -128,14 +128,18 @@ function why()
   print(11)
 end
 
-why()]]
+why()
+]]
 
 while(0) do -- should don't enter here
     print(3)
 end
 
-while(1) do -- should don't stop
+x = 4
+
+while(x ~= 0) do -- should don't stop
     print(4)
+    x = x - 1
 end
 
 --[[

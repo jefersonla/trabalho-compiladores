@@ -154,7 +154,7 @@ const char mips_global_define[] =
 /* Define a local variable */    
 const char mips_local_define[] =
     "\t# ------------ Define a local variable ---------- #\n"
-    "\taddiu $sp, $sp, -4\n"
+    "\taddiu $sp, $sp, -" TO_STRING(BYTE_VARIABLE_SIZE) "\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Store a global variable */    
@@ -184,8 +184,8 @@ const char mips_local_load[] =
 /* Push temporary return of a expression */
 const char mips_push_a0[] =
     "\t# -------------- Push $a0 to stack -------------- #\n"
-    "\tsw $a0, 4($sp)\n"
     "\taddiu $sp, $sp, -" TO_STRING(BYTE_VARIABLE_SIZE) "\n"
+    "\tsw $a0, 4($sp)\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Pop stack value */
@@ -202,7 +202,7 @@ const char mips_top_t1[] =
     
 /* Load top value to $t1 */
 const char mips_top_a0[] =
-    "\t# ------------- Top of stack to $t1 ------------- #\n"
+    "\t# ------------- Top of stack to $a0 ------------- #\n"
     "\tlw $a0, " TO_STRING(BYTE_VARIABLE_SIZE) "($sp)\n"
     "\t# ----------------------------------------------- #\n";
 
@@ -562,21 +562,21 @@ const char mips_start_function_def[] =
 const char mips_start_function_def2[] =
     "function_%s:\n"
         "\t# Load Function Frame Pointer and Return Adress\n"
+        "\tmove $fp, $sp\n"
         "\taddiu $sp, $sp, -8\n"
         "\tsw $ra, 4($sp)\n"
-        "\tsw $fp, 4($sp)\n"
-        "\tmove $fp, $sp\n";
+        "\tsw $fp, 8($sp)\n";
 
 /* End of function definition */
 const char mips_end_function_def[] =
     "end_function_%s:\n"
-        "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, %d\n"
-        "\tlw $fp, 4($sp)\n"
-        "\tjr $ra\n";
-
+        "\tlw $ra, 4($fp)\n"
+        "\tlw $fp, 8($sp)\n"
+        "\taddiu $sp, $sp, -8\n";
+        
 /* End of function definition part 2 */
 const char mips_end_function_def2[] = 
+        "\tjr $ra\n"
     "\t# ^-------- End of Function Definition ---------^ #\n"
     "end_definition_function_%s: # Continue program from here\n";
 

@@ -10,29 +10,29 @@
 /* ------------------------------------------------------------- */
 
 /* Global Start Address */
-#define GLOBAL_START_ADRESS                     -1
+#define GLOBAL_START_ADRESS                         -1
 
 /* Function Prefix */
-#define FUNCTION_PREFIX                         "function_"
+#define FUNCTION_PREFIX                             "function_"
 
 /* Global reserved variables Prefix */
-#define GLOBAL_SYSTEM_VARIABLE_PREFIX           "_"
+#define GLOBAL_SYSTEM_VARIABLE_PREFIX               "_"
 
 /* Global variables Prefix */
-#define GLOBAL_VARIABLE_PREFIX                  "__"
+#define GLOBAL_VARIABLE_PREFIX                      "__"
 
 /* Value of a nil variable */
-#define NIL_TYPE_MASK                           "0x80000000"
-#define NIL_TYPE_VALUE                          "0x7FFFFFFF"
+#define NIL_TYPE_MASK                               "0x80000000"
+#define NIL_TYPE_VALUE                              "0x7FFFFFFF"
 
 /* Integer type */
-#define NUMBER_TYPE                             1
+#define NUMBER_TYPE                                 1
 
 /* Standard way to add itens to main queue */
-#define addInstructionMainQueue(VAR)            instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR), false)
+#define addInstructionMainQueue(VAR)                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR), false)
 
 /* New array of instructions with variadic parameters */
-#define addInstructionMainQueueFormated(VAR, ...)  instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR, ##__VA_ARGS__), false)
+#define addInstructionMainQueueFormated(VAR, ...)   instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR, ##__VA_ARGS__), false)
 
 /* ------------------------------------------------------------- */
 /*                         Global Structures                     */

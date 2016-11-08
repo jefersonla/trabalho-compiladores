@@ -78,3 +78,7 @@ x = 1
 x, y = 10, 20
 print(x)
 print(y)
+y = 30
+print(y)
+y = nil
+print(y)

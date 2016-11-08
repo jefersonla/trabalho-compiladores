@@ -313,6 +313,9 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         
         /* Store the correct store instruction */
         instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
+        
+        /* pop */
+        addInstructionMainQueue(mips_pop);
     }
     /* Otherwise we have a list of operands */
     else{
@@ -1015,7 +1018,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     cgenBlockCode(block_token, new_table);
     
     /* Finish function definition poping Record Activation */
-    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str), (new_table->shift_address + 4));
+    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
     addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     
     /* Delete local symbol table */
