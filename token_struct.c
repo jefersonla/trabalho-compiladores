@@ -536,19 +536,38 @@ int symbolNodeGetSymbolSize(SymbolNode *symbol_node){
  * @return Pointer to a instruction node with the apropriated load instruction.
  */
 InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
+    InstructionNode *_new_instruction_node;
+    
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
         printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
-
-    /* If this node belong to global symbol table */
-    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return newInstructionNode(formatedInstruction(mips_global_define, symbol_node->symbol_name), false);
+    
+    /* Check if this node have a valid root_symbol_table */
+    if(symbol_node->root_symbol_table == NULL){
+        printError("INVALID ROOT SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Select which type of reference ponter this node have */
+    switch(symbol_node->root_symbol_table->register_type){
+        case REGISTER_TYPE_GP:
+            /* Global Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_global_define, symbol_node->symbol_name), false);
+            break;
+        case REGISTER_TYPE_SP:
+        case REGISTER_TYPE_FP:
+            /* Stack Pointer and Frame Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_local_define, symbol_node->symbol_address), false);
+            break;
+        default:
+            printError("UNKNOW REGISTER TYPE!");
+            return false;
     }
 
     /* Return the formated instruction */
-    return newInstructionNode(formatedInstruction(mips_local_define), false);
+    return _new_instruction_node;
 }
 
 /**
@@ -558,19 +577,41 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
  * @return Pointer to a instruction node with the apropriated load instruction.
  */
 InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
+    InstructionNode *_new_instruction_node;
+    
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
         printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
-
-    /* If this node belong toa global symbol table */
-    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return newInstructionNode(formatedInstruction(mips_global_load, symbol_node->symbol_name), false);
+    
+    /* Check if this node have a valid root_symbol_table */
+    if(symbol_node->root_symbol_table == NULL){
+        printError("INVALID ROOT SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Select which type of reference ponter this node have */
+    switch(symbol_node->root_symbol_table->register_type){
+        case REGISTER_TYPE_GP:
+            /* Global Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_global_load, symbol_node->symbol_name), false);
+            break;
+        case REGISTER_TYPE_SP:
+            /* Stack Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_local_load, (symbol_node->symbol_address), 's'), false);
+            break;
+        case REGISTER_TYPE_FP:
+            /* Frame Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_local_load, (symbol_node->symbol_address), 'f'), false);
+            break;
+        default:
+            printError("UNKNOW REGISTER TYPE!");
+            return false;
     }
 
     /* Return the formated instruction */
-    return newInstructionNode(formatedInstruction(mips_local_load, symbol_node->symbol_address), false);
+    return _new_instruction_node;
 }
 
 /** 
@@ -580,19 +621,41 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
  * @return Pointer to a instruction node with the apropriated store instruction.
  */
 InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
+    InstructionNode *_new_instruction_node;
+    
     /* Check if symbol node is not NULL */
     if(symbol_node == NULL){
         printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
     
-    /* If this node belong toa global symbol table */
-    if(symbol_node->root_symbol_table->start_address == GLOBAL_START_ADRESS){
-        return newInstructionNode(formatedInstruction(mips_global_store, symbol_node->symbol_name), false);
+    /* Check if this node have a valid root_symbol_table */
+    if(symbol_node->root_symbol_table == NULL){
+        printError("INVALID ROOT SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Select which type of reference ponter this node have */
+    switch(symbol_node->root_symbol_table->register_type){
+        case REGISTER_TYPE_GP:
+            /* Global Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_global_store, symbol_node->symbol_name), false);
+            break;
+        case REGISTER_TYPE_SP:
+            /* Stack Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_local_store, symbol_node->symbol_address, 's'), false);
+            break;
+        case REGISTER_TYPE_FP:
+            /* Frame Pointer Register Type */
+            _new_instruction_node = newInstructionNode(formatedInstruction(mips_local_store, symbol_node->symbol_address, 'f'), false);
+            break;
+        default:
+            printError("UNKNOW REGISTER TYPE!");
+            return false;
     }
 
     /* Return the formated instruction */
-    return newInstructionNode(formatedInstruction(mips_local_store, symbol_node->symbol_address), false);
+    return _new_instruction_node;
 }
 
 /**
@@ -607,6 +670,9 @@ InstructionNode* symbolNodeGetLoadTypeInstruction(SymbolNode *symbol_node){
         printError("ERROR SYMBOL NODE IS NULL!");
         return NULL;
     }
+    
+    /* Print a todo message */
+    printTodo("TODO GET STORE TYPE!");
     
     /* Return the formated instruction */
     return newInstructionNode(formatedInstruction("# TODO - LOAD TYPE\n"), false);
@@ -625,6 +691,9 @@ InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
         return NULL;
     }
     
+    /* Print a todo message */
+    printTodo("TODO GET STORE TYPE!");
+    
     /* Return the formated instruction */
     return newInstructionNode(formatedInstruction("# TODO - STORE TYPE\n"), false);
 }
@@ -637,7 +706,7 @@ InstructionNode* symbolNodeGetStoreTypeInstruction(SymbolNode *symbol_node){
  * @param previous_scope Previous symbol table, define symbol scope.
  * @return An empty symbol table.
  */
-SymbolTable* newSymbolTable(SymbolTable *previous_scope){
+SymbolTable* newSymbolTable(SymbolTable *previous_scope, int register_type){
     SymbolTable *_new_symbol_table;
     SymbolNode **_items_table;
     
@@ -671,8 +740,10 @@ SymbolTable* newSymbolTable(SymbolTable *previous_scope){
     _new_symbol_table->size = DEFAULT_BLOCK_SIZE;
     _new_symbol_table->length = 0;
     _new_symbol_table->shift_address = 0;
-    _new_symbol_table->previous_scope = previous_scope;
+    _new_symbol_table->brother_table = NULL;
     _new_symbol_table->items = _items_table;
+    _new_symbol_table->register_type = register_type;
+    _new_symbol_table->previous_scope = previous_scope;
     
     /* Return pointer of the new symbol table */
     return _new_symbol_table;
@@ -687,16 +758,13 @@ SymbolTable* newGlobalSymbolTable(){
     SymbolTable *_new_global_symbol_table;
 
     /* Allocate a new symbol table */
-    _new_global_symbol_table = newSymbolTable(NULL);
+    _new_global_symbol_table = newSymbolTable(NULL, REGISTER_TYPE_GP);
     
     /* Give a fatal error if cannot allocate new symbol table */
     if(_new_global_symbol_table == NULL){
         printFatalError("FATAL ERROR CANNOT ALLOCATE NEW GLOBAL SYMBOL TABLE!");
         exit(EXIT_FAILURE);
     }
-    
-    /* Global Symbol Table Start Address */
-    _new_global_symbol_table->start_address = GLOBAL_START_ADRESS;
     
     /* Return pointer of the new symbol table */
     return _new_global_symbol_table;
@@ -737,6 +805,32 @@ bool deleteSymbolTable(ptrSymbolTable *symbol_table){
     
     /* Free symbol_table  */
     secureFree((*symbol_table));
+    
+    /* Return success */
+    return true;
+}
+
+/**
+ * Add a brother symbol table to a given symbol table.
+ * 
+ * @param symbol_table Table of symbols.
+ * @param brother_table Brother table of symbols.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTableAddBrother(SymbolTable *symbol_table, SymbolTable *brother_table){
+    /* Check if symbol table is not null */
+    if(symbol_table == NULL){
+        printError("INVALID TABLE OF SYMBOLS!");
+        return false;
+    }
+    
+    /* Check if brother table is null, and show a warning about a redundant operation */
+    if(brother_table == NULL){
+        printWarning("BROTHER TABLE IS ALREADY NULL, THERE'S NO NECESSITY TO CHANGE THIS AGAIN!");
+    }
+    
+    /* Assign brother_table to symbol table node */
+    symbol_table->brother_table = brother_table;
     
     /* Return success */
     return true;
@@ -795,7 +889,9 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     
     /* Increase address of previous nodes */
     for(i = 0; i < symbol_table->length; i++){
+        //fprintf(stderr, ">>>%s - symbol %d - addr %d\n", symbol_table->items[i]->symbol_name, i, symbol_table->items[i]->symbol_address);
         symbol_table->items[i]->symbol_address += BYTE_VARIABLE_SIZE;
+        //fprintf(stderr, ">>>%s - symbol %d - addr %d\n", symbol_table->items[i]->symbol_name, i, symbol_table->items[i]->symbol_address);
     }
     
     /* Increase shift */
@@ -851,8 +947,14 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
             }
         }
         
-        /* Get the previous symbol table */
-        _actual_symbol_table = _actual_symbol_table->previous_scope; 
+        /* Check if we have got to the top of the table list, and if this occur check if this node have a brother */
+        if(_actual_symbol_table->previous_scope == NULL){
+            _actual_symbol_table = _actual_symbol_table->brother_table;
+        }
+        else{
+            /* Get the previous symbol table */
+            _actual_symbol_table = _actual_symbol_table->previous_scope;
+        }
     }
     
     /* The element is not on symbol table */
@@ -868,6 +970,7 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name){
  */
 SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symbol_name){
     int i;
+    SymbolNode *_symbol_found;
     SymbolTable *_actual_symbol_table;
     
     /* Check if symbol table is not NULL */
@@ -899,8 +1002,20 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
             }
         }
         
+        /* Check if brother table is valid and search recursively */
+        if(_actual_symbol_table->brother_table != NULL){
+            
+            /* Look for the symbol_name on brother table */
+            _symbol_found = symbolTableGetSymbolNodeByName(_actual_symbol_table->brother_table, symbol_name);
+            
+            /* Check if symbol found is not null, and return this pointer */
+            if(_symbol_found != NULL){
+                return _symbol_found;
+            }
+        }
+        
         /* Get the previous symbol table */
-        _actual_symbol_table = _actual_symbol_table->previous_scope; 
+        _actual_symbol_table = _actual_symbol_table->previous_scope;
     }
     
     /* The element is not on symbol table */

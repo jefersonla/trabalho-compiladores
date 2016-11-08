@@ -119,30 +119,45 @@ print(1 ~= 1)           -- 0
 -- Separator
 print(1234567890)
 
--- teste while --
---[[
+-- Test functions OK
 function why()
   while(0) do
     print(3)
   end
   print(11)
+  z = 4
+  while(z ~= 10) do
+      print(2 + z)
+      z = z + 1
+  end
 end
 
 why()
-]]
 
+
+-- Separator
+print(1234567890)
+
+-- Test of while, with some assigns 
 while(0) do -- should don't enter here
     print(3)
 end
 
 x = 4
 
-while(x ~= 0) do -- should don't stop
-    print(4)
+while(x ~= 0) do -- OK!
     x = x - 1
+    print(45)
 end
 
---[[
-    -- Separator
-    -- print(1234567890)
-]]
+-- Separator
+print(1111111111)
+
+-- Test of functions with parameters OK
+function kk(xxx, yyy)
+    print(xxx + yyy)
+end
+
+xxx = 150
+
+kk(100, 200)

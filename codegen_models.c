@@ -38,7 +38,7 @@ const char mips_main[] =
     "# -- System Main Definition -- #\n"
     "main:\n"
         "\n"
-        "\tjal main_user      # Jumpt to main user function\n"
+        "\tjal main_user      # Jump to main user function\n"
         "\n"
     "# Close Main Declaration\n"
     "end_main:\n"
@@ -172,13 +172,13 @@ const char mips_global_load[] =
 /* Store a local variable */    
 const char mips_local_store[] =
     "\t# --------- Store $a0 in local variable --------- #\n"
-    "\tsw $a0, %d($sp)\n"
+    "\tsw $a0, %d($%cp)\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load a local variable into $a0 */
 const char mips_local_load[] =
     "\t# --------- Load local variable in $a0 ---------- #\n"
-    "\tlw $a0, %d($sp)\n"
+    "\tlw $a0, %d($%cp)\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Push temporary return of a expression */
@@ -192,6 +192,12 @@ const char mips_push_a0[] =
 const char mips_pop[] =
     "\t# ------------------- Pop stack ----------------- #\n"
     "\taddiu $sp, $sp, " TO_STRING(BYTE_VARIABLE_SIZE) "\n"
+    "\t# ----------------------------------------------- #\n";
+
+/* Pop stack params */
+const char mips_pop_params[] =
+    "\t# ---------------- Pop Params Stack ------------- #\n"
+    "\taddiu $sp, $sp, %d\n"
     "\t# ----------------------------------------------- #\n";
 
 /* Load top value to $t1 */
@@ -567,13 +573,17 @@ const char mips_start_function_def2[] =
         "\tsw $ra, 4($sp)\n"
         "\tsw $fp, 8($sp)\n";
 
+/* -- BLOCK -- */
+
 /* End of function definition */
 const char mips_end_function_def[] =
     "end_function_%s:\n"
-        "\tlw $ra, 4($fp)\n"
+        "\tlw $ra, 4($sp)\n"
         "\tlw $fp, 8($sp)\n"
-        "\taddiu $sp, $sp, -8\n";
-        
+        "\taddiu $sp, $sp, 8\n";
+
+/* -- POP PARAMETERS -- */
+
 /* End of function definition part 2 */
 const char mips_end_function_def2[] = 
         "\tjr $ra\n"

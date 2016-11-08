@@ -114,17 +114,14 @@ bool cgenAllCode(TokenNode *root_token){
     }
     
     /* Initialize Global Symbol Table */
-    global_symbol_table = newSymbolTable(NULL);
+    global_symbol_table = newGlobalSymbolTable();
     
     /* Check if the global symbol was correct initialized */
     if(global_symbol_table == NULL){
         printError("CANNOT CREATE GLOBAL SYMBOL TABLE.");
         return false;
     }
-    
-    /* Configure symbol table as global */
-    global_symbol_table->start_address = GLOBAL_START_ADRESS;
-    
+
     /* Block token node */
     TokenNode *block_token = listGetTokenByIndex(root_token->child_list, 1);
     
@@ -496,7 +493,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     }
     
     /* Create a new symbol table */
-    new_symbol_table = newSymbolTable(previous_symbol_table);
+    new_symbol_table = newSymbolTable(previous_symbol_table, REGISTER_TYPE_SP);
     
     /* Check the new symbol table */
     if(new_symbol_table == NULL){
@@ -603,7 +600,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueue(mips_for_ini);
     
     /* Initialize a new symbol table */
-    new_symbol_table = newSymbolTable(actual_symbol_table);
+    new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
     
     /* Check if new symbol table hasn't failed */
     if(new_symbol_table == NULL){
@@ -777,7 +774,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueueFormated(mips_check_if, cond_if_counter, 0);
     
     /* Create a new escope */
-    new_symbol_table = newSymbolTable(actual_symbol_table);
+    new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
     
     /* Check if the new symbol table is correct */
     if(new_symbol_table == NULL){
@@ -864,7 +861,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             addInstructionMainQueueFormated(mips_check_if, cond_if_counter, i);
             
             /* Create a new escope */
-            new_symbol_table = newSymbolTable(actual_symbol_table);
+            new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
             
             /* Check if the new symbol table is correct */
             if(new_symbol_table == NULL){
@@ -896,7 +893,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         }
         
         /* Create a new escope */
-        new_symbol_table = newSymbolTable(actual_symbol_table);
+        new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
         
         /* Check if the new symbol table is correct */
         if(new_symbol_table == NULL){
@@ -934,10 +931,11 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
 bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
     int i;
     SymbolTable *new_table;
+    SymbolTable *new_params_table;
     TokenNode *t_name;
-    TokenNode *parameters_list_token;
-    TokenNode *parameter_token;
     TokenNode *block_token;
+    TokenNode *parameter_token;
+    TokenNode *parameters_list_token;
      
     /* Check if function def is null */
     if(function_def_token == NULL){
@@ -946,13 +944,25 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     }
     
     /* New scope symbol_table */
-    new_table = newSymbolTable(NULL);
+    new_table = newSymbolTable(NULL, REGISTER_TYPE_SP);
     
     /* Check if the new table is null */
     if(new_table == NULL){
         printError("NEW SYMBOL TABLE IS NULL!");
         return false;
     }
+    
+    /* New parameters list symbol table */
+    new_params_table = newSymbolTable(NULL, REGISTER_TYPE_FP);
+    
+    /* Check if the new table is not null */
+    if(new_params_table == NULL){
+        printError("PARAMETERS SYMBOL TABLE IS NULL!");
+        return false;
+    }
+    
+    /* Link new_table with the parameters list table */
+    symbolTableAddBrother(new_table, new_params_table);
     
     /* Get Token name */
     t_name = listGetTokenByIndex(function_def_token->child_list, 2); 
@@ -977,19 +987,22 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         if(parameters_list_token->token_type == TI_LISTADENOMES){
             
             /* If we have a list of names we need to start from the last one to the first */
-            for(i = parameters_list_token->child_list->length; i > 0; i++){
+            for(i = parameters_list_token->child_list->length; i > 0; i--){
                 
                 /* Get the token */
                 parameter_token = listGetTokenByIndex(parameters_list_token->child_list, i);
                 
-                /* Add this token as a symbol in the symbol table */
-                symbolTableAddSymbol(new_table, parameter_token->lex_str, NUMBER_TYPE);
+                /* Check if this parameter is a t_name */
+                if(parameter_token->token_type == T_NAME){
+                    /* Add this token as a symbol in the symbol table */
+                    symbolTableAddSymbol(new_params_table, parameter_token->lex_str, NUMBER_TYPE);
+                }
             }
         }
         else{
             /* If we have only one name we just add this name to the new table */
             parameter_token = parameters_list_token;
-            symbolTableAddSymbol(new_table, parameter_token->lex_str, NUMBER_TYPE);
+            symbolTableAddSymbol(new_params_table, parameter_token->lex_str, NUMBER_TYPE);
         }
         
         /* Get the block token */
@@ -1019,10 +1032,16 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     
     /* Finish function definition poping Record Activation */
     addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
+    
+    /* Pop parameters on stack */
+    addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
+    
+    /* Add final part */
     addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     
-    /* Delete local symbol table */
+    /* Delete local symbol table and parameters symbol table */
     deleteSymbolTable(&new_table);
+    deleteSymbolTable(&new_params_table);
     
     /* Return success */
     return true;
@@ -1143,7 +1162,7 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
     }
     
     /* Actual Symbol Table */
-    actual_symbol_table = newSymbolTable(previous_scope);
+    actual_symbol_table = newSymbolTable(previous_scope, REGISTER_TYPE_SP);
     
     /* Command list token */
     command_list_token = listGetTokenByIndex(block_token->child_list, 1);
@@ -1481,14 +1500,23 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
                     symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_terminal->lex_str);
                 }
                 
-                /* If this symbol is not on global symbol table, so it's nil */
+                /* If this symbol is not on global symbol table, so it's nil, and will be declared on global table */
                 if(symbol_node == NULL){
-                    addInstructionMainQueue(mips_nil);
+                    /* Add Symbol to table */
+                    symbolTableAddSymbol(global_symbol_table, token_terminal->lex_str, NUMBER_TYPE);
+                    
+                    /* Get the recent added symbol and assign nil to this variable */
+                    symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_terminal->lex_str);
+                    
+                    /* Check if new symbol node is valid */
+                    if(symbol_node == NULL){
+                        printError("CANNOT CREATE NEW SYMBOL NODE ON GLOBAL SYMBOL TABLE!");
+                        return false;
+                    }
                 }
-                else{
-                    /* Store the correct load instruction */
-                    instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetLoadInstruction(symbol_node));
-                }
+                
+                /* Store the correct load instruction */
+                instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetLoadInstruction(symbol_node));
                 break;
             case TI_CALL_FUNCTION:
             case TI_CALL_FUNCTION_PAR:

@@ -175,6 +175,12 @@ typedef struct strSymbolTable{
     /* Previous Scope */
     SymbolTable *previous_scope;
     
+    /* Brother Symbol Table */
+    SymbolTable *brother_table;
+    
+    /* Register type */
+    int register_type;
+    
     /* Items present on the table */
     SymbolNode **items;
 } SymbolTable, *ptrSymbolTable;
@@ -185,7 +191,7 @@ typedef struct strSymbolTable{
 SymbolTable* newGlobalSymbolTable();
 
 /* Create a new SymbolTable */
-SymbolTable* newSymbolTable(SymbolTable *symbol_table);
+SymbolTable* newSymbolTable(SymbolTable *symbol_table, int register_type);
 
 /* Free a symbol table */
 bool deleteSymbolTable(ptrSymbolTable *symbol_table);
@@ -200,6 +206,9 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name);
 /* Get symbol node by name */
 SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table, 
                                             char *symbol_name);
+
+/* Add a brother table */
+bool symbolTableAddBrother(SymbolTable *symbol_table, SymbolTable *brother_table);
 
 /* ------------------------------------------------ */
 /*            Instruction Node Structure            */
@@ -277,7 +286,7 @@ bool instructionQueueFilePrint(FILE *_output_file, InstructionQueue *instruction
 #define NEWLINE_CHAR                "\n"
 
 /* Tab char */
-#define TAB_CHAR                    "\n"
+#define TAB_CHAR                    "\t"
 
 /* Empty String */
 #define EMPTY_STRING                ""

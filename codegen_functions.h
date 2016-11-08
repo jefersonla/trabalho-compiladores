@@ -9,8 +9,16 @@
 /*                     Code Generator Constants                  */
 /* ------------------------------------------------------------- */
 
-/* Global Start Address */
-#define GLOBAL_START_ADRESS                         -1
+/* Register Types */
+
+/* Register Type GP (Global Pointer) */
+#define REGISTER_TYPE_GP                            1
+
+/* Register Type SP (Stack Pointer) */
+#define REGISTER_TYPE_SP                            2
+
+/* Register Type FP (Frame Pointer) */              
+#define REGISTER_TYPE_FP                            3
 
 /* Function Prefix */
 #define FUNCTION_PREFIX                             "function_"
@@ -29,10 +37,13 @@
 #define NUMBER_TYPE                                 1
 
 /* Standard way to add itens to main queue */
-#define addInstructionMainQueue(VAR)                instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR), false)
+#define addInstructionMainQueue(VAR)                instructionQueueEnqueueInstruction( main_instruction_queue, \
+                                                                                        formatedInstruction(VAR), false)
 
 /* New array of instructions with variadic parameters */
-#define addInstructionMainQueueFormated(VAR, ...)   instructionQueueEnqueueInstruction(main_instruction_queue, formatedInstruction(VAR, ##__VA_ARGS__), false)
+#define addInstructionMainQueueFormated(VAR, ...)   instructionQueueEnqueueInstruction( main_instruction_queue, \
+                                                                                        formatedInstruction(VAR, ##__VA_ARGS__), \
+                                                                                        false)
 
 /* ------------------------------------------------------------- */
 /*                         Global Structures                     */
@@ -138,6 +149,9 @@ extern const char mips_push_a0[];
     
 /* Pop stack value */
 extern const char mips_pop[];
+
+/* Pop stack params */
+extern const char mips_pop_params[];
 
 /* Load top value to $t1 */
 extern const char mips_top_t1[];
