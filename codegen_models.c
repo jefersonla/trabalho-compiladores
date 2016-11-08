@@ -58,6 +58,9 @@ const char mips_main[] =
 /* Close main */
 const char mips_footer[] =
         "\n"
+    "# Close main user function\n"
+    "end_main_function:\n"
+        "\n"
         "\tlw $ra, 4($sp)\n"
         "\tlw $fp, 8($sp)\n"
         "\taddiu $sp, $sp, 8\n"

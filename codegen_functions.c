@@ -1123,7 +1123,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
             cgenLocalVariable(command_token, actual_symbol_table);
             break;
         default:
-            printWarning("NOT IMPLEMENTED YET, TODO!");
+            printWarning("NOT IMPLEMENTED YET!");
             return false;
     }
     

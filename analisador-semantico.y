@@ -377,7 +377,7 @@ comando         : T_SEMICOL                             {
                                                         }
                 | T_WHILE exp T_DO bloco T_END          {
                                                             /* Allocate Token and append childs */
-                                                            allocateTokenAndChilds(&$$, TI_WHILE, 4, $1, $2, $3, $4);
+                                                            allocateTokenAndChilds(&$$, TI_WHILE, 5, $1, $2, $3, $4, $5);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText(  $$, 5,
