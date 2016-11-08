@@ -175,7 +175,7 @@ check-final:
 				param3="exec-"a[2] ; \
 				param4="code-"a[2] ; \
 				command="./$(EXECUTABLE) tests/input/"$$1" tests/testing/"param2" > /dev/null 2>&1 && "\
-						"./test.sh spim tests/testing/"param2" tests/testing/"param3" tests/executed/"param4; \
+						"./test.sh simulate.sh tests/testing/"param2" tests/testing/"param3" tests/executed/"param4; \
 				system(command); \
 			} \
 		}'
