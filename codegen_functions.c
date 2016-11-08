@@ -157,11 +157,14 @@ bool cgenAllCode(TokenNode *root_token){
 /** 
  * Generate code for function call.
  * 
- * @param _token
+ * @param call_function_token Call function token.
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol_table){
+    TokenNode *exp_list;
+    TokenNode *token_name;
+    
     /* Check if command list token is null */
     if(call_function_token == NULL){
         printError("COMMAND LIST IS INVALID!");
@@ -174,16 +177,36 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
         return false;
     }
     
+    /* Get function name */
+    token_name = listGetTokenByIndex(call_function_token->child_list, 1);
+    
+    /* Check if token_name is valid */
+    if(token_name == NULL){
+        printError("INVALID TOKEN NAME!");
+        return false;
+    }
+    
     /* Add the header of the function call  */
     addInstructionMainQueue(mips_start_function_call);
     
     /* Check what is the type of the function call */
     if(call_function_token->token_type == TI_CALL_FUNCTION_PAR){
-        cgenExpressionList(listGetTokenByIndex(call_function_token->child_list, 3), actual_symbol_table);
+        
+        /* Get the list of expressions */
+        exp_list = listGetTokenByIndex(call_function_token->child_list, 3);
+        
+        /* Check if expression list is valid */
+        if(exp_list == NULL){
+            printError("CANNOT GET LIST OF EXPRESSIONS!");
+            return false;
+        }
+        
+        /* Execute expression list and assign number of params processed */
+        cgenExpressionList(exp_list, actual_symbol_table);
     }
 
     /* Add the end of the function call */
-    addInstructionMainQueueFormated(mips_end_function_call, listGetTokenByIndex(call_function_token->child_list, 1)->lex_str);
+    addInstructionMainQueueFormated(mips_end_function_call, token_name->lex_str);
     
     /* Return success */
     return true;
@@ -1183,15 +1206,16 @@ bool cgenCommandList(TokenNode *command_list_token, SymbolTable *actual_symbol_t
  * 
  * @param list_exp_token Receive a list of expressions token.
  * @param actual_symbol_table Actual table symbol escope.
- * @return true if there's no error on execution and false otherwise.
+ * @return Number of expressions processed.
  */
-bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
+int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
     int i;
+    int processed_exp;
     TokenNode *token_node;
     
     if(list_exp_token->token_type == TI_LISTAEXP){
         /* Execute from right to left child list that is non T_COMMA */
-        for(i = list_exp_token->child_list->length; i > 0; i--) {
+        for(i = list_exp_token->child_list->length, processed_exp = 0; i > 0; i--) {
             /* Get the token i */
             token_node = listGetTokenByIndex(list_exp_token->child_list, i);
             
@@ -1205,6 +1229,9 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
             if(token_node->token_type == T_COMMA){
                 continue;
             }
+            
+            /* If we get there we have an expression, so increment counter of expressions */
+            processed_exp += 1;
             
             /* CGEN(exp) */
             cgenExpression(token_node, symbol_table);
@@ -1220,7 +1247,7 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         /* Check if this token is null */
         if(token_node == NULL){
             printError("INVALID TOKEN NODE!");
-            return false;
+            return -1;
         }
 
         /* CGEN(exp) */
@@ -1228,10 +1255,13 @@ bool cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         
         /* push a0 */
         addInstructionMainQueue(mips_push_a0);
+        
+        /* Processed only one exp */
+        processed_exp = 1;
     }
     
     /* Return success */
-    return true;
+    return processed_exp;
 }
 
 /**

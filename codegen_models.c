@@ -33,19 +33,37 @@ const char mips_main[] =
     ".globl main\n"
     ".text\n"
     "\n"
-    "# -- Main Definition -- #\n"
+    "# !!! System main is created by compiler and should not be edited !!! #\n"
+    "\n"
+    "# -- System Main Definition -- #\n"
     "main:\n"
-    "\n";
+        "\n"
+        "\tjal main_user      # Jumpt to main user function\n"
+        "\n"
+    "# Close Main Declaration\n"
+    "end_main:\n"
+        "\tli $v0, " SYSCALL_EXIT_PROG "\n"
+        "\tsyscall\n"
+    "\n"
+    "# -- Begin of Main User -- \n"
+    "main_user:\n"
+        "\tmove $fp, $sp\n"
+        "\taddiu $sp, $sp, -8\n"
+        "\tsw $ra, 4($sp)\n"
+        "\tsw $fp, 8($sp)\n"
+        "\n";
     
 /* -- ALL INSTRUCTIONS -- "%s" */
 
 /* Close main */
 const char mips_footer[] =
-    "\n"
-    "# Close Main Declaration\n"
-    "end_main:\n"
-        "\tli $v0, " SYSCALL_EXIT_PROG "\n"
-        "\tsyscall\n"
+        "\n"
+        "\tlw $ra, 4($sp)\n"
+        "\tlw $fp, 8($sp)\n"
+        "\taddiu $sp, $sp, 8\n"
+        "\tjr $ra\n"
+        "\n"
+    "# -- End of Main User -- #\n"
     "\n"
     "# -- End of Main -- #\n"
     "\n"
@@ -53,9 +71,11 @@ const char mips_footer[] =
     "\n"
     "# -- Check if variable is nil -- #\n"
     "function_check_nil:\n"
+        "\t# Load Function Frame Pointer and Return Adress\n"
         "\tmove $fp, $sp\n"
-        "\tsw $ra, 0($sp)\n"
-        "\taddiu $sp, $sp, -4\n"
+        "\taddiu $sp, $sp, -8\n"
+        "\tsw $ra, 4($sp)\n"
+        "\tsw $fp, 8($sp)\n"
         "\n"
         "\t# Load First Parameter\n"
         "\tlw $a0, 4($fp)\n"
@@ -72,9 +92,9 @@ const char mips_footer[] =
         "\tli $a0, 0\n"
         "\n"
     "end_check_nil:\n"
-        "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 4\n"
-        "\tlw $fp, 4($sp)\n"
+        "\tlw $ra, 4($sp)\n"
+        "\tlw $fp, 8($sp)\n"
+        "\taddiu $sp, $sp, 12\n"
         "\tjr $ra\n"
     "# -- End Check Nil -- #\n"
     "\n"
@@ -82,8 +102,9 @@ const char mips_footer[] =
     "function_print:\n"
         "\t# Load Function Frame Pointer and Return Adress\n"
         "\tmove $fp, $sp\n"
-        "\tsw $ra, 0($sp)\n"
-        "\taddiu $sp, $sp, -4\n"
+        "\taddiu $sp, $sp, -8\n"
+        "\tsw $ra, 4($sp)\n"
+        "\tsw $fp, 8($sp)\n"
         "\n"
         "\t# Load First Parameter\n"
         "\tlw $a0, 4($fp)\n"
@@ -112,9 +133,9 @@ const char mips_footer[] =
         "\tsyscall\n"
         "\n"
         "\t# Close Print Function \n"
-        "\tlw $ra, 0($fp)\n"
-        "\taddiu $sp, $sp, 4\n"
-        "\tlw $fp, 4($sp)\n"
+        "\tlw $ra, 4($sp)\n"
+        "\tlw $fp, 8($sp)\n"
+        "\taddiu $sp, $sp, 12\n"
         "\tjr $ra\n"
     "# -- End Print Function -- #\n"
     "\n"
@@ -163,7 +184,7 @@ const char mips_local_load[] =
 /* Push temporary return of a expression */
 const char mips_push_a0[] =
     "\t# -------------- Push $a0 to stack -------------- #\n"
-    "\tsw $a0, 0($sp)\n"
+    "\tsw $a0, 4($sp)\n"
     "\taddiu $sp, $sp, -" TO_STRING(BYTE_VARIABLE_SIZE) "\n"
     "\t# ----------------------------------------------- #\n";
     
@@ -519,13 +540,13 @@ const char mips_end_for[]=
  *      CGEN(function f(x1, ..., xn) bloco [retorno]* end)
  *          function_name:
  *          move $fp, $sp
- *          sw $ra, 0($sp)
+ *          sw $ra, 4($sp)
  *          addiu $sp, $sp, -4
  *          CGEN(bloco)
  *          end_function_name:
  *          lw $ra, 4($sp)
  *          addiu $sp, $sp, z
- *          lw $fp, 0($sp)
+ *          lw $fp, 4($sp)
  *          jr $ra
  * 
  */
@@ -540,17 +561,19 @@ const char mips_start_function_def[] =
 /* Start of function definition part 2 */
 const char mips_start_function_def2[] =
     "function_%s:\n"
-    "\tmove $fp, $sp\n"
-    "\tsw $ra, 0($sp)\n"
-    "\taddiu $sp, $sp, -4\n";
+        "\t# Load Function Frame Pointer and Return Adress\n"
+        "\taddiu $sp, $sp, -8\n"
+        "\tsw $ra, 4($sp)\n"
+        "\tsw $fp, 4($sp)\n"
+        "\tmove $fp, $sp\n";
 
 /* End of function definition */
 const char mips_end_function_def[] =
     "end_function_%s:\n"
-    "\tlw $ra, 0($fp)\n"
-    "\taddiu $sp, $sp, %d\n"
-    "\tlw $fp, 0($sp)\n"
-    "\tjr $ra\n";
+        "\tlw $ra, 0($fp)\n"
+        "\taddiu $sp, $sp, %d\n"
+        "\tlw $fp, 4($sp)\n"
+        "\tjr $ra\n";
 
 /* End of function definition part 2 */
 const char mips_end_function_def2[] = 
@@ -576,13 +599,14 @@ const char mips_end_function_def2[] =
 /* Start of a function call */
 const char mips_start_function_call[] =
     "\t# v--------------- Call Function ---------------v #\n"
-    "\tsw $fp, 0($sp)\n"
-    "\taddiu $sp, $sp, -4\n";
+    "\taddiu $sp, $sp, -4 # Push $fp\n"
+    "\tsw $fp, 4($sp)\n";
     
 /* End of a function call */
 const char mips_end_function_call[] =
     "\tjal function_%s\n"
-    "\taddiu $sp, $sp, 4\n"
+    "\tlw $fp, 4($sp)     # Load old $fp\n"
+    "\taddiu $sp, $sp, 4  # Pop $fp\n"
     "\t# ^----------- End of Call Function ------------^ #\n";
 
 /* ------------------------------------------------------------- */
@@ -616,10 +640,12 @@ const char mips_nil[] =
 /* Check if a given variable is nil */
 const char mips_check_a0_nil[] =
     "\t# ----------- Check if variable is nil ---------- #\n"
-    "\tsw $a0, 0($sp)\n"
-	"\taddiu $sp, $sp, -4\n"
+    "\taddiu $sp, $sp, -8 # Push $fp\n"
+    "\tsw $fp, 8($sp)\n"
+    "\tsw $a0, 4($sp)\n"
 	"\tjal function_check_nil\n"
-	"\taddiu $sp, $sp, 4\n"
+    "\tlw $fp, 4($sp)     # Load old $fp\n"
+    "\taddiu $sp, $sp, 4  # Pop $fp\n"
 	"\t# ----------------------------------------------- #\n";
  
 /* ------------------------------------------------------------- */
