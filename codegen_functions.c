@@ -537,6 +537,9 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     /* Increment while loop counter */
     loop_while_counter += 1;
     
+    /* Pop actual scope */
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    
     /* Delete Scope */
     deleteSymbolTable(&new_symbol_table);
     
@@ -627,7 +630,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node));
     
     /* Execute token assign */
-    cgenExpression(token_assign, actual_symbol_table);
+    cgenExpression(token_assign, new_symbol_table);
     
     /* Assign the local iterator variable */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
@@ -703,6 +706,12 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Add the footer of the for instruction */
     addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
+    
+    /* Pop actual scope */
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    
+    /* Delte actual scope */
+    deleteSymbolTable(&new_symbol_table);
     
     /* Increment for counter */
     loop_for_counter += 1;

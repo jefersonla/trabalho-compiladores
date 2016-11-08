@@ -202,6 +202,12 @@ const char mips_pop_params[] =
     "\t# ---------------- Pop Params Stack ------------- #\n"
     "\taddiu $sp, $sp, %d\n"
     "\t# ----------------------------------------------- #\n";
+    
+/* Pop local variables on stack */
+const char mips_pop_local[] =
+    "\t# ---------- Pop Params Local Variables --------- #\n"
+    "\taddiu $sp, $sp, %d\n"
+    "\t# ----------------------------------------------- #\n";
 
 /* Load top value to $t1 */
 const char mips_top_t1[] =

@@ -153,6 +153,9 @@ extern const char mips_pop[];
 /* Pop stack params */
 extern const char mips_pop_params[];
 
+/* Pop local variables on stack */
+extern const char mips_pop_local[];
+
 /* Load top value to $t1 */
 extern const char mips_top_t1[];
 

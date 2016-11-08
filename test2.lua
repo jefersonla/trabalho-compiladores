@@ -161,3 +161,9 @@ end
 xxx = 150
 
 kk(100, 200)
+
+
+-- Test of for structure
+for i = 1, 10 do
+    print(i)
+end
