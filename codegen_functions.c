@@ -117,12 +117,15 @@ bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
         /* pop */
         addInstructionMainQueue(mips_pop);
         
+        /* Pop address on symbol table too. This assume that the symbol table has a lot of blank space */
+        symbolTablePopVar(actual_symbol_table);
+        
         /* Restore correct symbol address after pop value stacked */
-        if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
-            
-            /* Update address temporarily, because stack contains a lot of new values */
-            symbol_node->symbol_address -= ((list_names->length - i + 1) * 4);
-        }
+        //if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
+        //    
+        //    /* Update address temporarily, because stack contains a lot of new values */
+        //    symbol_node->symbol_address -= ((list_names->length - i + 1) * 4);
+        //}
     }
     
     /* Return success */
@@ -170,6 +173,8 @@ bool copyGlobalVariables(){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAllCode(TokenNode *root_token){
+    SymbolTable *main_symbol_table;
+    
     /* Initialize global operation counters */
     sc_or_counter = 0;
     sc_and_counter = 0;
@@ -213,6 +218,15 @@ bool cgenAllCode(TokenNode *root_token){
         return false;
     }
     
+    /* Create the main symbol table */
+    main_symbol_table = newSymbolTable(NULL, REGISTER_TYPE_SP);
+    
+    /* Check if the main symbol table is working */
+    if(main_symbol_table == NULL){
+        printFatalError("INVALID MAIN SYMBOL TABLE! STOPPING NOW!");
+        exit(EXIT_FAILURE);
+    }
+    
     /* Add header on header instruction queue */
     instructionQueueEnqueueInstruction(header_instruction_queue, formatedInstruction(mips_header), false);
     
@@ -220,8 +234,14 @@ bool cgenAllCode(TokenNode *root_token){
     addInstructionMainQueue(mips_main);
     
     /* Generate code for main application */
-    cgenBlockCode(block_token, NULL);
-    
+    cgenBlockCode(block_token, main_symbol_table);
+
+    /* Pop Main Symbol table */
+    addInstructionMainQueueFormated(mips_pop_local, (main_symbol_table->shift_address));
+
+    /* Delete main symbol table */
+    deleteSymbolTable(&main_symbol_table);
+
     /* Copy variable definitions to main-instruction_queue */
     copyGlobalVariables();
     
@@ -508,14 +528,14 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     /* CGEN(bloco) */
     cgenBlockCode(block_token, new_symbol_table);
     
+    /* Pop actual scope */
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    
     /* Add while end */
     addInstructionMainQueueFormated(mips_end_while, loop_while_counter, loop_while_counter);
     
     /* Increment while loop counter */
     loop_while_counter += 1;
-    
-    /* Pop actual scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
     
     /* Delete Scope */
     deleteSymbolTable(&new_symbol_table);
@@ -539,6 +559,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     TokenNode *token_increment;
     SymbolNode *symbol_node;
     SymbolTable *new_symbol_table;
+    SymbolTable *new_symbol_table_iterator;
     
     /* Check if for token is null */
     if(for_token == NULL){
@@ -582,8 +603,17 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Header of the for operation */
     addInstructionMainQueue(mips_for_ini);
     
+    /* Initialize a new symbol table just for iterator */
+    new_symbol_table_iterator = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
+    
+    /* Check if new symbol table hasn't failed */
+    if(new_symbol_table_iterator == NULL){
+        printError("CANNOT CREATE A NEW SYMBOL TABLE!");
+        return false;
+    }
+    
     /* Initialize a new symbol table */
-    new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
+    new_symbol_table = newSymbolTable(new_symbol_table_iterator, REGISTER_TYPE_SP);
     
     /* Check if new symbol table hasn't failed */
     if(new_symbol_table == NULL){
@@ -592,10 +622,10 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     }
     
     /* Add our token name to the new symbol table */
-    symbolTableAddSymbol(new_symbol_table, token_name->lex_str, NUMBER_TYPE);
+    symbolTableAddSymbol(new_symbol_table_iterator, token_name->lex_str, NUMBER_TYPE);
 
     /* Get the symbol node */
-    symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table, token_name->lex_str);
+    symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table_iterator, token_name->lex_str);
     
     /* Check if symbol node is valid */
     if(symbol_node == NULL){
@@ -607,7 +637,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node));
     
     /* Execute token assign */
-    cgenExpression(token_assign, new_symbol_table);
+    cgenExpression(token_assign, new_symbol_table_iterator);
     
     /* Assign the local iterator variable */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
@@ -681,11 +711,14 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     instructionQueueEnqueueInstructionNode( main_instruction_queue,
                                             symbolNodeGetStoreInstruction(symbol_node));
     
+    /* Pop local scope */
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    
     /* Add the footer of the for instruction */
     addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
     
     /* Pop actual scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
     
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
@@ -773,9 +806,9 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     
     /* CGEN(bloco) */
     cgenBlockCode(block_token, new_symbol_table);
-    
-    /* Delete the temporary escope */
-    deleteSymbolTable(&new_symbol_table);
+     
+    /* Pop local scope */
+    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
     
     /* Add check for next if condition {else if / else} */
     addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, 0);
@@ -861,6 +894,9 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             /* CGEN(bloco) */
             cgenBlockCode(block_token, new_symbol_table);
             
+            /* Pop local scope */
+            addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+            
             /* Delete the temporary escope */
             deleteSymbolTable(&new_symbol_table);
             
@@ -895,6 +931,9 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         
         /* CGEN(bloco) */
         cgenBlockCode(block_token, new_symbol_table);
+        
+        /* Pop local scope */
+        addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
         
         /* Delete the temporary escope */
         deleteSymbolTable(&new_symbol_table);
@@ -1018,6 +1057,9 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     
     /* Generate code for block */
     cgenBlockCode(block_token, new_table);
+    
+    /* Pop local variables on stack */
+    addInstructionMainQueueFormated(mips_pop_params, (new_table->shift_address));
     
     /* Finish function definition poping Record Activation */
     addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
@@ -1340,9 +1382,88 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for return of commands 
-    printTodo("'cgenCommandReturn' - NOT IMPLEMENTED YET!");
-    return false;
+    int num_exp;
+    int return_shift;
+    TokenNode *list_exp_token;
+    
+    /* Check if token return command is valid */
+    if(command_return_token == NULL){
+        printError("INVALID COMMAND RETURN TOKEN!");
+        return false;
+    }
+    
+    /* Check if actual symbol table is valid */
+    if(actual_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* 
+        The result of a given command is always, a jump to the $ra, but before we do that we
+        need to stack the return, and this is really hard to do, at least for me.
+        The idea that is implemented here is the following, first we perform a shift of all stack
+        from the last $fp to the first variable, and to perform this, first I found what is the size
+        of the shift necessary for us to return the values, after found this size and perform the
+        shift we execute the list of parameters, assuming that the old $fp is on the top of the stack
+        and the first return is always on $a0, and if there are others, they are on stack, we can
+        continue the code.
+        Example:
+        
+            Initial stack:
+            
+                4+  $$local_variables$$
+                12  $ra
+                16  $fp
+                20+ $$function_parameters$$
+                28  $old_fp
+                
+            Executing return exp_list:
+            
+                4+  $$local_variables$$
+                12  $ra
+                16  $fp
+                20+ $$function_parameters$$
+                28  $old_fp
+                32+ $$return$$
+                
+            Final stack:
+                
+                4   $old_fp
+                8+  $$return$$
+                
+        PS.:    For the examples above I had assumed that $$return$$, $$local_variables$$ and $$function_parameters$$
+                has at least 2 blocks of code, on in other words, I assume that these variables, represent two 
+                other variables.
+        
+    */
+    if(command_return_token->token_type == TI_RETURN){
+        /* Empty return */
+        num_exp = 0;
+        
+        /* Assign a null value to our list_exp_token */
+        list_exp_token = NULL;
+    } 
+    else{
+        /* Get list of expressions */
+        list_exp_token = listGetTokenByIndex(command_return_token->child_list, 2);
+        
+        /* Check the integrity of this pointer */
+        if(list_exp_token == NULL){
+            printError("FAILED TO RETRIEVE LIST EXP TOKEN!");
+            return false;
+        }
+        
+        /* List of exp returned */
+        num_exp = (list_exp_token->child_list->length / 2) + 1;
+    }
+    
+    /* Calculate the necessary shift */
+    return_shift = num_exp * 4;
+    
+    /* Perform shift if it's need */
+    
+    /* Return success */
+    return true;
 }
 
 /**
@@ -1364,13 +1485,13 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
     }
     
     /* Actual Symbol Table */
-    actual_symbol_table = newSymbolTable(previous_scope, REGISTER_TYPE_SP);
+    //actual_symbol_table = newSymbolTable(previous_scope, REGISTER_TYPE_SP);
     
     /* Command list token */
     command_list_token = listGetTokenByIndex(block_token->child_list, 1);
     
     /* Generate command list code */
-    cgenCommandList(command_list_token, actual_symbol_table);
+    cgenCommandList(command_list_token, previous_scope);
     
     /* Check if there are a return command */
     if(block_token->child_list->length > 1){
@@ -1379,11 +1500,14 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
         command_return_token = listGetTokenByIndex(block_token->child_list, 2);
         
         /* Generate command return code */
-        cgenCommandReturn(command_return_token, actual_symbol_table);
+        cgenCommandReturn(command_return_token, previous_scope);
     }
     
+    /* Pop this actual symbol table */
+    //addInstructionMainQueueFormated(mips_pop_local, actual_symbol_table->shift_address);
+    
     /* Delete local symbol table */
-    deleteSymbolTable(&actual_symbol_table);
+    //deleteSymbolTable(&actual_symbol_table);
     
     /* Return success */
     return true;
@@ -1439,8 +1563,10 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
     
     /* Check if we have a list of expressions or just an expression */
     if(list_exp_token->token_type == TI_LISTAEXP){
+
         /* Execute from right to left child list that is non T_COMMA */
         for(i = list_exp_token->child_list->length, processed_exp = 0; i > 0; i--) {
+            
             /* Get the token i */
             token_node = listGetTokenByIndex(list_exp_token->child_list, i);
             
@@ -1455,14 +1581,17 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
                 continue;
             }
             
-            /* If we get there we have an expression, so increment counter of expressions */
-            processed_exp += 1;
-            
             /* CGEN(exp) */
             cgenExpression(token_node, symbol_table);
             
             /* push a0 */
             addInstructionMainQueue(mips_push_a0);
+            
+            /* Increase symbol table */
+            symbolTablePushVar(symbol_table);
+            
+            /* If we get there we have an expression, so increment counter of expressions */
+            processed_exp += 1;
         }
     }
     else{
@@ -1480,6 +1609,9 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         
         /* push a0 */
         addInstructionMainQueue(mips_push_a0);
+        
+        /* Increase symbol table */
+        symbolTablePushVar(symbol_table);
         
         /* Processed only one exp */
         processed_exp = 1;
@@ -1550,6 +1682,9 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         /* push_a0 */
         addInstructionMainQueue(mips_push_a0);
         
+        /* Increase symbol table to avoid errors */
+        symbolTablePushVar(symbol_table);
+        
         /* CGEN(exp2) */
         cgenExpression(token_right, symbol_table);
         
@@ -1612,6 +1747,9 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         
         /* pop */
         addInstructionMainQueue(mips_pop);
+        
+        /* Pop symbol table */
+        symbolTablePopVar(symbol_table);
     }
     /* And & Or should use short-circuit evaluation */
     else if(IS_SHORT_CIRCUIT_OP(exp_token->token_type)){

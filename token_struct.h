@@ -207,6 +207,12 @@ bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name);
 SymbolNode* symbolTableGetSymbolNodeByName( SymbolTable *symbol_table, 
                                             char *symbol_name);
 
+/* Pop last symbol */
+bool symbolTablePopVar(SymbolTable *symbol_table);
+
+/* Push a virtual memory */
+bool symbolTablePushVar(SymbolTable *symbol_table);
+
 /* Add a brother table */
 bool symbolTableAddBrother(SymbolTable *symbol_table, SymbolTable *brother_table);
 

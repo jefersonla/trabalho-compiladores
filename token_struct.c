@@ -547,7 +547,7 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
     /* Check if this node have a valid root_symbol_table */
     if(symbol_node->root_symbol_table == NULL){
         printError("INVALID ROOT SYMBOL TABLE!");
-        return false;
+        return NULL;
     }
     
     /* Select which type of reference ponter this node have */
@@ -563,7 +563,7 @@ InstructionNode* symbolNodeGetDefineInstruction(SymbolNode *symbol_node){
             break;
         default:
             printError("UNKNOW REGISTER TYPE!");
-            return false;
+            return NULL;
     }
 
     /* Return the formated instruction */
@@ -588,7 +588,7 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
     /* Check if this node have a valid root_symbol_table */
     if(symbol_node->root_symbol_table == NULL){
         printError("INVALID ROOT SYMBOL TABLE!");
-        return false;
+        return NULL;
     }
     
     /* Select which type of reference ponter this node have */
@@ -607,7 +607,7 @@ InstructionNode* symbolNodeGetLoadInstruction(SymbolNode *symbol_node){
             break;
         default:
             printError("UNKNOW REGISTER TYPE!");
-            return false;
+            return NULL;
     }
 
     /* Return the formated instruction */
@@ -632,7 +632,7 @@ InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
     /* Check if this node have a valid root_symbol_table */
     if(symbol_node->root_symbol_table == NULL){
         printError("INVALID ROOT SYMBOL TABLE!");
-        return false;
+        return NULL;
     }
     
     /* Select which type of reference ponter this node have */
@@ -651,7 +651,7 @@ InstructionNode* symbolNodeGetStoreInstruction(SymbolNode *symbol_node){
             break;
         default:
             printError("UNKNOW REGISTER TYPE!");
-            return false;
+            return NULL;
     }
 
     /* Return the formated instruction */
@@ -810,6 +810,29 @@ bool deleteSymbolTable(ptrSymbolTable *symbol_table){
     return true;
 }
 
+/* Increase or decrease size of all vars in a symbol table */
+void symbolTableUpdateNodes(SymbolTable *symbol_table, int symbol_exp){
+    int i;
+    SymbolTable *_actual_symbol_table;
+    
+    /* Assign the first value of actual symbol table */
+    _actual_symbol_table = symbol_table;
+    
+    /* Update all variables in this symbol table structure */
+    while(_actual_symbol_table != NULL){    
+        
+        /* Check if symbol table already has a symbol with this name */
+        for(i = 0; i < symbol_table->length; i++){
+            
+            /* Change the node address based  */
+            symbol_table->items[i]->symbol_address += symbol_exp;
+        }
+        
+        /* Get the previous symbol table */
+        _actual_symbol_table = _actual_symbol_table->previous_scope;
+    }
+}
+
 /**
  * Add a brother symbol table to a given symbol table.
  * 
@@ -855,12 +878,7 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
         return false;
     }
     
-    /* Check if the symbol is already on symbol table */
-    if(symbol_table->length != 0 && symbolTableContains(symbol_table, symbol_name)){
-        return false;
-    }
-    
-    /* Check if there are space on symbol table */
+    /* Check if there are space left on symbol table */
     if((symbol_table->length + 1) == symbol_table->size){
         /* Increase structure size */
         symbol_table->size += DEFAULT_BLOCK_SIZE;
@@ -888,14 +906,14 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Increase address of previous nodes */
-    for(i = 0; i < symbol_table->length; i++){
-        //fprintf(stderr, ">>>%s - symbol %d - addr %d\n", symbol_table->items[i]->symbol_name, i, symbol_table->items[i]->symbol_address);
-        symbol_table->items[i]->symbol_address += BYTE_VARIABLE_SIZE;
-        //fprintf(stderr, ">>>%s - symbol %d - addr %d\n", symbol_table->items[i]->symbol_name, i, symbol_table->items[i]->symbol_address);
-    }
+    symbolTableUpdateNodes(symbol_table, 4);
+    
+    fprintf(stderr, "%s :: %d\n", symbol_name, symbol_table->shift_address);
     
     /* Increase shift */
     symbol_table->shift_address += BYTE_VARIABLE_SIZE;
+    
+    fprintf(stderr, "%s :: %d\n", symbol_name, symbol_table->shift_address);
     
     /* Add the new symbol */
     symbol_table->items[symbol_table->length] = _new_symbol_node;
@@ -1020,6 +1038,49 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
     
     /* The element is not on symbol table */
     return NULL;
+}
+
+/**
+ * Push a random variable to a given symbol table. This variable start with the character '$', so it's unique.
+ * 
+ * @param symbol_table The symbol table which the last symbol node will be pushed.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTablePushVar(SymbolTable *symbol_table){
+
+    /* Check if symbol table is valid */
+    if(symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Now update all nodes with the new value */
+    symbolTableUpdateNodes(symbol_table, 4);
+    
+    /* Return success */
+    return true;
+    
+}
+
+/** 
+ * Pop last symbol present on symbol table.
+ * 
+ * @param symbol_table The symbol table which the last symbol node will be popped.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTablePopVar(SymbolTable *symbol_table){
+
+    /* Check if symbol table is valid */
+    if(symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Just update all nodes with the new value */
+    symbolTableUpdateNodes(symbol_table, -4);
+    
+    /* Return success */
+    return true;
 }
 
 /* ---------- Instruction Node Methods ----------- */

@@ -147,6 +147,9 @@ x = 4
 
 while(x ~= 0) do -- OK!
     x = x - 1
+    local zz = 10
+    print(zz)
+    zz = zz -1
     print(45)
 end
 
@@ -161,9 +164,3 @@ end
 xxx = 150
 
 kk(100, 200)
-
-
--- Test of for structure
-for i = 1, 10 do
-    print(i)
-end

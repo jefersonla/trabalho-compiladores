@@ -700,8 +700,8 @@ const char mips_and_sc_skip[] =
 
 /* End of mips sc */
 const char mips_and_sc_footer[] =
-    "\tsltiu $a0, $a0, 1\n"
-    "\txori $a0, $a0, 1\n"
+    //"\tsltiu $a0, $a0, 1\n" -- I'm not sure but the result shouldn't be bool
+    //"\txori $a0, $a0, 1\n"
 	"\tend_and_%d:\n"
 	"\t# ^-------- End of 'and' short-circuit ---------^ #\n";
 
@@ -717,8 +717,8 @@ const char mips_or_sc_skip[] =
 
 /* End of mips sc */
 const char mips_or_sc_footer[] =
-    "\tsltiu $a0, $a0, 1\n"
-    "\txori $a0, $a0, 1\n"
+    // "\tsltiu $a0, $a0, 1\n" -- I'm not sure but the result shouldn't be bool
+    //"\txori $a0, $a0, 1\n"
 	"\tend_or_%d:\n"
 	"\t# ^-------- End of 'or' short-circuit ----------^ #\n";
  
