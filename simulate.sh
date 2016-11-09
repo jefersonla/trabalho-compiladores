@@ -1,5 +1,7 @@
 #!/bin/bash
 
+MAX_RUNNING_TIME=10
+
 # Show help usage
 if [ "$#" -eq "0" ] || [ "$#" -gt "2" ]
 then
@@ -32,7 +34,7 @@ fi
 
 # Execute compiler, generate mips code pass this to spim and put the output in a file
 ( ./compilador "$1" "$2.mips" > /dev/null 2>&1 && \
-spim -f "$2.mips" | tail -n +6 | head -n 10000 > "$2" ) || \
+timeout $MAX_RUNNING_TIME spim -f "$2.mips" | tail -n +6 | head -n 10000 > "$2" ) || \
 ( echo "Failed to compile program" && exit 1 )
 
 # Program simulated with success
