@@ -52,5 +52,8 @@ analisador_semantico
 # Debug status
 debug.y.output
 
+# Binary output files
+*.mips
+
 # Temp files
 *.swp

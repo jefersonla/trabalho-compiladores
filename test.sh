@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Show help usage
-if [ "$#" -eq "0" ]
+if [ "$#" -eq "0" ] || [ "$#" -gt "3" ]
 then
 	printf "Usage: \n\t./test.sh executable input [output] [expected]\n"
 	exit 0

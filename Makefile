@@ -31,9 +31,11 @@ BISON_HEADER_FILE=y.tab.h
 # Codigos fontes
 SOURCES=$(FLEX_SRC) $(FLEX_HEADER_FILE) $(BISON_SRC) $(BISON_HEADER_FILE)
 # Package files
-PKG_FILES=analisador-lexico.l analisador-semantico.y lexical.defs.h parser.defs.h token_struct.h utils.h codegen_functions.h $(LIBS_SRC) $(TODO_WARN)
+PKG_FILES=$(FLEX_SRC) $(BISON_SRC) $(LIBS_SRC) $(LIBS_HEADERS)
 # Libs sources
 LIBS_SRC=token_struct.c utils.c codegen_models.c codegen_functions.c
+# Libs sources headers
+LIBS_HEADERS=lexical.defs.h parser.defs.h token_struct.h utils.h codegen_functions.h
 # Comment this to ignore TODO WARNINGS!
 TODO_WARN=-Wno-unused-parameter
 
@@ -63,7 +65,7 @@ debug_codegen_executable: debug.lex.yy.c debug.y.tab.c
 	$(CC) $(CFLAGS) -o $(EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(LIBS_SRC) $(TODO_WARN) $(CFLAGS_PARSER) -D DEBUG_MODE 
 
 # Executavel Gerador de código
-$(EXECUTABLE): lex.yy.c y.tab.c
+$(EXECUTABLE): lex.yy.c y.tab.c $(LIBS_SRC) $(LIBS_HEADERS)
 	$(CC) $(CFLAGS) -o $(EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(TODO_WARN) $(CFLAGS_PARSER)
 	
 # Compilação Analisador Sintático/Semântico
@@ -85,7 +87,7 @@ debug_parser_executable: debug.lex.yy.c debug.y.tab.c
 	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) -g debug.y.tab.c debug.lex.yy.c $(LIBS_SRC) $(TODO_WARN) $(CFLAGS_PARSER) -D DEBUG_MODE -D SEMANTIC_ANALYSER 
 
 # Executavel Analisador Semantico/Sintatico
-$(PARSER_EXECUTABLE): lex.yy.c y.tab.c
+$(PARSER_EXECUTABLE): lex.yy.c y.tab.c $(LIBS_SRC) $(LIBS_HEADERS)
 	$(CC) $(CFLAGS) -o $(PARSER_EXECUTABLE) y.tab.c lex.yy.c $(LIBS_SRC) $(TODO_WARN) $(CFLAGS_PARSER) -D SEMANTIC_ANALYSER 
 
 # Compilação Analisador Léxico
@@ -107,7 +109,7 @@ debug_lexical_executable: debug.y.tab.c debug.lex.yy.c
 	$(CC) $(CFLAGS) debug.lex.yy.c $(LIBS_SRC) $(TODO_WARN) -o $(LEXICAL_EXECUTABLE) -g $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER  -D DEBUG_MODE
 
 # Executavel Analisador Lexico
-$(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c
+$(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c $(LIBS_SRC) $(LIBS_HEADERS)
 	$(CC) $(CFLAGS) lex.yy.c $(LIBS_SRC) $(TODO_WARN) -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER 
 
 # Realiza os testes nos executaveis
@@ -171,11 +173,9 @@ check-final:
 	awk '{ \
 			for(i = 1; i <= NF; i++) { \
 				split($$1,a,"-"); \
-				param2="test-"a[2] ;\
-				param3="exec-"a[2] ; \
-				param4="code-"a[2] ; \
-				command="./$(EXECUTABLE) tests/input/"$$1" tests/testing/"param2" > /dev/null 2>&1 && "\
-						"./test.sh simulate.sh tests/testing/"param2" tests/testing/"param3" tests/executed/"param4; \
+				param2="exec-"a[2] ; \
+				param3="code-"a[2] ; \
+				command="./test.sh simulate.sh tests/input/"$$1" tests/testing/"param2" tests/executed/"param3; \
 				system(command); \
 			} \
 		}'
