@@ -309,6 +309,15 @@ extern const char mips_marker_assign[];
 /* End of a assign */
 extern const char mips_end_assign[];
 
+/* Begin of a local assign */
+extern const char mips_start_local_assign[];
+
+/* Assign local assign marker */
+extern const char mips_marker_local_assign[];
+
+/* End of a local assign */
+extern const char mips_end_local_assign[];
+
 /* ------------------------------------------------------------- */
 
 #endif

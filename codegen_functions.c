@@ -150,7 +150,6 @@ bool cgenAllCode(TokenNode *root_token){
     return true;
 }
 
-
 /** 
  * Generate code for function call.
  * 
@@ -218,11 +217,10 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
     int i;
-    TokenList *list_exp;
+    int exp_processed;
     TokenList *list_names;
     TokenNode *token_exp;
     TokenNode *token_name;
-    TokenNode *token_node;
     TokenNode *list_exp_token;
     TokenNode *list_names_token;
     SymbolNode *symbol_node;
@@ -272,17 +270,11 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         /* CGEN(exp) */
         cgenExpression(token_exp, actual_symbol_table);
         
-        /* push_a0 */
-        addInstructionMainQueue(mips_push_a0);
-        
         /* Get the actual token name node */
         token_name = list_names_token;
         
         /* Add header of the instruction */
         addInstructionMainQueueFormated(mips_marker_assign, token_name->lex_str, 0);
-        
-        /* $a0 = top */
-        addInstructionMainQueue(mips_top_a0);
         
         /* Get the symbol node */
         symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
@@ -310,9 +302,6 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         
         /* Store the correct store instruction */
         instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
-        
-        /* pop */
-        addInstructionMainQueue(mips_pop);
     }
     /* Otherwise we have a list of operands */
     else{
@@ -325,54 +314,8 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
             return false;
         }
 
-        /* Create a new list of expressions */        
-        list_exp = newTokenList();
-        
-        /* Check if new token list hasn't failed */
-        if(list_exp == NULL){
-            printError("CANNOT CREATE A NEW LIST OF EXPRESSIONS!");
-            return false;
-        }
-        
-        /* Get list of expressions */
-        for(i = 1; i <= list_exp_token->child_list->length; i++){
-            
-            /* Get the token node */
-            token_node = listGetTokenByIndex(list_exp_token->child_list, i);
-            
-            /* Check if this token node is valid or not */
-            if(token_node == NULL){
-                printError("INVALID TOKEN NODE!");
-                return false;
-            }
-            
-            /* If this token is an expression add him to the token list */
-            if(IS_EXPRESSION(token_node->token_type)){
-                listAddToken(list_exp, token_node);
-            }
-        }
-        
-        /* Reverse list of expressions */
-        for(i = list_exp->length; i > 0; i--){
-            
-            /* Get the actual token node */
-            token_exp = listGetTokenByIndex(list_exp, i);
-            
-            /* Check if token exp is valid */
-            if(token_exp == NULL){
-                printError("INVALID EXPRESSION TOKEN!");
-                return false;
-            }
-            
-            /* Add header of this instruction to main queue */
-            addInstructionMainQueueFormated(mips_marker_exp, i);
-            
-            /* CGEN(exp[n]) */
-            cgenExpression(token_exp, actual_symbol_table);
-            
-            /* push_a0 */
-            addInstructionMainQueue(mips_push_a0);
-        }
+        /* Execute list of expressions, and put reverse results on stack */
+        exp_processed = cgenExpressionList(list_exp_token, actual_symbol_table);
         
         /* Execute list of names and assign values for each symbol name */
         for(i = 1; i <= list_names->length; i++){
@@ -399,6 +342,17 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
             if(symbol_node == NULL){
                 symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_name->lex_str);
             }
+            /* If this symbol doesn't have a valid root symbol table */
+            else if(symbol_node->root_symbol_table == NULL){
+                printError("INVALID SYMBOL NODE ROOT TOKEN!");
+                return false;
+            }
+            /* If this symbol has a valid root symbol table, and the type of this symbol table is SP - Stack Pointer */
+            else if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
+                
+                /* Update address temporarily, because stack contains a lot of new values */
+                symbol_node->symbol_address += ((list_names->length - i + 1) * 4);
+            }
             
             /* If this symbol is not on global symbol table, so need to add him first */
             if(symbol_node == NULL){
@@ -421,6 +375,13 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
             
             /* pop */
             addInstructionMainQueue(mips_pop);
+            
+            /* Restore correct symbol address after pop value stacked */
+            if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
+                
+                /* Update address temporarily, because stack contains a lot of new values */
+                symbol_node->symbol_address -= ((list_names->length - i + 1) * 4);
+            }
         }
     }
     
@@ -1067,9 +1028,285 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
-    // TODO! Implement codegenerator for local variables assign and declaration
-    printTodo("'cgenLocalVariable' - NOT IMPLEMENTED YET!");
-    return false;    
+    int i;
+    TokenList *list_names;
+    TokenNode *token_exp;
+    TokenNode *token_name;
+    TokenNode *token_node;
+    TokenNode *list_exp_token;
+    TokenNode *list_names_token;
+    SymbolNode *symbol_node;
+    
+    /* Check if local variable token is null */
+    if(local_variable_token == NULL){
+        printError("LOCAL VARIABLE TOKEN IS INVALID!");
+        return false;
+    }
+    
+    /* Check if symbol table is null */
+    if(actual_symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+    
+    /* Get token list of names */
+    list_names_token = listGetTokenByIndex(assign_token->child_list, 1);
+    
+    /* Check list of names token */
+    if(list_names_token == NULL){
+        printError("INVALID LIST OF NAMES!");
+        return false;
+    }
+    
+    /* Add header for a local assign */
+    addInstructionMainQueue(mips_start_local_assign);
+    
+    /* Local_variable_token is of type 'LOCAL DEFINE' so we are only creating variables with nil value */
+    if(local_variable_token->token_type == TI_LOCAL_DEFINE){
+        
+        /* If we have only one variable so our list of names will be only a T_NAME */
+        if(list_names_token->token_type == T_NAME){
+            
+            /* In that case we only have a T_NAME token */
+            token_name = list_names_token;
+            
+            /* Add the new token name to our symbol table */
+            symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
+            
+            /* Retrieve the added symbol node */
+            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+            
+            /* Check if the retrieved symbol node is correct */
+            if(symbol_node == NULL){
+                printError("INVALID SYMBOL NODE!");
+                return false;
+            }
+            
+            /* Add the definition node to stack */
+            instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node), false);
+            
+            /* As we are only definig variable we'll assign nil value to this variable */
+            addInstructionMainQueue(mips_nil);
+            
+            /* Store the a0 value to the variable we had created */
+            instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node), false);
+        }
+        /* Otherwise we have a token with all childs being or T_NAME or T_COMMA (͡° ͜ʖ ͡°) */
+        else{
+            
+            /* Get list of names */
+            list_names = listGetTokensByType(list_names_token->child_list, T_NAME);
+            
+            /* Check if the list of names is correct */
+            if(list_names == NULL){
+                printError("INVALID LIST OF NAMES!");
+                return false;
+            }
+            
+            /* The only difference now is that we have a list of names, not just a name */
+            for(i = list_names_token->length; i > 0; i--){
+                
+                /* Get the i token name */
+                token_name = listGetTokenByIndex(list_names, i);
+                
+                /* Check if the token retrieved is valid */
+                if(token_name == NULL){
+                    printError("INVALID TOKEN NAME!");
+                    return false;
+                }
+                
+                /* Add the new token name to our symbol table */
+                symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
+                
+                /* Retrieve the added symbol node */
+                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+                
+                /* Check if the retrieved symbol node is correct */
+                if(symbol_node == NULL){
+                    printError("INVALID SYMBOL NODE!");
+                    return false;
+                }
+                
+                /* Add the definition node to stack */
+                instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node), false);
+                
+                /* As we are only definig variable we'll assign nil value to this variable */
+                addInstructionMainQueue(mips_nil);
+                
+                /* Store the a0 value to the variable we had created */
+                instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node), false);
+            }
+        }
+    }
+    /* Local assign with expression values */
+    else{
+        
+        /* Get token list of expressions */
+        list_exp_token = listGetTokenByIndex(assign_token->child_list, 4);
+        
+        /* Check if list of expressions token is not null */
+        if(list_exp_token == NULL){
+            printError("INVALID LIST OF EXPRESSIONS!");
+            return false;
+        }
+        
+        /* 
+            First of all, our list of expression could be only one name, and since we
+            know that all functions store the first return in $a0, there's no way we
+            have a function with two returns assign to a single variable, and since
+            semantic proccess has been done, otherwise we won't get there, there's 
+            no need to pop more than one return of the expression list on that case.
+        */
+        if(list_names_token->token_type == T_NAME){
+
+            /* Add header of the instruction */
+            addInstructionMainQueueFormated(mips_marker_local_assign, token_name->lex_str, 0);
+            
+            /* Get the actual token expression node */
+            token_exp = list_exp_token;
+
+            /* Add header of this instruction to main queue */
+            addInstructionMainQueueFormated(mips_marker_exp, 0);
+
+            /* CGEN(exp) */
+            cgenExpression(token_exp, actual_symbol_table);
+
+            /* Get the actual token name node */
+            token_name = list_names_token;
+            
+            /* Get the symbol node */
+            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+            
+            /* Try to retrieve the already inserted token, if this token is null, we have a problem */
+            if(symbol_node == NULL){
+                printError("ERROR INSERTING SYMBOL NODE!");
+                return false;
+            }
+            
+            /* Store the correct store $a0 instruction */
+            instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
+        }
+        /* Otherwise we have a list of operands */
+        else{
+            
+            /* Get list of names */
+            list_names = listGetTokensByType(list_names_token->child_list, T_NAME);
+            
+            /* Check if the list of names is correct */
+            if(list_names == NULL){
+                printError("INVALID LIST OF NAMES!");
+                return false;
+            }
+    
+        /////////////////////////////////////////////////////////////
+            /* Create a new list of expressions */        
+            list_exp = newTokenList();
+            
+            /* Check if new token list hasn't failed */
+            if(list_exp == NULL){
+                printError("CANNOT CREATE A NEW LIST OF EXPRESSIONS!");
+                return false;
+            }
+            
+            /* Get list of expressions */
+            for(i = 1; i <= list_exp_token->child_list->length; i++){
+                
+                /* Get the token node */
+                token_node = listGetTokenByIndex(list_exp_token->child_list, i);
+                
+                /* Check if this token node is valid or not */
+                if(token_node == NULL){
+                    printError("INVALID TOKEN NODE!");
+                    return false;
+                }
+                
+                /* If this token is an expression add him to the token list */
+                if(IS_EXPRESSION(token_node->token_type)){
+                    listAddToken(list_exp, token_node);
+                }
+            }
+            
+            /* Reverse list of expressions */
+            for(i = list_exp->length; i > 0; i--){
+                
+                /* Get the actual token node */
+                token_exp = listGetTokenByIndex(list_exp, i);
+                
+                /* Check if token exp is valid */
+                if(token_exp == NULL){
+                    printError("INVALID EXPRESSION TOKEN!");
+                    return false;
+                }
+                
+                /* Add header of this instruction to main queue */
+                addInstructionMainQueueFormated(mips_marker_exp, i);
+                
+                /* CGEN(exp[n]) */
+                cgenExpression(token_exp, actual_symbol_table);
+                
+                /* push_a0 */
+                addInstructionMainQueue(mips_push_a0);
+            }
+            
+            /* Execute list of names and assign values for each symbol name */
+            for(i = 1; i <= list_names->length; i++){
+                
+                /* Get token name */
+                token_name = listGetTokenByIndex(list_names, i);
+                
+                /* Check if token name is not null */
+                if(token_name == NULL){
+                    printError("INVALID TOKEN NAME!");
+                    return false;
+                }
+                
+                /* Add header of the instruction */
+                addInstructionMainQueueFormated(mips_marker_assign, token_name->lex_str, i);
+                
+                /* $a0 = top */
+                addInstructionMainQueue(mips_top_a0);
+                
+                /* Get the symbol node */
+                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+                
+                /* If token name isn't inside the actual symbol table so this t_name is global */
+                if(symbol_node == NULL){
+                    symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_name->lex_str);
+                }
+                
+                /* If this symbol is not on global symbol table, so need to add him first */
+                if(symbol_node == NULL){
+                    
+                    /* Add the symbol to the global symbol table */
+                    symbolTableAddSymbol(global_symbol_table, token_name->lex_str, NUMBER_TYPE);
+                    
+                    /* Get the inserted symbol node */
+                    symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_name->lex_str);
+                    
+                    /* Check if symbol node is valid */
+                    if(symbol_node == NULL){
+                        printError("INVALID SYMBOL NODE!");
+                        return false;
+                    }
+                }
+                
+                /* Store the correct store instruction */
+                instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
+                
+                /* pop */
+                addInstructionMainQueue(mips_pop);
+            }
+        }
+        
+        /////////////////////////////////////////////////////////////
+    
+    }
+    
+    /* Add footer of a local assign */
+    addInstructionMainQueue(mips_end_local_assign);
+    
+    /* Return success */
+    return true;
 }
 
 /** 
@@ -1247,6 +1484,7 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
     int processed_exp;
     TokenNode *token_node;
     
+    /* Check if we have a list of expressions or just an expression */
     if(list_exp_token->token_type == TI_LISTAEXP){
         /* Execute from right to left child list that is non T_COMMA */
         for(i = list_exp_token->child_list->length, processed_exp = 0; i > 0; i--) {

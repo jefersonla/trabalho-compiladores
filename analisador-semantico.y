@@ -265,14 +265,14 @@ programa        : bloco                                 {
                 ;
 
 /* -- Block are sections of code -- */
-bloco           : comando_list comandoret               { 
+bloco           : comando_list comandoret               {
                                                             /* Allocate Token and Childs */
                                                             allocateTokenAndChilds(&$$, TI_BLOCO, 2, $1, $2);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[bloco", $1->token_str, " ", $2->token_str, "]");
                                                         }
-                | comando_list                          { 
+                | comando_list                          {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BLOCO, 1, $1);
                                                             
@@ -336,14 +336,14 @@ comando         : T_SEMICOL                             {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[comando ", $1->token_str, "]");
                                                         }
-                | T_BREAK                               { 
+                | T_BREAK                               {
                                                             /* Copy pointer of the terminal token */
                                                             $$ = $1;
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 1, "[comando [T_BREAK break]]");
                                                         }
-                | chamadadefuncao                       { 
+                | chamadadefuncao                       {
                                                             /* Copy pointer of the terminal token */
                                                             $$ = $1;
                                                             
@@ -525,7 +525,7 @@ comando         : T_SEMICOL                             {
                 ;
 
 
-label           : T_LABEL T_NAME T_LABEL                { 
+label           : T_LABEL T_NAME T_LABEL                {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_LABEL, 3, $1, $2, $3);
                                                             
@@ -567,7 +567,7 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             listAddToken($$->child_list, $4);
                                                             listAddToken($$->child_list, $5);
                                                         }
-                | /* Empty */                           { 
+                | /* Empty */                           {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EMPTY, 0);
                                                             
@@ -595,7 +595,7 @@ comandoret      : T_RETURN listaexp T_SEMICOL           {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[comandoret [T_RETURN return] [listaexp ", $2->token_str, "]]");
                                                         }
-                | T_RETURN T_SEMICOL                    { 
+                | T_RETURN T_SEMICOL                    {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds( &$$, TI_RETURN, 1, $1);
                                                             
@@ -618,7 +618,7 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 1, "[exp [T_NIL nil]]");
                                                         }
-                | T_VARARG                              { 
+                | T_VARARG                              {
                                                             /* Copy pointer of the terminal */
                                                             $$ = $1;
                                                             
@@ -639,14 +639,14 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[exp [T_LITERAL \"", $1->lex_str, "\"]]");
                                                         }
-                | T_NAME                                { 
+                | T_NAME                                {
                                                             /* Copy pointer of the terminal */
                                                             $$ = $1;
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 3, "[exp [T_NAME ", $1->lex_str, "]]");
                                                         }
-                | chamadadefuncao                       { 
+                | chamadadefuncao                       {
                                                             /* Copy pointer of the terminal or last token since this token is intermediary */
                                                             $$ = $1;
                                                             
@@ -681,7 +681,7 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_PLUS +]] ", $3->token_str, "]");
                                                         }
-                | exp T_MINUS exp                       { 
+                | exp T_MINUS exp                       {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_MINUS, 3, $1, $2, $3);
                                                             
@@ -702,7 +702,7 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_DIV /]] ", $3->token_str, "]");
                                                         }
-                | exp T_FLOOR exp                       { 
+                | exp T_FLOOR exp                       {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_FLOOR, 3, $1, $2, $3);
                                                             
@@ -716,14 +716,14 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_EXP ^]] ", $3->token_str, "]");
                                                         }
-                | exp T_MOD exp                         { 
+                | exp T_MOD exp                         {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_MOD, 3, $1, $2, $3);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_MOD %%]] ", $3->token_str, "]");
                                                         }
-                | exp T_BIT_AND exp                     { 
+                | exp T_BIT_AND exp                     {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_BIT_AND, 3, $1, $2, $3);
                                                             
@@ -758,7 +758,7 @@ exp             : T_NIL                                 {
                                                             
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_BIT_RSH >>]] ", $3->token_str, "]");
                                                         }
-                | exp T_CONCAT exp                      { 
+                | exp T_CONCAT exp                      {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_CONCAT, 3, $1, $2, $3);
                                                             
@@ -793,7 +793,7 @@ exp             : T_NIL                                 {
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[exp ", $1->token_str, " [opbin [T_GTEQ >=]] ", $3->token_str, "]");
                                                         }
-                | exp T_EQ exp                          { 
+                | exp T_EQ exp                          {
                                                             /* Allocate Token and append childs */
                                                             allocateTokenAndChilds(&$$, TI_EQ, 3, $1, $2, $3);
                                                             
@@ -833,7 +833,7 @@ exp             : T_NIL                                 {
                                                             deleteTokenNode(&$3, true);
                                                         }
                 /*
-                | T_TRUE                                { 
+                | T_TRUE                                {
                                                             /* Copy pointer of the terminal or last token since this token is intermediary * /
                                                             $$ = $1;
                                                             

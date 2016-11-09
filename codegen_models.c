@@ -139,6 +139,7 @@ const char mips_footer[] =
         "\tlw $ra, 4($sp)\n"
         "\tlw $fp, 8($sp)\n"
         "\taddiu $sp, $sp, 12\n"
+        "\tlw $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val # Load nil as return\n"
         "\tjr $ra\n"
     "# -- End Print Function -- #\n"
     "\n"
@@ -652,7 +653,7 @@ const char mips_end_function_call[] =
 
 /* Load a nil into $a0 */
 const char mips_nil[] =
-    "\t# --------- Load global variable in $a0 --------- #\n"
+    "\t# -------- Load global nil value in $a0 --------- #\n"
     "\tlw $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val\n"
     "\t# ----------------------------------------------- #\n";
     
@@ -764,34 +765,30 @@ const char mips_end_assign[] =
 /**
  * Model for assigns, exp == x {, y}+ = z {, k}.
  * 
- *  Default Model for assign CGEN(nomes = expressions)
+ *  Default Model for assign CGEN(local nomes):
  *      {
- *          CGEN(expressions[n - 1])
- *          push_a0
+ *          CGEN(define nomes[i])
+ *          CGEN(mips_value)
+ *          CGEN(store nomes[i])
  *      }+
- *      ==
+ * 
+ *  Default Model for assign CGEN(local nomes = expressions):
  *      {
- *          top_a0
- *          nome = a0
- *          pop
- *      }+
+ *          
+ *      }
  */
 
-/* Begin of a assign */
-//const char mips_start_assign[] =
-//    "\t# v------------------- Assign ------------------v #\n";
-//
-///* Expression Execution marker */
-//const char mips_marker_exp[] =
-//    "\t### Expression -- %d ###\n";
-//
-///* Assign marker */
-//const char mips_marker_assign[] =
-//    "\t### Assign -- %s -- %d ###\n";
-//
-///* End of a assign */
-//const char mips_end_assign[] =
-//	"\t# ^--------------- End of Assign ---------------^ #\n";
+/* Begin of a local assign */
+const char mips_start_local_assign[] =
+    "\t# v---------------- Local Assign ---------------v #\n";
+
+/* Assign local assign marker */
+const char mips_marker_local_assign[] =
+    "\t### Local Assign -- %s -- %d ###\n";
+
+/* End of a local assign */
+const char mips_end_local_assign[] =
+	"\t# ^------------ End of local assign ------------^ #\n";
  
 /* ------------------------------------------------------------- */
 /*                  ..........................                   */
