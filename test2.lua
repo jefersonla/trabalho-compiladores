@@ -59,9 +59,14 @@ o segundo argumento.
 -- 'and' and 'or' - OK
 
 print(0 or 1)         -- 1
-print(nil and 1)      -- 0 -- nil pelo professor .... 0
-print(not not nil)    -- 0 -- nil, ta certo ... 0
-print(nil or not nil) -- 1 -- not nil... eu acho, eu penso ... CRENDEUSPAI SEI O QUE É ISSO AQUI NÃO, PELA CARA È MACUMBA
+print(nil and 1)      -- 0
+print(not not nil)    -- 0
+print(nil or not nil) -- 1
+print(5 or 0)         -- 5
+print(0 or 6)         -- 6
+print(2 and 6)        -- 6
+print(0 and 6)        -- 0
+print(5 and 1)        -- 1
 
 -- Separator
 print(1000000000)
@@ -100,9 +105,9 @@ print(1212121212)
 
 -- Last tests just for curiosity - OK
 
-print(1 and 2)          -- 1
-print(5 or 0)           -- 1
-print(nil or 6)         -- 1
+print(1 and 2)          -- 2
+print(5 or 0)           -- 5
+print(nil or 6)         -- 6
 print(2 > 1)            -- 1
 print(2 <= 0)           -- 0
 print(3 == 3)           -- 1
@@ -130,6 +135,12 @@ function why()
       print(2 + z)
       z = z + 1
   end
+  for i = 10, 20 do
+      print(i)
+  end
+  for i = 0, 20, 2 do
+      print(i)
+  end
 end
 
 why()
@@ -147,9 +158,6 @@ x = 4
 
 while(x ~= 0) do -- OK!
     x = x - 1
-    local zz = 10
-    print(zz)
-    zz = zz -1
     print(45)
 end
 
@@ -158,9 +166,11 @@ print(1111111111)
 
 -- Test of functions with parameters OK
 function kk(xxx, yyy)
-    print(xxx + yyy)
+    print(xxx)                  -- 100
+    print(yyy)                  -- 200
+    print(xxx + yyy * 2 / 4)    -- 200
 end
 
 xxx = 150
 
-kk(100, 200)
+kk(100, 200) -- 100, 200, 200

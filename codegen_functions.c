@@ -331,6 +331,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
+    int i;
     TokenList *list_names;
     TokenNode *token_exp;
     TokenNode *token_name;

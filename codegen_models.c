@@ -294,7 +294,7 @@ const char mips_sub_a0_t1_a0[] =
 /* Div value of $t1 with $a0 and store in $a0 */
 const char mips_div_a0_t1_a0[] =
     "\t# ------------- Div $a0 = $t1 / $a0 ------------- #\n"
-    "\tdiv $a0, $a0, $t1 \n"
+    "\tdiv $a0, $t1, $a0 \n"
     "\t# ----------------------------------------------- #\n";
 
 /* Mul value of $t1 with $a0 and store in $a0 */
@@ -694,13 +694,13 @@ const char mips_and_sc_header[] =
     
 /* Skip the next evaluation if the first has failed */
 const char mips_and_sc_skip[] =
-    "\tsltiu $a0, $a0, 1\n"
-    "\txori $a0, $a0, 1\n"
+    //"\tsltiu $a0, $a0, 1\n" // Uncoment this if you wanna use bool result
+    //"\txori $a0, $a0, 1\n"
     "\tbeqz $a0, end_and_%d\n";
 
 /* End of mips sc */
 const char mips_and_sc_footer[] =
-    //"\tsltiu $a0, $a0, 1\n" -- I'm not sure but the result shouldn't be bool
+    //"\tsltiu $a0, $a0, 1\n" // Uncoment this if you wanna use bool result
     //"\txori $a0, $a0, 1\n"
 	"\tend_and_%d:\n"
 	"\t# ^-------- End of 'and' short-circuit ---------^ #\n";
@@ -711,13 +711,13 @@ const char mips_or_sc_header[] =
     
 /* Skip the next evaluation if the first has success */
 const char mips_or_sc_skip[] =
-    "\tsltiu $a0, $a0, 1\n"
-    "\txori $a0, $a0, 1\n"
+    //"\tsltiu $a0, $a0, 1\n" // Uncoment this if you wanna use bool result
+    //"\txori $a0, $a0, 1\n"
     "\tbnez $a0, end_or_%d\n";
 
 /* End of mips sc */
 const char mips_or_sc_footer[] =
-    // "\tsltiu $a0, $a0, 1\n" -- I'm not sure but the result shouldn't be bool
+    // "\tsltiu $a0, $a0, 1\n" // Uncoment this if you wanna use bool result
     //"\txori $a0, $a0, 1\n"
 	"\tend_or_%d:\n"
 	"\t# ^-------- End of 'or' short-circuit ----------^ #\n";
