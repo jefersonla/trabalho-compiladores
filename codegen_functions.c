@@ -260,6 +260,8 @@ bool cgenAllCode(TokenNode *root_token){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol_table){
+    int i;
+    int no_exp_executed;
     TokenNode *exp_list;
     TokenNode *token_name;
     
@@ -287,6 +289,9 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     /* Add the header of the function call  */
     addInstructionMainQueue(mips_start_function_call);
     
+    /* Push var */
+    symbolTablePushVar(actual_symbol_table);
+    
     /* Check what is the type of the function call */
     if(call_function_token->token_type == TI_CALL_FUNCTION_PAR){
         
@@ -300,11 +305,19 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
         }
         
         /* Execute expression list and assign number of params processed */
-        cgenExpressionList(exp_list, actual_symbol_table);
+        no_exp_executed = cgenExpressionList(exp_list, actual_symbol_table);
     }
 
     /* Add the end of the function call */
     addInstructionMainQueueFormated(mips_end_function_call, token_name->lex_str);
+    
+    /* Pop All parameters */
+    for(i = 0; i < no_exp_executed; i++){
+        symbolTablePopVar(actual_symbol_table);
+    }
+    
+    /* Pop var */
+    symbolTablePopVar(actual_symbol_table);
     
     /* Return success */
     return true;

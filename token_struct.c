@@ -822,10 +822,15 @@ void symbolTableUpdateNodes(SymbolTable *symbol_table, int symbol_exp){
     while(_actual_symbol_table != NULL){    
         
         /* Check if symbol table already has a symbol with this name */
-        for(i = 0; i < symbol_table->length; i++){
+        for(i = 0; i < _actual_symbol_table->length; i++){
             
-            /* Change the node address based  */
-            symbol_table->items[i]->symbol_address += symbol_exp;
+            fprintf(stderr, "%s :: %d\n", _actual_symbol_table->items[i]->symbol_name, _actual_symbol_table->items[i]->symbol_address);
+    
+            /* Change the node address based on the new value */
+            _actual_symbol_table->items[i]->symbol_address += symbol_exp;
+    
+            fprintf(stderr, "%s :: %d\n", _actual_symbol_table->items[i]->symbol_name, _actual_symbol_table->items[i]->symbol_address);
+            
         }
         
         /* Get the previous symbol table */
@@ -1003,19 +1008,19 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
         return false;
     }
 
-    /* Get the actual symbl table */
+    /* Get the actual symbol table */
     _actual_symbol_table = symbol_table;
     
     /* Search for the variable in the actual symbol table */
     while(_actual_symbol_table != NULL){
         
         /* Check if the symbol table have elements and them search for */ 
-        if(symbol_table->length != 0){
+        if(_actual_symbol_table->length > 0){
             
             /* Check if symbol table already has a symbol with this name */
-            for(i = 0; i < symbol_table->length; i++){
-                if(symbolEqualsName(symbol_table->items[i], symbol_name)){
-                    return symbol_table->items[i];
+            for(i = 0; i < _actual_symbol_table->length; i++){
+                if(symbolEqualsName(_actual_symbol_table->items[i], symbol_name)){
+                    return _actual_symbol_table->items[i];
                 }
             }
         }
