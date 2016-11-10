@@ -11,3 +11,15 @@ for i = 0, 10 do
     print(i)
     print(1222333444)
 end
+
+function z()
+    for i = 0, 10 do
+        print(i)
+        
+        if i == 5 then
+            return
+        end
+    end
+end
+
+z()

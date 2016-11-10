@@ -858,12 +858,31 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         }
         
         /* Get all blocks */
-        block_list = listGetTokensByType(list_elseif->child_list, TI_BLOCO);
+        block_list = newTokenList();
         
-        /* Check if block list is valid */
+        /* Check if the list of blocks is valid */
         if(block_list == NULL){
             printError("BLOCK LIST IS INVALID!");
             return false;
+        }
+        
+        /* Now as we have two types of block we should do it manually */
+        /* Pick all blocks of elseif */
+        for(i = 1; i <= list_elseif->child_list->length; i++){
+            
+            /* Get the token node */
+            token_node = listGetTokenByIndex(list_elseif->child_list, i);
+            
+            /* Check if this token node is valid or not */
+            if(token_node == NULL){
+                printError("INVALID TOKEN NODE!");
+                return false;
+            }
+            
+            /* If this token is an expression add him to the token list */
+            if(IS_BLOCK(token_node->token_type)){
+                listAddToken(block_list, token_node);
+            }
         }
         
         /* Add the other 'else if' conditionals */
@@ -970,7 +989,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
  * @param actual_symbol_table The actual or previous symbol table.
  * @return true if there's no error on execution and false otherwise.
  */
-bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table) {
+bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_table){
     int i;
     SymbolTable *new_table;
     SymbolTable *new_params_table;
@@ -1075,14 +1094,23 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     /* Pop local variables on stack */
     addInstructionMainQueueFormated(mips_pop_params, (new_table->shift_address));
     
-    /* Finish function definition poping Record Activation */
-    addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
-    
-    /* Pop parameters on stack */
-    addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
-    
-    /* Add final part */
-    addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
+    /* 
+        Check if we have a block with return or not. Functions which return values, should push the return and jr
+        acordingle, and the other who don't have values to return should pop local variables and jump to end_function_%s.
+        Functions who have more than one return rule, NEED TO RETURN THE SAME QUANTITY OF EXPRESSIONS! OF THE MAIN RETURN!
+        On void functions (functions without a return)
+    */
+    if(block_token->token_type == TI_BLOCO){
+        
+        /* Finish function definition poping Record Activation */
+        addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
+        
+        /* Pop parameters on stack */
+        addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
+        
+        /* Add final part */
+        addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
+    }
     
     /* Delete local symbol table and parameters symbol table */
     deleteSymbolTable(&new_table);
@@ -1398,6 +1426,9 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     int num_exp;
     int return_shift;
+    char *function_name;
+    TokenNode *token_name;
+    TokenNode *root_token;
     TokenNode *list_exp_token;
     
     /* Check if token return command is valid */
@@ -1451,30 +1482,69 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         
     */
     if(command_return_token->token_type == TI_RETURN){
-        /* Empty return */
-        num_exp = 0;
+        /* Pop local variables on stack */
+        addInstructionMainQueueFormated(mips_pop_params, (actual_symbol_table->shift_address));
         
-        /* Assign a null value to our list_exp_token */
-        list_exp_token = NULL;
-    } 
-    else{
-        /* Get list of expressions */
-        list_exp_token = listGetTokenByIndex(command_return_token->child_list, 2);
+        root_token = command_return_token->root_token;
         
-        /* Check the integrity of this pointer */
-        if(list_exp_token == NULL){
-            printError("FAILED TO RETRIEVE LIST EXP TOKEN!");
+        /* Recurse and get the name of the function which is being returned */
+        while(root_token != NULL){
+            
+            printf("0x%X -- %s\n", root_token->token_type, root_token->token_str);
+            
+            /* If the actual token is of the type we wanted stop */
+            if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
+                break;
+            }
+            
+            /* Get the next 'previous token' */
+            root_token = root_token->root_token;
+        }
+        
+        /* If we can't find a function definition we are on main, and need to use a specific jump to end */
+        if(root_token == NULL){
+            instructionQueueEnqueueInstruction(main_instruction_queue, "\tj end_main_function # End of main\n", true);
+            
+            /* Return success */
+            return true;
+        }
+        
+        /* Get token name of a function definition */
+        token_name = listGetTokenByIndex(root_token->child_list, 2);
+        
+        /* Check if this token name is valid */
+        if(token_name == NULL){
+            printError("INVALID FUNCTION NAME!");
             return false;
         }
         
-        /* List of exp returned */
-        num_exp = (list_exp_token->child_list->length / 2) + 1;
+        /* Pick the pointer of the string of the function name */
+        function_name = token_name->lex_str;
+        
+        /* Add jump to function return */
+        addInstructionMainQueueFormated(mips_end_of_function, function_name);
+        
+        /* Return success */
+        return true;
+    } 
+    /* Get list of expressions */
+    list_exp_token = listGetTokenByIndex(command_return_token->child_list, 2);
+    
+    /* Check the integrity of this pointer */
+    if(list_exp_token == NULL){
+        printError("FAILED TO RETRIEVE LIST EXP TOKEN!");
+        return false;
     }
+    
+    /* List of exp returned */
+    num_exp = (list_exp_token->child_list->length / 2) + 1;
+
     
     /* Calculate the necessary shift */
     return_shift = num_exp * 4;
     
     /* Perform shift if it's need */
+    
     
     /* Return success */
     return true;
@@ -1507,8 +1577,8 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
     /* Generate command list code */
     cgenCommandList(command_list_token, previous_scope);
     
-    /* Check if there are a return command */
-    if(block_token->child_list->length > 1){
+    /* Check if this block has a return command */
+    if(block_token->token_type == TI_BLOCO_RETURN){
         
         /* Command return assign */
         command_return_token = listGetTokenByIndex(block_token->child_list, 2);

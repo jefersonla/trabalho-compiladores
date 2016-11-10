@@ -267,7 +267,7 @@ programa        : bloco                                 {
 /* -- Block are sections of code -- */
 bloco           : comando_list comandoret               {
                                                             /* Allocate Token and Childs */
-                                                            allocateTokenAndChilds(&$$, TI_BLOCO, 2, $1, $2);
+                                                            allocateTokenAndChilds(&$$, TI_BLOCO_RETURN, 2, $1, $2);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText($$, 5, "[bloco", $1->token_str, " ", $2->token_str, "]");
@@ -578,7 +578,7 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
 
 comandoret      : T_RETURN listaexp T_SEMICOL           {
                                                             /* Allocate Token and append childs */
-                                                            allocateTokenAndChilds( &$$, TI_RETURN_EXPLIST, 2, $1, $2);
+                                                            allocateTokenAndChilds( &$$, TI_RETURN_EXPLIST, 3, $1, $2, $3);
                                                             
                                                             /* Allocate a concatenation of token text strings */
                                                             allocateTokenText(  $$, 3,

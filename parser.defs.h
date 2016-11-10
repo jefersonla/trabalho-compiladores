@@ -2,8 +2,9 @@
 #define PARSER_DEFS_H
 
 /* Non Terminals Defines */
-#define TI_PROGRAMA             0xCAF1
-#define TI_BLOCO                0xCAF2
+#define TI_PROGRAMA             0xCAF0
+#define TI_BLOCO                0xCAF1
+#define TI_BLOCO_RETURN         0xCAF2
 #define TI_COMANDO              0xCAF3
 #define TI_COMANDORET           0xCAF4
 #define TI_EXP                  0xCAF5
@@ -13,6 +14,9 @@
 #define TI_COMANDO_LIST         0xCAF9
 #define TI_TERM_ELSEIF          0xCAFA
 #define TI_LABEL                0xCAFB
+
+/* Check if it is a block */
+#define IS_BLOCK(X)             ((X == TI_BLOCO) || (X == TI_BLOCO_RETURN))
 
 /* Extra Non Terminals */
 #define TI_BLOCO_COMANDO        0xCAFC
@@ -31,11 +35,11 @@
 #define TI_RETURN               0xCB0A
 
 /* Expressions */
-#define IS_FUNCTION(X)          ((X == TI_CALL_FUNCTION) || (X == TI_CALL_FUNCTION_PAR))
+#define IS_CALL_FUNCTION(X)     ((X == TI_CALL_FUNCTION) || (X == TI_CALL_FUNCTION_PAR))
 #define IS_NUMBER(X)            (X == T_NUMBER) 
 #define IS_NAME(X)              (X == T_NAME)
 #define IS_NIL(X)               (X == T_NIL)
-#define IS_EXPRESSION(X)        (((X >= 0xCB0B) && (X <= 0xCB24)) || IS_FUNCTION(X) || IS_NUMBER(X) || IS_NAME(X) || IS_NIL(X))
+#define IS_EXPRESSION(X)        (((X >= 0xCB0B) && (X <= 0xCB24)) || IS_CALL_FUNCTION(X) || IS_NUMBER(X) || IS_NAME(X) || IS_NIL(X))
 
 /* Unary Operands */
 #define IS_UNARY_OPERAND(X)     ((X >= 0xCB0B) && (X <= 0xCB0D))
