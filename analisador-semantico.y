@@ -303,7 +303,7 @@ comando_list    : comando_list comando                  {
                                                                 return EXIT_FAILURE;
                                                             }
                                                             
-                                                             /* Check if there are errors with the actual node */
+                                                             /* Check if there are errors with the actual child list */
                                                             if($$->child_list == NULL){
                                                                 printFatalError("FATAL ERROR ON CHILD LIST!");
                                                                 return EXIT_FAILURE;
@@ -311,6 +311,7 @@ comando_list    : comando_list comando                  {
                                                             
                                                             /* Add the last node */
                                                             listAddToken($$->child_list, $2);
+                                                            nodeAddRootToken($2, $$);
                                                         }
                 | /* Empty */                           {
                                                             /* Allocate Token and append childs */
@@ -566,6 +567,10 @@ term_elseif     : term_elseif T_ELSEIF exp T_THEN bloco {
                                                             listAddToken($$->child_list, $3);
                                                             listAddToken($$->child_list, $4);
                                                             listAddToken($$->child_list, $5);
+                                                            nodeAddRootToken($2, $$);
+                                                            nodeAddRootToken($3, $$);
+                                                            nodeAddRootToken($4, $$);
+                                                            nodeAddRootToken($5, $$);
                                                         }
                 | /* Empty */                           {
                                                             /* Allocate Token and append childs */
@@ -898,6 +903,7 @@ listadenomes    : T_NAME                                {
                                                             /* Add the first child if the last child was a token */
                                                             else{
                                                                 listAddToken($$->child_list, $1);
+                                                                nodeAddRootToken($1, $$);
                                                             }
                                                             
                                                             /* Check if there are errors with the actual node */
@@ -915,6 +921,8 @@ listadenomes    : T_NAME                                {
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
+                                                            nodeAddRootToken($2, $$);
+                                                            nodeAddRootToken($3, $$);
                                                         }
                 ;
 
@@ -936,6 +944,7 @@ listaexp        : exp                                   {
                                                             /* Add the first child if the last child was a token */
                                                             else{
                                                                 listAddToken($$->child_list, $1);
+                                                                nodeAddRootToken($1, $$);
                                                             }
                                                             
                                                             /* Check if there are errors with the actual node */
@@ -953,6 +962,8 @@ listaexp        : exp                                   {
                                                             /* Add the last nodes */
                                                             listAddToken($$->child_list, $2);
                                                             listAddToken($$->child_list, $3);
+                                                            nodeAddRootToken($2, $$);
+                                                            nodeAddRootToken($3, $$);
                                                         }
                 ;
 

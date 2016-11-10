@@ -587,7 +587,7 @@ const char mips_start_function_def2[] =
 
 /* Empty return */
 const char mips_end_of_function[] =
-    "end_function_%s: # Jump to the end of this void function\n";
+    "\tj end_function_%s # Jump to the end of this void function\n";
 
 /* End of function definition */
 const char mips_end_function_def[] =

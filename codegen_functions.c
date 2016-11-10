@@ -1425,11 +1425,13 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     int num_exp;
+    int pop_size;
     int return_shift;
     char *function_name;
     TokenNode *token_name;
     TokenNode *root_token;
     TokenNode *list_exp_token;
+    SymbolTable *symbol_table;
     
     /* Check if token return command is valid */
     if(command_return_token == NULL){
@@ -1482,15 +1484,30 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         
     */
     if(command_return_token->token_type == TI_RETURN){
-        /* Pop local variables on stack */
-        addInstructionMainQueueFormated(mips_pop_params, (actual_symbol_table->shift_address));
         
+        /* Since we can be inside a lot of blocks of code, we need to pop all variables until the function definition */
+        /* First symbol table to check */
+        symbol_table = actual_symbol_table;
+        
+        /* Initialize pop size */
+        pop_size = 0;
+        
+        /* Recurse and count the size of the pop */
+        while(symbol_table != NULL){
+            pop_size += symbol_table->shift_address;
+            symbol_table = symbol_table->previous_scope;
+        }
+        
+        /* Pop local variables on stack */
+        addInstructionMainQueueFormated(mips_pop_params, pop_size);
+        
+        /* First root token */
         root_token = command_return_token->root_token;
         
         /* Recurse and get the name of the function which is being returned */
         while(root_token != NULL){
             
-            printf("0x%X -- %s\n", root_token->token_type, root_token->token_str);
+            printf("0x%X --\n", root_token->token_type, root_token->token_str);
             
             /* If the actual token is of the type we wanted stop */
             if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
