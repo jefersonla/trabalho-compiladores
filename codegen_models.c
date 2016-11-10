@@ -506,7 +506,7 @@ const char mips_start_for[] =
 
 /* For condition check */
 const char mips_for_check[] =
-    "\t# -------------- Condition achieved ------------- #\n"
+    "\t# --------- Condition check expression ---------- #\n"
     "\tsle $a0, $a0, $t1\n"
     "\tbeq $a0, $0, end_for_%d # Check iterator\n"
     "\t# ----------------------------------------------- #\n";
