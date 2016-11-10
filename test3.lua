@@ -6,6 +6,7 @@ if 0 == 0 then
 else
     print(8)
 end
+-- 10
 
 -- if | else if | else if - OK
 if 10 > 100 then
@@ -15,6 +16,7 @@ elseif 10 ~= 10 then
 elseif 10 >= 2 then
     print(11)
 end
+-- 11
 
 -- if | else - OK
 if 10 == 11 then
@@ -24,6 +26,7 @@ elseif 10 == 9 then
 else
     print(12)
 end
+-- 12
 
 -- Print separator
 print(1212121212)

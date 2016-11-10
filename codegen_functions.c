@@ -659,15 +659,15 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Add label of for begin */
     addInstructionMainQueueFormated(mips_start_for, loop_for_counter);
     
-    /* Load value of the iterator */
-    instructionQueueEnqueueInstructionNode( main_instruction_queue,
-                                            symbolNodeGetLoadInstruction(symbol_node));
+    /* Execute for expression condition */
+    cgenExpression(token_exp, new_symbol_table);
     
     /* Move iterator from $a0 to $t1 */
     addInstructionMainQueue(mips_move_a0_t1);
     
-    /* Execute for expression condition */
-    cgenExpression(token_exp, new_symbol_table);
+    /* Load value of the iterator */
+    instructionQueueEnqueueInstructionNode( main_instruction_queue,
+                                            symbolNodeGetLoadInstruction(symbol_node));
     
     /* Add check expression */
     addInstructionMainQueueFormated(mips_for_check, loop_for_counter);
