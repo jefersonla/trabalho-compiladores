@@ -48,6 +48,37 @@ int loop_for_counter;
 int cond_if_counter;
 
 /**
+ * Pop local varibles, this include, the instruction pop, and the logical (symbol table) pop too.
+ * 
+ * @param symbol_table The symbol table which is being popped.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool popSymbolTable(SymbolTable *symbol_table){
+    int i;
+    int no_variables;
+ 
+    /* Check if we have a valid symbol table */
+    if(symbol_table == NULL){
+        printError("INVALID SYMBOL TABLE!");
+        return false;
+    }
+ 
+    /* Include the instruction to pop local variables */
+    addInstructionMainQueueFormated(mips_pop_local, (symbol_table->shift_address));
+    
+    /* Get how many variables we have */
+    no_variables = symbol_table->length;
+    
+    /* Remove each variable shift from all scopes */
+    for(i = 0; i < no_variables; i++){
+        symbolTablePopVar(symbol_table);
+    }
+    
+    /* Return success */
+    return true;
+}
+
+/**
  * Assign a list of names all values on stack.
  * 
  * @param list_names a valid list of *ONLY* token names.
@@ -117,15 +148,8 @@ bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
         /* pop */
         addInstructionMainQueue(mips_pop);
         
-        /* Pop address on symbol table too. This assume that the symbol table has a lot of blank space */
+        /* Pop address on symbol table too. This assume that the symbol table has a lot of blank spaces */
         symbolTablePopVar(actual_symbol_table);
-        
-        /* Restore correct symbol address after pop value stacked */
-        //if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
-        //    
-        //    /* Update address temporarily, because stack contains a lot of new values */
-        //    symbol_node->symbol_address -= ((list_names->length - i + 1) * 4);
-        //}
     }
     
     /* Return success */
@@ -233,11 +257,13 @@ bool cgenAllCode(TokenNode *root_token){
     /* Add header on main instruction queue */
     addInstructionMainQueue(mips_main);
     
+    //symbolTableAddSymbol(main_symbol_table, "$RA",NUMBER_TYPE); OTHER DUMMY DEBUG! -_-
+    
     /* Generate code for main application */
     cgenBlockCode(block_token, main_symbol_table);
 
     /* Pop Main Symbol table */
-    addInstructionMainQueueFormated(mips_pop_local, (main_symbol_table->shift_address));
+    popSymbolTable(main_symbol_table);
 
     /* Delete main symbol table */
     deleteSymbolTable(&main_symbol_table);
@@ -245,7 +271,7 @@ bool cgenAllCode(TokenNode *root_token){
     /* Copy variable definitions to main-instruction_queue */
     copyGlobalVariables();
     
-    /* Add header on main instruction queue */
+    /* Add footer of the main instruction queue */
     addInstructionMainQueue(mips_footer);
     
     /* Return success */
@@ -334,7 +360,6 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
-    int i;
     TokenList *list_names;
     TokenNode *token_exp;
     TokenNode *token_name;
@@ -495,7 +520,10 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
     cgenBlockCode(block_token, new_symbol_table);
     
     /* Pop variables */
-    addInstructionMainQueueFormated(mips_pop_local, new_symbol_table->shift_address);
+    popSymbolTable(new_symbol_table);
+    
+    /* Pop local symbol table */
+    popSymbolTable(new_symbol_table);
     
     /* Destroy new symbol table */
     deleteSymbolTable(&new_symbol_table);
@@ -574,6 +602,9 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     
     /* Increment while loop counter */
     loop_while_counter += 1;
+    
+    /* Pop local symbol table */
+    popSymbolTable(new_symbol_table);
     
     /* Delete Scope */
     deleteSymbolTable(&new_symbol_table);
@@ -661,6 +692,9 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Add our token name to the new symbol table */
     symbolTableAddSymbol(new_symbol_table_iterator, token_name->lex_str, NUMBER_TYPE);
+    
+    /* Push this variable */
+    symbolTablePushVar(new_symbol_table);
 
     /* Get the symbol node */
     symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table_iterator, token_name->lex_str);
@@ -750,13 +784,16 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
                                             symbolNodeGetStoreInstruction(symbol_node));
     
     /* Pop local scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    popSymbolTable(new_symbol_table);
     
     /* Add the footer of the for instruction */
     addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
     
-    /* Pop actual scope */
+    /* Pop iterator scope */
     addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
+    
+    /* Pop var */
+    symbolTablePopVar(new_symbol_table);
     
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
@@ -847,7 +884,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     cgenBlockCode(block_token, new_symbol_table);
      
     /* Pop local scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+    popSymbolTable(new_symbol_table);
     
     /* Add check for next if condition {else if / else} */
     addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, 0);
@@ -953,7 +990,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             cgenBlockCode(block_token, new_symbol_table);
             
             /* Pop local scope */
-            addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+            popSymbolTable(new_symbol_table);
             
             /* Delete the temporary escope */
             deleteSymbolTable(&new_symbol_table);
@@ -991,7 +1028,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         cgenBlockCode(block_token, new_symbol_table);
         
         /* Pop local scope */
-        addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+        popSymbolTable(new_symbol_table);
         
         /* Delete the temporary escope */
         deleteSymbolTable(&new_symbol_table);
@@ -1120,23 +1157,29 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     addInstructionMainQueueFormated(mips_pop_params, (new_table->shift_address));
     
     /* 
+        // DEPRECATED //
         Check if we have a block with return or not. Functions which return values, should push the return and jr
         acordingle, and the other who don't have values to return should pop local variables and jump to end_function_%s.
-        Functions who have more than one return rule, NEED TO RETURN THE SAME QUANTITY OF EXPRESSIONS! OF THE MAIN RETURN!
-        On void functions (functions without a return)
+        
+        // NEW STANDARD //
+        All types of function should go to end when found  return and arranged the return values.
+        Now this check is only to know if the first return is nil or the first expression!
     */
     if(block_token->token_type == TI_BLOCO){
-        
-        /* Finish function definition poping Record Activation */
+        /* Finish function definition poping Record Activation, and puting nil on $a0*/
         addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
-        
-        /* Pop parameters on stack */
-        addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
-        
-        /* Add final part */
-        addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     }
+    else{
+        /* Finish function definition poping Record Activation, without puting nil on $a0 */
+        addInstructionMainQueueFormated(mips_end_function_defX, (t_name->lex_str));
+    }
+        
+    /* Pop parameters on stack */
+    addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
     
+    /* Add final part */
+    addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
+
     /* Delete local symbol table and parameters symbol table */
     deleteSymbolTable(&new_table);
     deleteSymbolTable(&new_params_table);
@@ -1174,7 +1217,8 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
     }
     
     /* Get token list of names */
-    list_names_token = listGetTokenByIndex(local_variable_token->child_list, 1);
+    /* I NEED 3 DAYS TO FOUND THAT INDEX OF THE LIST OF NAMES IS 2 NOT 1... PLEASE ALWAYS REMEMBER THAT! */
+    list_names_token = listGetTokenByIndex(local_variable_token->child_list, 2); //1);
     
     /* Check list of names token */
     if(list_names_token == NULL){
@@ -1293,10 +1337,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             addInstructionMainQueueFormated(mips_marker_local_assign, token_name->lex_str, 0);
             
             /* Add the new token name to our symbol table */
-            symbolTableAddSymbol(actual_symbol_table->previous_scope, token_name->lex_str, NUMBER_TYPE);
+            symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
             
             /* Retrieve the added symbol node */
-            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str);
+            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
             
             /* Check if the retrieved symbol node is correct */
             if(symbol_node == NULL){
@@ -1311,7 +1355,7 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             addInstructionMainQueueFormated(mips_marker_exp, 0);
 
             /* CGEN(exp) */
-            cgenExpression(token_exp, actual_symbol_table->previous_scope->previous_scope);
+            cgenExpression(token_exp, actual_symbol_table);
             
             /* Add the correct store $a0 instruction */
             instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
@@ -1341,10 +1385,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
                 }
                 
                 /* Add the new token name to our symbol table */
-                symbolTableAddSymbol(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str, NUMBER_TYPE);
+                symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
                 
                 /* Retrieve the added symbol node */
-                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str);
+                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
                 
                 /* Check if the retrieved symbol node is correct */
                 if(symbol_node == NULL){
@@ -1357,15 +1401,27 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             }
             
             /* Execute list of expressions, and put reverse results on stack */
-            cgenExpressionList(list_exp_token, actual_symbol_table->previous_scope->previous_scope);
+            cgenExpressionList(list_exp_token, actual_symbol_table);
             
             /* Assign our list of names with our actual symbol table, the values stacked */
-            assignStackHelper(list_names, actual_symbol_table->previous_scope->previous_scope);
+            assignStackHelper(list_names, actual_symbol_table);
         }
     }
     
     /* Add footer of a local assign */
     addInstructionMainQueue(mips_end_local_assign);
+    
+    /*
+        ONLY NECESSARY FOR DEBUGS... IGNORE THIS CODE
+        SymbolTable *previous_table;
+        previous_table = actual_symbol_table;
+        while(previous_table!=NULL){
+            for(i = 0; i < previous_table->length; i++){
+                printf("%s ... 0x%X\n", previous_table->items[i]->symbol_name, previous_table->items[i]->symbol_address);
+            }
+            previous_table = previous_table->previous_scope;
+        }
+    */
     
     /* Return success */
     return true;
@@ -1451,7 +1507,6 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     int num_exp;
     int pop_size;
-    int return_shift;
     char *function_name;
     TokenNode *token_name;
     TokenNode *root_token;
@@ -1507,41 +1562,47 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
                 has at least 2 blocks of code, on in other words, I assume that these variables, represent two 
                 other variables.
         
+        But if we have a procedure (a void function) or a function which don't return a value (the same as the return is null)
+        we don't need to change too much things, we just need to free all of the local variables and then jump to the end
+        of this procedure, 'cause the function already knows how to finish this function.
+        
     */
+        
+    /* Since we can be inside a lot of blocks of code, we need to pop all variables until the function definition */
+    /* First symbol table to check */
+    symbol_table = actual_symbol_table;
+    
+    /* Initialize pop size */
+    pop_size = 0;
+    
+    /* Recurse and count the size of the pop */
+    while(symbol_table != NULL){
+        pop_size += symbol_table->shift_address;
+        symbol_table = symbol_table->previous_scope;
+    }
+    
+    /* Pop local variables on stack */
+    addInstructionMainQueueFormated(mips_pop_params, pop_size);
+    
+    /* First root token */
+    root_token = command_return_token->root_token;
+    
+    /* Recurse and get the name of the function which is being returned */
+    while(root_token != NULL){
+        
+        //printf("0x%X --\n", root_token->token_type);
+        
+        /* If the actual token is of the type we wanted stop */
+        if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
+            break;
+        }
+        
+        /* Get the next 'previous token' */
+        root_token = root_token->root_token;
+    }
+
+    /* If this a void return, we don't need to evaluation expressions return */
     if(command_return_token->token_type == TI_RETURN){
-        
-        /* Since we can be inside a lot of blocks of code, we need to pop all variables until the function definition */
-        /* First symbol table to check */
-        symbol_table = actual_symbol_table;
-        
-        /* Initialize pop size */
-        pop_size = 0;
-        
-        /* Recurse and count the size of the pop */
-        while(symbol_table != NULL){
-            pop_size += symbol_table->shift_address;
-            symbol_table = symbol_table->previous_scope;
-        }
-        
-        /* Pop local variables on stack */
-        addInstructionMainQueueFormated(mips_pop_params, pop_size);
-        
-        /* First root token */
-        root_token = command_return_token->root_token;
-        
-        /* Recurse and get the name of the function which is being returned */
-        while(root_token != NULL){
-            
-            printf("0x%X --\n", root_token->token_type, root_token->token_str);
-            
-            /* If the actual token is of the type we wanted stop */
-            if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
-                break;
-            }
-            
-            /* Get the next 'previous token' */
-            root_token = root_token->root_token;
-        }
         
         /* If we can't find a function definition we are on main, and need to use a specific jump to end */
         if(root_token == NULL){
@@ -1568,7 +1629,62 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         
         /* Return success */
         return true;
-    } 
+    }
+    
+    /*
+        If we get there, we have a return with multiple values, the script to return multiple values is one
+        of the harder things in this code. First of all we assume that you can't return  execution of another function
+        and we make sure of this with the semantic analyser. Second if we count the number of expressions...
+        Hmmmm...
+        No call_function is a valid expression... I need to found a way of return multiple values of a call function expression.
+        I know that a function call, which have more than one return value, will put this values on stack, and I just need
+        to evaluate the list of expressions, the problem is that I need to shift all variables before I do this.
+        Hmmm... I know how to move the last $fp from stack to the top of my new stack, and it's easy, because I know
+        how much parameters, I have on stack, and it's easy remove all of them, since computer need this parameters to
+        evaluate the return, I can't remove them before finish expression evaluation... Hmmmm... GOT IT!
+        If we now how many expression we had evaluated, we just need to shift all of them to begin of the stack, but, to do this
+        I need to write a code that push the entire stack with the same model of the procedure return, and if I maintain the
+        same model as a normal expression, then I don't need to use $ra, because all of the function registers, will remain stacked
+        where they should stay, so in this moment I can jump to end and remove the local variables, the $ra, the $fp, the parameters
+        and left the old $fp untouched.
+        
+        Example:
+        
+        This is how stack will be after the expression list execution:
+        
+            +   $$>>return<<$$
+            +   $$local$$
+            4   $ra
+            8   $fp
+            +   $$parameters$$
+            4   $old-fp
+            
+        Then all I need to do is just shift return that is on stack, to the bottom of this stack, like this:
+        
+            +   $$local$$
+            4   $ra
+            8   $fp
+            +   $$parameters$$
+            4   $old-fp
+            +   $$>>return<<$$
+            
+    */
+    
+    /* Since, you can't return values on on main, we don't need to check if we are on main or not */
+    
+    /* Get token name of a function definition */
+    token_name = listGetTokenByIndex(root_token->child_list, 2);
+    
+    /* Check if this token name is valid */
+    if(token_name == NULL){
+        printError("INVALID FUNCTION NAME!");
+        return false;
+    }
+    
+    /* Pick the pointer of the string of the function name */
+    function_name = token_name->lex_str;
+    
+    
     /* Get list of expressions */
     list_exp_token = listGetTokenByIndex(command_return_token->child_list, 2);
     
@@ -1578,15 +1694,38 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         return false;
     }
     
-    /* List of exp returned */
-    num_exp = (list_exp_token->child_list->length / 2) + 1;
+    /* Execute list of expressions */
+    num_exp = cgenExpressionList(list_exp_token, actual_symbol_table);
 
+    /* 
+        Now all expressions that is being returned is on top of stack, I Need to found a way to put them on bottom of stack.
+        I know that the list of expressions that is inside on my stack, had changed the pointers of the symbol table,
+        so indirectly I know the size of the stack, and the size of stack is the address of the last item on my symbol table
+        
+                            (symbol_table->items[symbol_table->length - 1]->symbol_address - 4)
+        
+        I know that the size of my parameters is the size of the brother table, and I can go to brother table easily, because
+        there are only one brother table in a normal symbol table, of course there are a lot of previous scope so i need to go
+        to the first one to found the brother table
+        
+            previous_scope = symbol_table; while(previous_scope != NULL){ if(previous_scope->brother_table != NULL) break; }
+               if(previous_scope == NULL) { no_params_table; } else { brother_table = previous_scope->brother_table; }
+        
+        The size of $old_fp, $fp, $ra, are always 12, so the last parameter is the size of local variables that is
+            
+                                           (symbol_table->shift_address - 4)
+        
+        This is the complete size of our stack after execute the return expression list, and all we need to do is rearrange 
+        this stack and jump to the end of this function.
+    */
     
-    /* Calculate the necessary shift */
-    return_shift = num_exp * 4;
+    // TODO!
+    printTodo("RETURN VALUES ARE INCOMPLETE AT THE MOMENT!");
     
-    /* Perform shift if it's need */
+    /* After shift we just need to jump to end of the function */
     
+    /* Add jump to function return */
+    addInstructionMainQueueFormated(mips_end_of_function, function_name);
     
     /* Return success */
     return true;
@@ -1602,16 +1741,12 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
 bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
     TokenNode *command_list_token;
     TokenNode *command_return_token;
-    SymbolTable *actual_symbol_table;
     
     /* Check if the actual block_token is not NULL */
     if(block_token == NULL){
         printError("BLOCK TOKEN IS NULL!");
         return false;
     }
-    
-    /* Actual Symbol Table */
-    //actual_symbol_table = newSymbolTable(previous_scope, REGISTER_TYPE_SP);
     
     /* Command list token */
     command_list_token = listGetTokenByIndex(block_token->child_list, 1);
@@ -1628,12 +1763,6 @@ bool cgenBlockCode(TokenNode *block_token, SymbolTable *previous_scope){
         /* Generate command return code */
         cgenCommandReturn(command_return_token, previous_scope);
     }
-    
-    /* Pop this actual symbol table */
-    //addInstructionMainQueueFormated(mips_pop_local, actual_symbol_table->shift_address);
-    
-    /* Delete local symbol table */
-    //deleteSymbolTable(&actual_symbol_table);
     
     /* Return success */
     return true;

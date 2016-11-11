@@ -200,13 +200,13 @@ const char mips_pop[] =
 
 /* Pop stack params */
 const char mips_pop_params[] =
-    "\t# ---------------- Pop Params Stack ------------- #\n"
+    "\t# --------------- Pop Params Stack -------------- #\n"
     "\taddiu $sp, $sp, %d\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Pop local variables on stack */
 const char mips_pop_local[] =
-    "\t# ---------- Pop Params Local Variables --------- #\n"
+    "\t# -------------- Pop Local Variables ------------ #\n"
     "\taddiu $sp, $sp, %d\n"
     "\t# ----------------------------------------------- #\n";
 
@@ -589,12 +589,19 @@ const char mips_start_function_def2[] =
 const char mips_end_of_function[] =
     "\tj end_function_%s # Jump to the end of this void function\n";
 
-/* End of function definition */
+/* End of function definition with nil return */
 const char mips_end_function_def[] =
     "end_function_%s:\n"
         "\tlw $ra, 4($sp)\n"
         "\tlw $fp, 8($sp)\n"
         "\tlw $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val # Load nil as return\n"
+        "\taddiu $sp, $sp, 8\n";
+        
+/* End of function definition without nil return */
+const char mips_end_function_defX[] =
+    "end_function_%s:\n"
+        "\tlw $ra, 4($sp)\n"
+        "\tlw $fp, 8($sp)\n"
         "\taddiu $sp, $sp, 8\n";
 
 /* -- POP PARAMETERS -- */

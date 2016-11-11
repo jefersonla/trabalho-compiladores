@@ -875,7 +875,6 @@ bool symbolTableAddBrother(SymbolTable *symbol_table, SymbolTable *brother_table
 bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symbol_type){
     SymbolNode *_new_symbol_node;
     SymbolNode **_reallocated_items;
-    int i;
     
     /* Check if symbol name is null or incorrect */
     if((symbol_name == NULL) || (strlen(symbol_name) == 0)){

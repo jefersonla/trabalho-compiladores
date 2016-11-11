@@ -270,8 +270,11 @@ extern const char mips_start_function_def2[];
 /* Empty return */
 extern const char mips_end_of_function[];
 
-/* End of function definition */
+/* End of function definition with nil return */
 extern const char mips_end_function_def[];
+
+/* End of function definition without nil return */
+extern const char mips_end_function_defX[];
 
 /* End of function definition */
 extern const char mips_end_function_def2[];
