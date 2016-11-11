@@ -187,8 +187,8 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the header instruction queue was corrected initialized */
     if(header_instruction_queue == NULL){
-        printError("CANNOT INITIALIZE HEADER INSTRUCTION QUEUE.");
-        return false;
+        printFatalError("CANNOT INITIALIZE HEADER INSTRUCTION QUEUE.");
+        exit(EXIT_FAILURE);
     }
     
     /* Initialize Main Instruction Queue */
@@ -196,8 +196,8 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the header instruction queue was corrected initialized */
     if(main_instruction_queue == NULL){
-        printError("CANNOT INITIALIZE MAIN INSTRUCTION QUEUE.");
-        return false;
+        printFatalError("CANNOT INITIALIZE MAIN INSTRUCTION QUEUE.");
+        exit(EXIT_FAILURE);
     }
     
     /* Initialize Global Symbol Table */
@@ -205,8 +205,8 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the global symbol was correct initialized */
     if(global_symbol_table == NULL){
-        printError("CANNOT CREATE GLOBAL SYMBOL TABLE.");
-        return false;
+        printFatalError("CANNOT CREATE GLOBAL SYMBOL TABLE.");
+        exit(EXIT_FAILURE);
     }
 
     /* Block token node */
@@ -214,8 +214,8 @@ bool cgenAllCode(TokenNode *root_token){
     
     /* Check if the block token really exists */
     if(block_token == NULL){
-        printError("CANNOT GET BLOCK TOKEN NODE.");
-        return false;
+        printFatalError("CANNOT GET BLOCK TOKEN NODE.");
+        exit(EXIT_FAILURE);
     }
     
     /* Create the main symbol table */
@@ -291,6 +291,9 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     
     /* Push var */
     symbolTablePushVar(actual_symbol_table);
+    
+    /* Iniitalize list of expressions executed */
+    no_exp_executed = 0;
     
     /* Check what is the type of the function call */
     if(call_function_token->token_type == TI_CALL_FUNCTION_PAR){
@@ -393,13 +396,18 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         /* Get the symbol node */
         symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
         
+        printf("%s -- symbol name\n", token_name->lex_str);
+        
         /* If token name isn't inside the actual symbol table so this t_name is global */
         if(symbol_node == NULL){
             symbol_node = symbolTableGetSymbolNodeByName(global_symbol_table, token_name->lex_str);
+            printf("NOT FOUND LOCAL!\n");
         }
         
         /* If this symbol is not on global symbol table, so need to add him first, on global symbol table */
         if(symbol_node == NULL){
+            
+            printf("NOT FOUND GLOBAL!\n");
             
             /* Add the symbol to the global symbol table */
             symbolTableAddSymbol(global_symbol_table, token_name->lex_str, NUMBER_TYPE);
@@ -451,6 +459,7 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol_table){
     TokenNode *block_token;
+    SymbolTable *new_symbol_table;
     
     /* Check if command list token is null */
     if(command_block_token == NULL){
@@ -473,8 +482,23 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
         return false;
     }
     
+    /* Create a new scope */
+    new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
+    
+    /* Check if the new symbol table is valid */
+    if(new_symbol_table == NULL){
+        printError("INVALID NEW SYMBOL TABLE!");
+        return false;
+    }
+    
     /* Generate Code for the T_DO [bloco] T_END */
-    cgenBlockCode(block_token, actual_symbol_table);
+    cgenBlockCode(block_token, new_symbol_table);
+    
+    /* Pop variables */
+    addInstructionMainQueueFormated(mips_pop_local, new_symbol_table->shift_address);
+    
+    /* Destroy new symbol table */
+    deleteSymbolTable(&new_symbol_table);
     
     return true;
 }
@@ -736,6 +760,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
+    deleteSymbolTable(&new_symbol_table_iterator);
     
     /* Increment for counter */
     loop_for_counter += 1;
@@ -1268,10 +1293,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             addInstructionMainQueueFormated(mips_marker_local_assign, token_name->lex_str, 0);
             
             /* Add the new token name to our symbol table */
-            symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
+            symbolTableAddSymbol(actual_symbol_table->previous_scope, token_name->lex_str, NUMBER_TYPE);
             
             /* Retrieve the added symbol node */
-            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+            symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str);
             
             /* Check if the retrieved symbol node is correct */
             if(symbol_node == NULL){
@@ -1286,7 +1311,7 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             addInstructionMainQueueFormated(mips_marker_exp, 0);
 
             /* CGEN(exp) */
-            cgenExpression(token_exp, actual_symbol_table);
+            cgenExpression(token_exp, actual_symbol_table->previous_scope->previous_scope);
             
             /* Add the correct store $a0 instruction */
             instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
@@ -1316,10 +1341,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
                 }
                 
                 /* Add the new token name to our symbol table */
-                symbolTableAddSymbol(actual_symbol_table, token_name->lex_str, NUMBER_TYPE);
+                symbolTableAddSymbol(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str, NUMBER_TYPE);
                 
                 /* Retrieve the added symbol node */
-                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table, token_name->lex_str);
+                symbol_node = symbolTableGetSymbolNodeByName(actual_symbol_table->previous_scope->previous_scope, token_name->lex_str);
                 
                 /* Check if the retrieved symbol node is correct */
                 if(symbol_node == NULL){
@@ -1332,10 +1357,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             }
             
             /* Execute list of expressions, and put reverse results on stack */
-            cgenExpressionList(list_exp_token, actual_symbol_table);
+            cgenExpressionList(list_exp_token, actual_symbol_table->previous_scope->previous_scope);
             
             /* Assign our list of names with our actual symbol table, the values stacked */
-            assignStackHelper(list_names, actual_symbol_table);
+            assignStackHelper(list_names, actual_symbol_table->previous_scope->previous_scope);
         }
     }
     
