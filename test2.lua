@@ -145,17 +145,16 @@ end
 
 why()
 
-
 -- Separator
 print(1234567890)
 
--- Test of while, with some assigns 
 while(0) do -- should don't enter here
     print(3)
 end
 
 x = 4
 
+-- Test of while, with some assigns 
 while(x ~= 0) do -- OK!
     x = x - 1
     print(45)

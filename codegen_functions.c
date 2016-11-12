@@ -692,9 +692,6 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Add our token name to the new symbol table */
     symbolTableAddSymbol(new_symbol_table_iterator, token_name->lex_str, NUMBER_TYPE);
-    
-    /* Push this variable */
-    symbolTablePushVar(new_symbol_table);
 
     /* Get the symbol node */
     symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table_iterator, token_name->lex_str);
@@ -791,10 +788,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Pop iterator scope */
     addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
-    
-    /* Pop var */
-    symbolTablePopVar(new_symbol_table);
-    
+
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
     deleteSymbolTable(&new_symbol_table_iterator);
