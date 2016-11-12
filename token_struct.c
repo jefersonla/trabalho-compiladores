@@ -1013,14 +1013,10 @@ SymbolNode* symbolTableGetSymbolNodeByName(SymbolTable *symbol_table, char *symb
     /* Search for the variable in the actual symbol table */
     while(_actual_symbol_table != NULL){
         
-        /* Check if the symbol table have elements and them search for */ 
-        if(_actual_symbol_table->length > 0){
-            
-            /* Check if symbol table already has a symbol with this name */
-            for(i = 0; i < _actual_symbol_table->length; i++){
-                if(symbolEqualsName(_actual_symbol_table->items[i], symbol_name)){
-                    return _actual_symbol_table->items[i];
-                }
+        /* Check if symbol table already has a symbol with this name */
+        for(i = 0; i < _actual_symbol_table->length; i++){
+            if(symbolEqualsName(_actual_symbol_table->items[i], symbol_name)){
+                return _actual_symbol_table->items[i];
             }
         }
         

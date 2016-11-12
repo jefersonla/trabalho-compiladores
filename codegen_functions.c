@@ -522,9 +522,6 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
     /* Pop variables */
     popSymbolTable(new_symbol_table);
     
-    /* Pop local symbol table */
-    popSymbolTable(new_symbol_table);
-    
     /* Destroy new symbol table */
     deleteSymbolTable(&new_symbol_table);
     

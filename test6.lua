@@ -16,9 +16,9 @@ function why()
   for i = 10, 20 do
     print(i)
   end
-  --for i = 0, 20, 2 do
-  --  print(i)
-  --end
+  for i = 0, 20, 2 do
+    print(i)
+  end
 end
 
 why()
