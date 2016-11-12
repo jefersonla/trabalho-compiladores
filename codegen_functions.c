@@ -1146,9 +1146,6 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
     /* Generate code for block */
     cgenBlockCode(block_token, new_table);
     
-    /* Pop local variables on stack */
-    addInstructionMainQueueFormated(mips_pop_params, (new_table->shift_address));
-    
     /* 
         // DEPRECATED //
         Check if we have a block with return or not. Functions which return values, should push the return and jr
@@ -1162,6 +1159,9 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         There's no need to jump to end of function, in functions with return.
     */
     if(block_token->token_type == TI_BLOCO){
+        /* Pop local variables on stack */
+        addInstructionMainQueueFormated(mips_pop_params, (new_table->shift_address));
+        
         /* Finish function definition poping Record Activation, and puting nil on $a0*/
         addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
 
@@ -1170,17 +1170,11 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         
         /* Add final part */
         addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
-    
-        /* Delete local symbol table and parameters symbol table */
-        deleteSymbolTable(&new_table);
-        deleteSymbolTable(&new_params_table);
-        
-        /* Return success */
-        return true;
     }
-    
-    // TODO
-    // SINGLE AND MULTPLE RETURNS!
+
+    /* Delete local symbol table and parameters symbol table */
+    deleteSymbolTable(&new_table);
+    deleteSymbolTable(&new_params_table);
     
     /* Return success */
     return true;
@@ -1503,7 +1497,6 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
-    int num_exp;
     int pop_size;
     char *function_name;
     TokenNode *token_name;
@@ -1579,9 +1572,6 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         symbol_table = symbol_table->previous_scope;
     }
     
-    /* Pop local variables on stack */
-    addInstructionMainQueueFormated(mips_pop_params, pop_size);
-    
     /* First root token */
     root_token = command_return_token->root_token;
     
@@ -1601,6 +1591,9 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
 
     /* If this a void return, we don't need to evaluation expressions return */
     if(command_return_token->token_type == TI_RETURN){
+        
+        /* Pop local variables on stack */
+        addInstructionMainQueueFormated(mips_pop_params, pop_size);
         
         /* If we can't find a function definition we are on main, and need to use a specific jump to end */
         if(root_token == NULL){
@@ -1659,12 +1652,15 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
             
         Then all I need to do is just shift return that is on stack, to the bottom of this stack, like this:
         
-            +   $$local$$
-            4   $ra
-            8   $fp
-            +   $$parameters$$
-            4   $old-fp
-            +   $$>>return<<$$
+            Removed:
+                +   $$local$$
+                4   $ra
+                8   $fp
+                +   $$parameters$$
+            
+            New Stack:
+                4   $old-fp
+                +   $$>>return<<$$
             
     */
     
@@ -1693,7 +1689,8 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     }
     
     /* Execute list of expressions */
-    num_exp = cgenExpressionList(list_exp_token, actual_symbol_table);
+    cgenExpressionList(list_exp_token, actual_symbol_table);
+    
 
     /* 
         Now all expressions that is being returned is on top of stack, I Need to found a way to put them on bottom of stack.

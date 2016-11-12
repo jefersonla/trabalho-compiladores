@@ -840,7 +840,7 @@ const char mips_start_return[] =
     "\tlw $a0, 4($sp)       # Load top of stack to $a0\n"
     "\taddiu $sp, $sp, 4    # pop stack\n"
     "\tmove $s0, $sp        # Store New $sp to $s0\n"
-    "\tli $t2, 0            # Load first value of 'i'\n"
+    "\tli $t2, 1            # Load first value of 'i'\n"
     "\tli $t3, %d           # Load final value of 'i'\n"
     "\taddiu $sp, $sp, -4   # Push old $fp\n"
     "\tlw $ra, %d($sp)      # Load $ra\n"
