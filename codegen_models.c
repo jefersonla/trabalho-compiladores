@@ -597,12 +597,10 @@ const char mips_end_function_def[] =
         "\tlw $a0, " GLOBAL_SYSTEM_VARIABLE_PREFIX "nil_val # Load nil as return\n"
         "\taddiu $sp, $sp, 8\n";
         
-/* End of function definition without nil return */
+/* End of function definition without nil return and jr */
 const char mips_end_function_defX[] =
-    "end_function_%s:\n"
-        "\tlw $ra, 4($sp)\n"
-        "\tlw $fp, 8($sp)\n"
-        "\taddiu $sp, $sp, 8\n";
+        "\t# ^-------- End of Function Definition ---------^ #\n"
+    "end_definition_function_%s: # Continue program from here\n";
 
 /* -- POP PARAMETERS -- */
 
@@ -862,6 +860,6 @@ const char mips_return_multiple[] =
 /* End of a return */
 const char mips_end_return[] =
     "\tjr $ra\n"
-    "\t# v---------------- End of Return --------------v #\n";
+    "\t# ^---------------- End of Return --------------^ #\n";
 
 /* ------------------------------------------------------------- */

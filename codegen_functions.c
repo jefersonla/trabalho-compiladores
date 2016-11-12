@@ -1181,6 +1181,10 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         /* Add final part */
         addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
     }
+    else{
+        /* End of a function to function wich return values */
+        addInstructionMainQueueFormated(mips_end_function_defX, (t_name->lex_str));
+    }
 
     /* Delete local symbol table and parameters symbol table */
     deleteSymbolTable(&new_table);
@@ -1729,9 +1733,9 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         Add a logical variable into the root symbol table of all functions
             
             -- Address of $ra
-            X + 4 => 
+            X => 
             -- Address of $fp
-            X + 8 =>
+            X + 4 =>
             -- Address of old $fp
             Y =>
             -- Shift to clear stack
@@ -1744,16 +1748,16 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     printTodo("CREATE THE FUNCTION ADD LOGIC SYMBOL!");
     
     /* Return 'address' address */
-    ra_address = root_symbol_table->items[0]->symbol_address + 4;
+    ra_address = root_symbol_table->items[0]->symbol_address;
     
     /* Frame pointer address */
-    fp_address = root_symbol_table->items[0]->symbol_address + 8;
+    fp_address = root_symbol_table->items[0]->symbol_address + 4;
     
     /* Number of expressions executed, should be at least one */
     exp_executed = ((actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4) / 4);
     
     /* Check if we have a brother table, if there no brother table, we are on main, there are no param and 'old fp' is bellow 'fp' */
-    if(root_symbol_table->brother_table != NULL){
+    if((root_symbol_table->brother_table != NULL) && (root_symbol_table->brother_table->shift_address > 0)){
         old_fp_address = fp_address + (root_symbol_table->brother_table->shift_address - 4) + 4;
     }
     else{
