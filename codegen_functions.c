@@ -786,7 +786,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
     
     /* Pop local iterator */
-    popSymbolTable(new_symbol_table);
+    popSymbolTable(new_symbol_table_iterator);
     //addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
 
     /* Delte actual scope */

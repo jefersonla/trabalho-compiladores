@@ -44,7 +44,7 @@ print(x)        -- Should print 10
 -- Separator
 print(123456789)
 
--- ERROR ON POP
+-- No more errors on POP - OK
 for i = 1, 1 do
     local x
     print(x)    -- Should print nil
@@ -57,6 +57,7 @@ print(x)        -- Should print 10
 -- Separator
 print(123456789)
 
+-- OK :3
 function test()
     local x
     print(x)    -- Should print nil
