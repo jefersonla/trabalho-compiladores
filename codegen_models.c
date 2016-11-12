@@ -803,14 +803,65 @@ const char mips_end_local_assign[] =
 	"\t# ^------------ End of local assign ------------^ #\n";
  
 /* ------------------------------------------------------------- */
-/*                  ..........................                   */
+/*                      Return Values Model                      */
 /* ------------------------------------------------------------- */
 
 /**
- * Model ...
+ * Model for returning values.
  * 
- *  Default Model:
- *      ...
+ *  Default Model CGEN(return exp_list):
+ *      CGEN(exp_list)                  # Push exp list to stack
+ *      lw $a0, 4($sp)                  # Load top of stack to $a0
+ *      addiu $sp, $sp, 4               # pop stack
+ *      move $s0, $sp                   # Store New $sp to $s0
+ *      li $t2, 0                       # Load first value of 'i'
+ *      li $t3, %d                      # Load final value of 'i'
+ *      addiu $sp, $sp, -4              # Push old $fp
+ *      lw $ra, %d($sp)                 # Load $ra
+ *      lw $fp, %d($sp)                 # Load $fp
+ *      lw $t1, %d($sp)                 # Load old $fp to $t1
+ *      sw $t1, 4($sp)                  # Store old $fp to top of stack
+ *      addiu $sp, $sp, %d              # Remove all values from stack
+ * {
+ *  return_loop_%d:                     # while (there are values on stack)
+ *      lw $t1, 4($s0)                  # Pick bottom value of exp stack
+ *      sw $t1, 4($sp)                  # and store on top of stack
+ *      addiu $s0, $s0, -4              # Decrease exp stack
+ *      addiu $sp, $sp, -4              # Increase stack
+ *      addiu $t2, $t2, 1               # Increase 'i' counter
+ *      bne $t2, $t3, return_loop_%d    # End Loop
+ * } if (return values are more than one)
+ *      jr $ra                          # Jump to register address
  */
+
+/* Begin of the return values model */
+const char mips_start_return[] =
+    "\t# v-------------- Start of return --------------v #\n"
+    "\tlw $a0, 4($sp)       # Load top of stack to $a0\n"
+    "\taddiu $sp, $sp, 4    # pop stack\n"
+    "\tmove $s0, $sp        # Store New $sp to $s0\n"
+    "\tli $t2, 0            # Load first value of 'i'\n"
+    "\tli $t3, %d           # Load final value of 'i'\n"
+    "\taddiu $sp, $sp, -4   # Push old $fp\n"
+    "\tlw $ra, %d($sp)      # Load $ra\n"
+    "\tlw $fp, %d($sp)      # Load $fp\n"
+    "\tlw $t1, %d($sp)      # Load old $fp to $t1\n"
+    "\tsw $t1, 4($sp)       # Store old $fp to top of stack\n"
+    "\taddiu $sp, $sp, %d   # Remove all values from stack\n";
+
+/* Multiple returns stack rearange */
+const char mips_return_multiple[] =
+    "\treturn_loop_%d:      # while (there are values on stack)\n"
+    "\tlw $t1, 4($s0)       # Pick bottom value of exp stack\n"
+    "\tsw $t1, 4($sp)       # and store on top of stack\n"
+    "\taddiu $s0, $s0, -4   # Decrease exp stack\n"
+    "\taddiu $sp, $sp, -4   # Increase stack\n"
+    "\taddiu $t2, $t2, 1    # Increase 'i' counter\n"
+    "\tbne $t2, $t3, return_loop_%d\n";
+
+/* End of a return */
+const char mips_end_return[] =
+    "\tjr $ra\n"
+    "\t# v---------------- End of Return --------------v #\n";
 
 /* ------------------------------------------------------------- */

@@ -1154,28 +1154,33 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         Check if we have a block with return or not. Functions which return values, should push the return and jr
         acordingle, and the other who don't have values to return should pop local variables and jump to end_function_%s.
         
-        // NEW STANDARD //
+        // NEW STANDARD // DEPRECATED //
         All types of function should go to end when found  return and arranged the return values.
         Now this check is only to know if the first return is nil or the first expression!
+        
+        // DEFINITIVE STANDARD //
+        There's no need to jump to end of function, in functions with return.
     */
     if(block_token->token_type == TI_BLOCO){
         /* Finish function definition poping Record Activation, and puting nil on $a0*/
         addInstructionMainQueueFormated(mips_end_function_def, (t_name->lex_str));
-    }
-    else{
-        /* Finish function definition poping Record Activation, without puting nil on $a0 */
-        addInstructionMainQueueFormated(mips_end_function_defX, (t_name->lex_str));
-    }
-        
-    /* Pop parameters on stack */
-    addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
-    
-    /* Add final part */
-    addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
 
-    /* Delete local symbol table and parameters symbol table */
-    deleteSymbolTable(&new_table);
-    deleteSymbolTable(&new_params_table);
+        /* Pop parameters on stack */
+        addInstructionMainQueueFormated(mips_pop_params, (new_params_table->shift_address));
+        
+        /* Add final part */
+        addInstructionMainQueueFormated(mips_end_function_def2, (t_name->lex_str));
+    
+        /* Delete local symbol table and parameters symbol table */
+        deleteSymbolTable(&new_table);
+        deleteSymbolTable(&new_params_table);
+        
+        /* Return success */
+        return true;
+    }
+    
+    // TODO
+    // SINGLE AND MULTPLE RETURNS!
     
     /* Return success */
     return true;

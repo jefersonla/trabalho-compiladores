@@ -324,6 +324,15 @@ extern const char mips_marker_local_assign[];
 /* End of a local assign */
 extern const char mips_end_local_assign[];
 
+/* Begin of the return values model */
+extern const char mips_start_return[];
+
+/* Multiple returns stack rearange */
+extern const char mips_return_multiple[];
+
+/* End of a return */
+extern const char mips_end_return[];
+
 /* ------------------------------------------------------------- */
 
 #endif
