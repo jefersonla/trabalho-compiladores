@@ -255,6 +255,9 @@ bool cgenAllCode(TokenNode *root_token){
         exit(EXIT_FAILURE);
     }
     
+    /* Add a logical symbol node on main symbol table */
+    symbolTableAddLogicSymbol(main_symbol_table);
+    
     /* Add header on header instruction queue */
     instructionQueueEnqueueInstruction(header_instruction_queue, formatedInstruction(mips_header), false);
     
@@ -1072,6 +1075,9 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
         return false;
     }
     
+    /* Add a logical symbol node on main symbol table */
+    symbolTableAddLogicSymbol(new_table);
+    
     /* New parameters list symbol table */
     new_params_table = newSymbolTable(NULL, REGISTER_TYPE_FP);
     
@@ -1512,6 +1518,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     TokenNode *root_token;
     TokenNode *list_exp_token;
     SymbolTable *symbol_table;
+    SymbolTable *root_symbol_table;
     
     /* Check if token return command is valid */
     if(command_return_token == NULL){
@@ -1577,7 +1584,15 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     
     /* Recurse and count the size of the pop */
     while(symbol_table != NULL){
+        /* Increase the pop size */
         pop_size += symbol_table->shift_address;
+        
+        /* If the root symbol table of this table is null them this is the root of this symbol table */
+        if(symbol_table->previous_scope == NULL){
+            root_symbol_table = symbol_table;
+        }
+        
+        /* Get the previous scope */
         symbol_table = symbol_table->previous_scope;
     }
     
@@ -1711,9 +1726,10 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         With the correct algorithm to shift the expression stack, all i need to do now, is just pick the correct variables,
         despite the fact, that this seems easy, found the correct variables could be not too easy, than your thoughts.
         The variables are X, Y, Z and Q, and a more formal description of this variables are declared below.
+        Add a logical variable into the root symbol table of all functions
             
             -- Address of $ra
-            X + 4 =>
+            X + 4 => 
             -- Address of $fp
             X + 8 =>
             -- Address of old $fp
@@ -1725,14 +1741,27 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     */
     
     // TODO!
-    printTodo("GET VARIABLES TO EXECUTE THE CORRECT RETURN PROCEDURE!");
+    printTodo("CREATE THE FUNCTION ADD LOGIC SYMBOL!");
     
-    /* Return address address */
-    ra_address = 0;
-    fp_address = 0;
-    exp_executed = 0;
-    old_fp_address = 0;
-    shift_stack_size = 0;
+    /* Return 'address' address */
+    ra_address = root_symbol_table->items[0]->symbol_address + 4;
+    
+    /* Frame pointer address */
+    fp_address = root_symbol_table->items[0]->symbol_address + 8;
+    
+    /* Number of expressions executed, should be at least one */
+    exp_executed = ((actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4) / 4);
+    
+    /* Check if we have a brother table, if there no brother table, we are on main, there are no param and 'old fp' is bellow 'fp' */
+    if(root_symbol_table->brother_table != NULL){
+        old_fp_address = fp_address + (root_symbol_table->brother_table->shift_address - 4) + 4;
+    }
+    else{
+        old_fp_address = fp_address + 4;
+    }
+    
+    /* Get the size of the shift need to clean this stack */
+    shift_stack_size = old_fp_address - 4;
 
     /* Add start of the return */
     addInstructionMainQueueFormated(mips_start_return, ra_address, fp_address, old_fp_address, shift_stack_size);

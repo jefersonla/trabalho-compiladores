@@ -931,6 +931,40 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
 }
 
 /**
+ * Add a new logic symbol to symbol table.
+ * 
+ * @param symbol_table Table of symbols.
+ * @return true if there's no error on execution and false otherwise.
+ */
+bool symbolTableAddLogicSymbol(SymbolTable *symbol_table){
+    SymbolNode *_new_symbol_node;
+    
+    /* Check if symbol table is not NULL */
+    if(symbol_table == NULL){
+        printError("SYMBOL TABLE IS NULL!");
+        return false;
+    }
+    
+    /* Try allocate the new symbol node */
+    _new_symbol_node = newSymbolNode(symbol_table, "$$logic$$", BYTE_VARIABLE_SIZE, VOID_TYPE);
+    
+    /* Check if we had problems allocating this new symbol node */
+    if(_new_symbol_node == NULL){
+        printFatalError("CANNOT CREATE NEW SYMBOL NODE!");
+        exit(EXIT_FAILURE);
+    }
+    
+    /* Add the new logic symbol */
+    symbol_table->items[0] = _new_symbol_node;
+    
+    /* Increase number of symbols */
+    symbol_table->length += 1;
+    
+    /* Return success */
+    return true;
+}
+
+/**
  * Check if a symbol of a given name is present on the table.
  * 
  * @param symbol_table Table of symbols.

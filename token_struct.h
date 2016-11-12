@@ -199,6 +199,9 @@ bool deleteSymbolTable(ptrSymbolTable *symbol_table);
 /* Add a new symbol to symbol table */
 bool symbolTableAddSymbol(  SymbolTable *symbol_table, char *symbol_name, 
                             int symbol_type);
+                            
+/* Add a new logical symbol node to symbol table */
+bool symbolTableAddLogicSymbol(SymbolTable *symbol_table);
 
 /* Check if a symbol of a given name is present on the table */
 bool symbolTableContains(SymbolTable *symbol_table, char *symbol_name);

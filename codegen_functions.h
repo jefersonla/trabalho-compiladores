@@ -33,6 +33,9 @@
 #define NIL_TYPE_MASK                               "0x80000000"
 #define NIL_TYPE_VALUE                              "0x7FFFFFFF"
 
+/* Logical type */
+#define VOID_TYPE                                   0
+
 /* Integer type */
 #define NUMBER_TYPE                                 1
 
