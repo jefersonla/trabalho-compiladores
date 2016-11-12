@@ -840,8 +840,6 @@ const char mips_start_return[] =
     "\tlw $a0, 4($sp)       # Load top of stack to $a0\n"
     "\taddiu $sp, $sp, 4    # pop stack\n"
     "\tmove $s0, $sp        # Store New $sp to $s0\n"
-    "\tli $t2, 1            # Load first value of 'i'\n"
-    "\tli $t3, %d           # Load final value of 'i'\n"
     "\taddiu $sp, $sp, -4   # Push old $fp\n"
     "\tlw $ra, %d($sp)      # Load $ra\n"
     "\tlw $fp, %d($sp)      # Load $fp\n"
@@ -851,6 +849,8 @@ const char mips_start_return[] =
 
 /* Multiple returns stack rearange */
 const char mips_return_multiple[] =
+    "\tli $t2, 0            # Load first value of 'i'\n"
+    "\tli $t3, %d           # Load final value of 'i'\n"
     "\treturn_loop_%d:      # while (there are values on stack)\n"
     "\tlw $t1, 4($s0)       # Pick bottom value of exp stack\n"
     "\tsw $t1, 4($sp)       # and store on top of stack\n"

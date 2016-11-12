@@ -47,6 +47,9 @@ int loop_for_counter;
 /* Conditional 'if' counter */
 int cond_if_counter;
 
+/* Counter for multiple values 'return' */
+int multiple_return_counter;
+
 /**
  * Pop local varibles, this include, the instruction pop, and the logical (symbol table) pop too.
  * 
@@ -205,6 +208,7 @@ bool cgenAllCode(TokenNode *root_token){
     cond_if_counter = 0;
     loop_for_counter = 0;
     loop_while_counter = 0;
+    multiple_return_counter = 0;
     
     /* Initialize Header Instruction Queue */
     header_instruction_queue = newInstructionQueue();
@@ -1498,6 +1502,11 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     int pop_size;
+    int ra_address;
+    int fp_address;
+    int exp_executed;
+    int old_fp_address;
+    int shift_stack_size;
     char *function_name;
     TokenNode *token_name;
     TokenNode *root_token;
@@ -1664,21 +1673,6 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
             
     */
     
-    /* Since, you can't return values on on main, we don't need to check if we are on main or not */
-    
-    /* Get token name of a function definition */
-    token_name = listGetTokenByIndex(root_token->child_list, 2);
-    
-    /* Check if this token name is valid */
-    if(token_name == NULL){
-        printError("INVALID FUNCTION NAME!");
-        return false;
-    }
-    
-    /* Pick the pointer of the string of the function name */
-    function_name = token_name->lex_str;
-    
-    
     /* Get list of expressions */
     list_exp_token = listGetTokenByIndex(command_return_token->child_list, 2);
     
@@ -1691,7 +1685,6 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     /* Execute list of expressions */
     cgenExpressionList(list_exp_token, actual_symbol_table);
     
-
     /* 
         Now all expressions that is being returned is on top of stack, I Need to found a way to put them on bottom of stack.
         I know that the list of expressions that is inside on my stack, had changed the pointers of the symbol table,
@@ -1714,13 +1707,44 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         this stack and jump to the end of this function.
     */
     
+    /* 
+        With the correct algorithm to shift the expression stack, all i need to do now, is just pick the correct variables,
+        despite the fact, that this seems easy, found the correct variables could be not too easy, than your thoughts.
+        The variables are X, Y, Z and Q, and a more formal description of this variables are declared below.
+            
+            -- Address of $ra
+            X + 4 =>
+            -- Address of $fp
+            X + 8 =>
+            -- Address of old $fp
+            Y =>
+            -- Shift to clear stack
+            Z =>
+            -- Size of expression stack
+            Q =>
+    */
+    
     // TODO!
-    printTodo("RETURN VALUES ARE INCOMPLETE AT THE MOMENT!");
+    printTodo("GET VARIABLES TO EXECUTE THE CORRECT RETURN PROCEDURE!");
     
-    /* After shift we just need to jump to end of the function */
+    /* Return address address */
+    ra_address = 0;
+    fp_address = 0;
+    exp_executed = 0;
+    old_fp_address = 0;
+    shift_stack_size = 0;
+
+    /* Add start of the return */
+    addInstructionMainQueueFormated(mips_start_return, ra_address, fp_address, old_fp_address, shift_stack_size);
     
-    /* Add jump to function return */
-    addInstructionMainQueueFormated(mips_end_of_function, function_name);
+    /* Add loop for rearrange values of the new stack */
+    addInstructionMainQueueFormated(mips_return_multiple, exp_executed, multiple_return_counter, multiple_return_counter);
+    
+    /* Increase the multiple return counter */
+    multiple_return_counter += 1;
+    
+    /* Add end of a return expression */
+    addInstructionMainQueue(mips_end_return);
     
     /* Return success */
     return true;
