@@ -901,7 +901,8 @@ bool symbolTableAddSymbol(SymbolTable *symbol_table, char *symbol_name, int symb
     }
     
     /* Try allocate the new symbol node */
-    _new_symbol_node = newSymbolNode(symbol_table, symbol_name, symbol_table->start_address + BYTE_VARIABLE_SIZE, symbol_type);
+    //_new_symbol_node = newSymbolNode(symbol_table, symbol_name, symbol_table->start_address + BYTE_VARIABLE_SIZE, symbol_type);
+    _new_symbol_node = newSymbolNode(symbol_table, symbol_name, BYTE_VARIABLE_SIZE, symbol_type);
     
     /* Check if we can't allocate a new symbol node has returned no errors */
     if(_new_symbol_node == NULL){

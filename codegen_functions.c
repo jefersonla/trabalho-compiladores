@@ -590,18 +590,15 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     
     /* CGEN(bloco) */
     cgenBlockCode(block_token, new_symbol_table);
-    
-    /* Pop actual scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table->shift_address));
+
+    /* Pop local symbol table */
+    popSymbolTable(new_symbol_table);
     
     /* Add while end */
     addInstructionMainQueueFormated(mips_end_while, loop_while_counter, loop_while_counter);
     
     /* Increment while loop counter */
     loop_while_counter += 1;
-    
-    /* Pop local symbol table */
-    popSymbolTable(new_symbol_table);
     
     /* Delete Scope */
     deleteSymbolTable(&new_symbol_table);
@@ -690,6 +687,10 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Add our token name to the new symbol table */
     symbolTableAddSymbol(new_symbol_table_iterator, token_name->lex_str, NUMBER_TYPE);
 
+    ///// JUST A TEST
+    ///// symbolTablePopVar(new_symbol_table_iterator);
+    ///// INITIALIZING LOCAL VARIABLES WITH WRONG ADDRESS -_-
+    
     /* Get the symbol node */
     symbol_node = symbolTableGetSymbolNodeByName(new_symbol_table_iterator, token_name->lex_str);
     
@@ -780,11 +781,13 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Pop local scope */
     popSymbolTable(new_symbol_table);
     
+    
     /* Add the footer of the for instruction */
     addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
     
-    /* Pop iterator scope */
-    addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
+    /* Pop local iterator */
+    popSymbolTable(new_symbol_table);
+    //addInstructionMainQueueFormated(mips_pop_local, (new_symbol_table_iterator->shift_address));
 
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
