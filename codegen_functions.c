@@ -715,6 +715,16 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
         return false;
     }
     
+    // --- CHECK THE TYPE OF THE FOR --- //
+    
+    /* Execute for expression condition */
+    cgenExpression(token_exp, new_symbol_table);
+    
+    /* Move iterator from $a0 to $t1 */
+    addInstructionMainQueue(mips_move_a0_t1);
+    
+    // --- CHECK THE TYPE OF THE FOR --- //
+    
     /* Add definition of this token */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node));
     
@@ -723,7 +733,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     /* Assign the local iterator variable */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
-    
+
     /* Add label of for begin */
     addInstructionMainQueueFormated(mips_start_for, loop_for_counter);
     
@@ -743,7 +753,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Add check expression */
     addInstructionMainQueueFormated(mips_for_check, loop_for_counter);
     
-    /* Block token and increment may vary so we first check wat's the type of the 'for' */
+    /* Block token and increment may vary so we first check what's the type of the 'for' */
     if(for_token->token_type == TI_FOR_INC){
         /* Get block token */
         token_block = listGetTokenByIndex(for_token->child_list, 10);

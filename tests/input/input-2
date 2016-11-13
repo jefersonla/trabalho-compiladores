@@ -1,3 +1,24 @@
-function floor_sqrt(n) local l, r = 0, n while l < r do local m = (l + r + 1) / 2 if m * m <= n then l = m else r = m - 1 end end return l end
+function floor_sqrt(n)
+    local l, r = 0, n
+    while l < r do
+        local m = (l + r + 1) / 2 
+        if m * m <= n then
+            l = m
+        else 
+            r = m - 1
+        end
+    end
+    return l
+end
 
-for n = 0, 1000, 2 do print(floor_sqrt(n)) end for n = 1000, 0, -1 do print(floor_sqrt(n)) end for n = 123, 0, -10 do print(floor_sqrt(n)) end
+for n = 0, 1000, 2 do 
+    print(floor_sqrt(n)) 
+end
+
+for n = 1000, 0, -1 do
+    print(floor_sqrt(n))
+end
+
+for n = 123, 0, -10 do
+    print(floor_sqrt(n))
+end
