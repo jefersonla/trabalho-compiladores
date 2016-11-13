@@ -91,7 +91,7 @@ bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
     int i;
     TokenNode *token_name;
     SymbolNode *symbol_node;
-    
+
     /* Execute list of names and assign values for each symbol name */
     for(i = 1; i <= list_names->length; i++){
         
@@ -126,7 +126,12 @@ bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
         else if(symbol_node->root_symbol_table->register_type == REGISTER_TYPE_SP){
             
             /* Update address temporarily, because stack contains a lot of new values */
-            symbol_node->symbol_address += ((list_names->length - i + 1) * 4);
+            //symbol_node->symbol_address += ((list_names->length - i + 1) * 4);
+            // WTF?
+            // WHY??
+            // COMMON, PLEASE TEACHER JUST ACCEPT!
+            // IT'S CLEARLY THAT I'M GETTING CRAZY!
+            // PLS! STOP THIS, PLS! 
         }
         
         /* If this symbol is not on global symbol table, so need to add him first */
@@ -1379,7 +1384,7 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             }
             
             /* Add all variables on list of names to stack and symbol table */
-            for(i = list_names->length; i > 0; i--){
+            for(i = 1; i <= list_names->length; i++){
                 
                 /* Get the i token name */
                 token_name = listGetTokenByIndex(list_names, i);
@@ -1512,6 +1517,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
     int pop_size;
+    int exp_shift;
     int ra_address;
     int fp_address;
     int exp_executed;
@@ -1567,11 +1573,15 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
             Final stack:
                 
                 4   $old_fp
-                8+  $$return$$
+                8  $$return$$
                 
         PS.:    For the examples above I had assumed that $$return$$, $$local_variables$$ and $$function_parameters$$
                 has at least 2 blocks of code, on in other words, I assume that these variables, represent two 
                 other variables.
+                
+        PS2.:   I always assume that the first value of return are always on $a0, for that reason if we have two variables
+                The first value is on $a0 and the second will be on the second position of the stack if old fp is on stack
+                or the first position if old fp was already poped.
         
         But if we have a procedure (a void function) or a function which don't return a value (the same as the return is null)
         we don't need to change too much things, we just need to free all of the local variables and then jump to the end
@@ -1599,26 +1609,24 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         /* Get the previous scope */
         symbol_table = symbol_table->previous_scope;
     }
-    
-    /* First root token */
-    root_token = command_return_token->root_token;
-    
-    /* Recurse and get the name of the function which is being returned */
-    while(root_token != NULL){
-        
-        //printf("0x%X --\n", root_token->token_type);
-        
-        /* If the actual token is of the type we wanted stop */
-        if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
-            break;
-        }
-        
-        /* Get the next 'previous token' */
-        root_token = root_token->root_token;
-    }
 
     /* If this a void return, we don't need to evaluation expressions return */
     if(command_return_token->token_type == TI_RETURN){
+        
+        /* First root token */
+        root_token = command_return_token->root_token;
+        
+        /* Recurse and get the name of the function which is being returned */
+        while(root_token != NULL){
+            
+            /* If the actual token is of the type we wanted stop */
+            if((root_token->token_type == TI_FUNCTION) || (root_token->token_type == TI_FUNCTION_PARAM)){
+                break;
+            }
+            
+            /* Get the next 'previous token' */
+            root_token = root_token->root_token;
+        }
         
         /* Pop local variables on stack */
         addInstructionMainQueueFormated(mips_pop_params, pop_size);
@@ -1730,22 +1738,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         With the correct algorithm to shift the expression stack, all i need to do now, is just pick the correct variables,
         despite the fact, that this seems easy, found the correct variables could be not too easy, than your thoughts.
         The variables are X, Y, Z and Q, and a more formal description of this variables are declared below.
-        Add a logical variable into the root symbol table of all functions
-            
-            -- Address of $ra
-            X => 
-            -- Address of $fp
-            X + 4 =>
-            -- Address of old $fp
-            Y =>
-            -- Shift to clear stack
-            Z =>
-            -- Size of expression stack
-            Q =>
     */
-    
-    // TODO!
-    printTodo("CREATE THE FUNCTION ADD LOGIC SYMBOL!");
     
     /* Return 'address' address */
     ra_address = root_symbol_table->items[0]->symbol_address;
@@ -1753,12 +1746,15 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     /* Frame pointer address */
     fp_address = root_symbol_table->items[0]->symbol_address + 4;
     
+    /* Store how much shift is needed to put $s0 on bottom of the stack */
+    exp_shift = (actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4);
+    
     /* Number of expressions executed, should be at least one */
     exp_executed = ((actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4) / 4);
     
     /* Check if we have a brother table, if there no brother table, we are on main, there are no param and 'old fp' is bellow 'fp' */
     if((root_symbol_table->brother_table != NULL) && (root_symbol_table->brother_table->shift_address > 0)){
-        old_fp_address = fp_address + (root_symbol_table->brother_table->shift_address - 4) + 4;
+        old_fp_address = fp_address + (root_symbol_table->brother_table->shift_address) + 4;
     }
     else{
         old_fp_address = fp_address + 4;
@@ -1768,7 +1764,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     shift_stack_size = old_fp_address - 4;
 
     /* Add start of the return */
-    addInstructionMainQueueFormated(mips_start_return, ra_address, fp_address, old_fp_address, shift_stack_size);
+    addInstructionMainQueueFormated(mips_start_return, ra_address, fp_address, old_fp_address, shift_stack_size, exp_shift);
     
     /* Add loop for rearrange values of the new stack */
     addInstructionMainQueueFormated(mips_return_multiple, exp_executed, multiple_return_counter, multiple_return_counter);

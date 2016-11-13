@@ -835,15 +835,14 @@ const char mips_end_local_assign[] =
 /* Begin of the return values model */
 const char mips_start_return[] =
     "\t# v-------------- Start of return --------------v #\n"
+    "\tmove $s0, $sp        # Store $sp to $s0\n"
     "\tlw $a0, 4($sp)       # Load top of stack to $a0\n"
-    "\taddiu $sp, $sp, 4    # pop stack\n"
-    "\tmove $s0, $sp        # Store New $sp to $s0\n"
-    "\taddiu $sp, $sp, -4   # Push old $fp\n"
     "\tlw $ra, %d($sp)      # Load $ra\n"
     "\tlw $fp, %d($sp)      # Load $fp\n"
     "\tlw $t1, %d($sp)      # Load old $fp to $t1\n"
     "\tsw $t1, 4($sp)       # Store old $fp to top of stack\n"
-    "\taddiu $sp, $sp, %d   # Remove all values from stack\n";
+    "\taddiu $sp, $sp, %d   # Remove all values from stack\n"
+    "\taddiu $s0, $s0, %d   # Put s0 on bottom of the expression stack\n";
 
 /* Multiple returns stack rearange */
 const char mips_return_multiple[] =
@@ -855,7 +854,8 @@ const char mips_return_multiple[] =
     "\taddiu $s0, $s0, -4   # Decrease exp stack\n"
     "\taddiu $sp, $sp, -4   # Increase stack\n"
     "\taddiu $t2, $t2, 1    # Increase 'i' counter\n"
-    "\tbne $t2, $t3, return_loop_%d\n";
+    "\tbne $t2, $t3, return_loop_%d\n"
+    "\taddiu $sp, $sp, 4    # Remove empty position on stack\n";
 
 /* End of a return */
 const char mips_end_return[] =
