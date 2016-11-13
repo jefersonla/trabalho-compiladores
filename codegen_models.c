@@ -315,13 +315,13 @@ const char mips_neg_a0[] =
 /* Add value of $t1 with $a0 and store in $a0 */
 const char mips_add_a0_t1_a0[] =
     "\t# ------------- Add $a0 = $t1 + $a0 ------------- #\n"
-    "\tadd $a0, $t1, $a0\n"
+    "\taddu $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Sub value of $t1 with $a0 and store in $a0 */
 const char mips_sub_a0_t1_a0[] =
     "\t# ------------- Sub $a0 = $t1 - $a0 ------------- #\n"
-    "\tsub $a0, $t1, $a0\n"
+    "\tsubu $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
     
 /* Div value of $t1 with $a0 and store in $a0 */

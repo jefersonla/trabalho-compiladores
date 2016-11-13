@@ -1766,7 +1766,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     fp_address = root_symbol_table->items[0]->symbol_address + 4;
     
     /* Store how much shift is needed to put $s0 on bottom of the stack */
-    exp_shift = (actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 8);
+    exp_shift = actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 8;
     
     /* Number of expressions executed, should be at least one */
     exp_executed = ((actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4) / 4);
