@@ -35,9 +35,10 @@ print(bezero)
 function h(h__, ab__)
     print(h__)
     print(ab__)
-    return h__, ab__
+    return ab__, h__
 end
 
 h2, ab2 = h(40, 80)
 
-print(h2, ab2)
+print(h2)
+print(ab2)
