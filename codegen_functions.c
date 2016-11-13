@@ -597,6 +597,9 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     /* CGEN(exp) */
     cgenExpression(exp_token, previous_symbol_table);
     
+    /* Check if it's not nil */
+    addInstructionMainQueue(mips_check_a0_nil);
+    
     /* Check condition */
     addInstructionMainQueueFormated(mips_check_while, loop_while_counter);
     
@@ -733,6 +736,9 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Load value of the iterator */
     instructionQueueEnqueueInstructionNode( main_instruction_queue,
                                             symbolNodeGetLoadInstruction(symbol_node));
+    
+    /* Check if it's not nil */
+    addInstructionMainQueue(mips_check_a0_nil);
     
     /* Add check expression */
     addInstructionMainQueueFormated(mips_for_check, loop_for_counter);
@@ -872,6 +878,9 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     
     /* CGEN(exp) */
     cgenExpression(exp_token, actual_symbol_table);
+    
+    /* Check if it's not nil */
+    addInstructionMainQueue(mips_check_a0_nil);
     
     /* Check condition */
     addInstructionMainQueueFormated(mips_check_if, cond_if_counter, 0);
