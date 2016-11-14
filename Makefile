@@ -113,7 +113,7 @@ $(LEXICAL_EXECUTABLE): y.tab.c lex.yy.c $(LIBS_SRC) $(LIBS_HEADERS)
 	$(CC) $(CFLAGS) lex.yy.c $(LIBS_SRC) $(TODO_WARN) -o $(LEXICAL_EXECUTABLE) $(CFLAGS_LEXICAL) -D LEXICAL_ANALYSER 
 
 # Realiza os testes nos executaveis
-check: lexical-test parser-test
+check: lexical-test parser-test codegen-test
 #test: lexical-test parser-test
 
 # Executa todos os testes
@@ -145,6 +145,28 @@ parser-all-tests:
 	#@printf "\n"
 	@bash test.sh $(PARSER_EXECUTABLE) tests/parser/simple.lua
 	@printf "\n-- Finished Parser All Tests-- \n"
+
+# Executa os testes basicos para o codegen
+codegen-test:
+	@bash test.sh simulate.sh tests/codegen/test1.lua
+	@printf "\n"
+
+# Executa todos os testes para o codegen
+codegen-all-tests:
+	@bash test.sh simulate.sh tests/codegen/test1.lua tests/codegen/test1.code.out  tests/codegen/test1.lua.exp 
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test2.lua tests/codegen/test2.code.out  tests/codegen/test2.lua.exp
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test3.lua tests/codegen/test3.code.out  tests/codegen/test3.lua.exp
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test4.lua tests/codegen/test4.code.out  tests/codegen/test4.lua.exp
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test5.lua tests/codegen/test5.code.out  tests/codegen/test5.lua.exp
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test6.lua tests/codegen/test6.code.out  tests/codegen/test6.lua.exp
+	@printf "\n"
+	@bash test.sh simulate.sh tests/codegen/test7.lua tests/codegen/test7.code.out  tests/codegen/test7.lua.exp
+	@printf "\n"
 
 # Parser extra
 check-extra:
@@ -193,4 +215,4 @@ package:
 # Limpa o ambiente
 clean:
 	@printf "Cleaning project folder...\n"
-	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h tests/testing/* *.o $(EXECUTABLES) *.out tests/lexical/*.out tests/parser/*.out *.output pkg pkg.zip
+	@\rm -rf *.yy.c *.yy.h *.tab.c *.tab.h tests/testing/* *.o $(EXECUTABLES) *.out tests/lexical/*.out tests/parser/*.out tests/codegen/*.out tests/codegen/*.mips *.output pkg pkg.zip
