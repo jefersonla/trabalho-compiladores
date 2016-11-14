@@ -366,21 +366,30 @@ const char mips_lt_a0_t1_a0[] =
     "\tslt $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
+/** 
+ * History of this command:
+ *  > 1.0 : slt $t0, $t1, $a0
+ *          slt $a0, $a0, $t1
+ *          xor $a0, $a0, $t0
+ *          xori $a0, $a0, 1
+ */
+
 /* Check if $a0 is equal $t1 */
 const char mips_eq_a0_t1_a0[] =
     "\t# ------------- Eq $a0 = $t1 == $a0 ------------- #\n"
-    "\tslt $t0, $t1, $a0\n"
-    "\tslt $a0, $a0, $t1\n"
-    "\txor $a0, $a0, $t0\n"
-    "\txori $a0, $a0, 1\n"
+    "\tseq $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
+/** 
+ * History of this command:
+ *  > 1.0 : slt $t0, $t1, $a0
+ *          slt $a0, $a0, $t1
+ *          xor $a0, $a0, $t0
+ */
 /* Check if $a0 is not equal $t1 */
 const char mips_neq_a0_t1_a0[] =
     "\t# ------------- Neq $a0 = $t1 ~= $a0 ------------ #\n"
-    "\tslt $t0, $t1, $a0\n"
-    "\tslt $a0, $a0, $t1\n"
-    "\txor $a0, $a0, $t0\n"
+    "\tsne $a0, $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
 /** 

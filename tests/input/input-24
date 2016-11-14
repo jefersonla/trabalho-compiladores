@@ -1,3 +1,22 @@
-function collatz(x) local steps = 0 while 1 do if x == 1 then return steps end if x >= 100000000 then return -1 end if (x / 2) * 2 == x then x = x / 2 else x = 3 * x + 1 end steps = steps + 1 end return steps end
+function collatz(x)
+    local steps = 0
+    while 1 do
+        if x == 1 then
+            return steps
+        end
+        if x >= 100000000 then
+            return -1
+        end
+        if (x / 2) * 2 == x then
+            x = x / 2
+        else 
+            x = 3 * x + 1
+        end
+        steps = steps + 1
+    end
+    return steps
+end
 
-for i = 1, 5000 do print(collatz(i)) end
+for i = 1, 5000 do
+    print(collatz(i))
+end

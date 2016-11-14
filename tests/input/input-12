@@ -99,8 +99,9 @@ x97 = 0
 x98 = 0
 x99 = 0
 x100 = 0
-function get(n) if n == 0 then
-    return x0 
+function get(n)
+    if n == 0 then
+        return x0 
     end
     if n == 1 then
         return x1 
@@ -608,9 +609,8 @@ function set(n, x)
     elseif n == 99 then
         x99 = x 
     elseif n == 100 then
-    x100 = x 
-end
-
+        x100 = x 
+    end
 end
 
 
@@ -647,7 +647,6 @@ function sort(l, r)
             swap(j, k)
             k = k - 1 
         end
-    
     end
     swap(r, j) 
     sort(l, i - 1) 
