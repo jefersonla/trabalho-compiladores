@@ -33,7 +33,7 @@ else
 fi
 
 # Execute compiler, generate mips code pass this to spim and put the output in a file
-( ./compilador "$1" "$2.mips" > /dev/null 2>&1 && \
+( timeout $MAX_RUNNING_TIME ./compilador "$1" "$2.mips" > /dev/null 2>&1 && \
 timeout $MAX_RUNNING_TIME spim -f "$2.mips" | tail -n +6 | head -n 10000 > "$2" ) || \
 ( echo "Failed to compile program" && exit 1 )
 

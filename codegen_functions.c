@@ -910,6 +910,9 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     /* Pop local scope */
     popSymbolTable(new_symbol_table);
     
+    /* Delete the temporary escope */
+    deleteSymbolTable(&new_symbol_table);
+    
     /* Add check for next if condition {else if / else} */
     addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, 0);
     
@@ -1548,6 +1551,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     TokenNode *list_exp_token;
     SymbolTable *symbol_table;
     SymbolTable *root_symbol_table;
+    SymbolTable *last_valid_symbol_table;
     
     /* Check if token return command is valid */
     if(command_return_token == NULL){
@@ -1765,11 +1769,23 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     /* Frame pointer address */
     fp_address = root_symbol_table->items[0]->symbol_address + 4;
     
+    /* Since my actual symbol_table could be empty I need to find the last symbol table with values */
+    last_valid_symbol_table = actual_symbol_table;
+    while((last_valid_symbol_table != NULL) && (last_valid_symbol_table->length == 0)){
+        last_valid_symbol_table = last_valid_symbol_table->previous_scope;
+    }
+    
+    /* If our valid symbol table is empty we found a fatal bug, because even main has a logical symbol node */
+    if(last_valid_symbol_table == NULL){
+        printError("INVALID VALID SYMBOL TABLE!");
+        return false;
+    }
+    
     /* Store how much shift is needed to put $s0 on bottom of the stack */
-    exp_shift = actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 8;
+    exp_shift = last_valid_symbol_table->items[(last_valid_symbol_table->length - 1)]->symbol_address - 8;
     
     /* Number of expressions executed, should be at least one */
-    exp_executed = ((actual_symbol_table->items[(actual_symbol_table->length - 1)]->symbol_address - 4) / 4);
+    exp_executed = ((last_valid_symbol_table->items[(last_valid_symbol_table->length - 1)]->symbol_address - 4) / 4);
     
     /* Check if we have a brother table, if there no brother table, we are on main, there are no param and 'old fp' is bellow 'fp' */
     if((root_symbol_table->brother_table != NULL) && (root_symbol_table->brother_table->shift_address > 0)){
