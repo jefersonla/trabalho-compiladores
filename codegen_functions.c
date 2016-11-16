@@ -548,6 +548,7 @@ bool cgenCommandBlock(TokenNode *command_block_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
+    int while_counter;
     SymbolTable *new_symbol_table;
     TokenNode *block_token;
     TokenNode *exp_token;
@@ -591,8 +592,14 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
         return false;
     }
     
+    /* Store locally the counter */
+    while_counter = loop_while_counter;
+    
+    /* Increment while loop counter */
+    loop_while_counter += 1;
+    
     /* Add header message */
-    addInstructionMainQueueFormated(mips_start_while, loop_while_counter);
+    addInstructionMainQueueFormated(mips_start_while, while_counter);
     
     /* CGEN(exp) */
     cgenExpression(exp_token, previous_symbol_table);
@@ -601,7 +608,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     addInstructionMainQueue(mips_check_a0_nil);
     
     /* Check condition */
-    addInstructionMainQueueFormated(mips_check_while, loop_while_counter);
+    addInstructionMainQueueFormated(mips_check_while, while_counter);
     
     /* CGEN(bloco) */
     cgenBlockCode(block_token, new_symbol_table);
@@ -610,10 +617,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
     popSymbolTable(new_symbol_table);
     
     /* Add while end */
-    addInstructionMainQueueFormated(mips_end_while, loop_while_counter, loop_while_counter);
-    
-    /* Increment while loop counter */
-    loop_while_counter += 1;
+    addInstructionMainQueueFormated(mips_end_while, while_counter, while_counter);
     
     /* Delete Scope */
     deleteSymbolTable(&new_symbol_table);
@@ -630,6 +634,7 @@ bool cgenWhile(TokenNode *while_token, SymbolTable *previous_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
+    int count_for;
     TokenNode *token_exp;
     TokenNode *token_name;
     TokenNode *token_block;
@@ -659,6 +664,12 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
         printError("INVALID TOKEN NAME!");
         return false;
     }
+    
+    /* Store the counter */
+    count_for = loop_for_counter;
+    
+    /* Increment for counter */
+    loop_for_counter += 1;
     
     /* Get assign expression token */
     token_assign = listGetTokenByIndex(for_token->child_list, 4);
@@ -735,7 +746,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     // --- CHECK THE TYPE OF THE FOR --- //
     
     /* Add label of for begin */
-    addInstructionMainQueueFormated(mips_start_for, loop_for_counter);
+    addInstructionMainQueueFormated(mips_start_for, count_for);
     
     /* Execute for expression condition */
     cgenExpression(token_exp, new_symbol_table);
@@ -751,7 +762,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueue(mips_check_a0_nil);
     
     /* Add check expression */
-    addInstructionMainQueueFormated(mips_for_check, loop_for_counter);
+    addInstructionMainQueueFormated(mips_for_check, count_for);
     
     /* Block token and increment may vary so we first check what's the type of the 'for' */
     if(for_token->token_type == TI_FOR_INC){
@@ -811,7 +822,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     
     
     /* Add the footer of the for instruction */
-    addInstructionMainQueueFormated(mips_end_for, loop_for_counter, loop_for_counter);
+    addInstructionMainQueueFormated(mips_end_for, count_for, count_for);
     
     /* Pop local iterator */
     popSymbolTable(new_symbol_table_iterator);
@@ -819,9 +830,6 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Delte actual scope */
     deleteSymbolTable(&new_symbol_table);
     deleteSymbolTable(&new_symbol_table_iterator);
-    
-    /* Increment for counter */
-    loop_for_counter += 1;
     
     /* Return success */
     return true;
@@ -836,6 +844,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
  */
 bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     int i;
+    int if_counter;
     TokenNode *exp_token;
     TokenNode *block_token;
     TokenNode *list_elseif;
@@ -883,6 +892,12 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         return false;
     }
     
+    /* Store the counter locally */
+    if_counter = cond_if_counter;
+    
+    /* Increment if counter */
+    cond_if_counter += 1;
+    
     /* Add header message */
     addInstructionMainQueue(mips_start_if);
     
@@ -893,7 +908,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueue(mips_check_a0_nil);
     
     /* Check condition */
-    addInstructionMainQueueFormated(mips_check_if, cond_if_counter, 0);
+    addInstructionMainQueueFormated(mips_check_if, if_counter, 0);
     
     /* Create a new escope */
     new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
@@ -914,7 +929,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     deleteSymbolTable(&new_symbol_table);
     
     /* Add check for next if condition {else if / else} */
-    addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, 0);
+    addInstructionMainQueueFormated(mips_next_if, if_counter, if_counter, 0);
     
     /* Check if there are a list of else if */
     if(list_elseif->token_type == TI_LIST_ELSEIF){
@@ -996,13 +1011,13 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             }
             
             /* Header for elseif */
-            addInstructionMainQueueFormated(mips_elseif_start, cond_if_counter, i);
+            addInstructionMainQueueFormated(mips_elseif_start, if_counter, i);
             
             /* CGEN(exp) */
             cgenExpression(exp_token, actual_symbol_table);
             
             /* Check condition */
-            addInstructionMainQueueFormated(mips_check_if, cond_if_counter, i);
+            addInstructionMainQueueFormated(mips_check_if, if_counter, i);
             
             /* Create a new escope */
             new_symbol_table = newSymbolTable(actual_symbol_table, REGISTER_TYPE_SP);
@@ -1023,7 +1038,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             deleteSymbolTable(&new_symbol_table);
             
             /* Add check for next if condition {else if / else} */
-            addInstructionMainQueueFormated(mips_next_if, cond_if_counter, cond_if_counter, i);
+            addInstructionMainQueueFormated(mips_next_if, if_counter, if_counter, i);
         }
     }
     
@@ -1049,7 +1064,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
         }
         
         /* Header for else */
-        addInstructionMainQueueFormated(mips_else_start, cond_if_counter);
+        addInstructionMainQueueFormated(mips_else_start, if_counter);
         
         /* CGEN(bloco) */
         cgenBlockCode(block_token, new_symbol_table);
@@ -1062,10 +1077,7 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
     }
     
     /* Add if footer */
-    addInstructionMainQueueFormated(mips_end_if, cond_if_counter);
-    
-    /* Increment if counter */
-    cond_if_counter += 1;
+    addInstructionMainQueueFormated(mips_end_if, if_counter);
     
     /* Return success */
     return true;
@@ -1546,6 +1558,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     int exp_executed;
     int old_fp_address;
     int shift_stack_size;
+    int multiple_return_counter_local;
     char *function_name;
     TokenNode *token_name;
     TokenNode *root_token;
@@ -1764,6 +1777,12 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
         The variables are X, Y, Z and Q, and a more formal description of this variables are declared below.
     */
     
+    /* Store locally the counter */
+    multiple_return_counter_local = multiple_return_counter;
+    
+    /* Increase the multiple return counter */
+    multiple_return_counter += 1;
+    
     /* Return 'address' address */
     ra_address = root_symbol_table->items[0]->symbol_address;
     
@@ -1803,10 +1822,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     addInstructionMainQueueFormated(mips_start_return, ra_address, fp_address, old_fp_address, shift_stack_size, exp_shift);
     
     /* Add loop for rearrange values of the new stack */
-    addInstructionMainQueueFormated(mips_return_multiple, exp_executed, multiple_return_counter, multiple_return_counter);
-    
-    /* Increase the multiple return counter */
-    multiple_return_counter += 1;
+    addInstructionMainQueueFormated(mips_return_multiple, exp_executed, multiple_return_counter_local, multiple_return_counter_local);
     
     /* Add end of a return expression */
     addInstructionMainQueue(mips_end_return);
@@ -1973,6 +1989,7 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
+    int local_counter;
     TokenNode *token_left;
     TokenNode *token_right;
     TokenNode *token_operand;
@@ -2106,6 +2123,13 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         
         /* In short circuit 'and' we check if both sides of this binary operation are valid */
         if(exp_token->token_type == TI_AND){
+            
+            /* Sotore the counter locally */ 
+            local_counter = sc_and_counter;
+            
+            /* Increment counter */
+            sc_and_counter += 1;
+            
             /* Add begin of the and sc verification */
             addInstructionMainQueue(mips_and_sc_header);
             
@@ -2116,7 +2140,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
             addInstructionMainQueue(mips_check_a0_nil);
             
             /* Add check or skip with counter */
-            addInstructionMainQueueFormated(mips_and_sc_skip, sc_and_counter);
+            addInstructionMainQueueFormated(mips_and_sc_skip, local_counter);
             
             /* CGEN(exp2) */
             cgenExpression(token_right, symbol_table);
@@ -2125,13 +2149,17 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
             addInstructionMainQueue(mips_check_a0_nil);
             
             /* Add footer of this instruction */
-            addInstructionMainQueueFormated(mips_and_sc_footer, sc_and_counter);
-            
-            /* Increment counter */
-            sc_and_counter += 1;
+            addInstructionMainQueueFormated(mips_and_sc_footer, local_counter);
         }
         /* In short circuit 'or' we check if at least one of the sentences are true */
         else if(exp_token->token_type == TI_OR){
+            
+            /* Sotore the counter locally */ 
+            local_counter = sc_or_counter;
+            
+            /* Increment counter */
+            sc_or_counter += 1;
+            
             /* Add begin of the and sc verification */
             addInstructionMainQueue(mips_or_sc_header);
             
@@ -2142,7 +2170,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
             addInstructionMainQueue(mips_check_a0_nil);
             
             /* Add check or skip with counter */
-            addInstructionMainQueueFormated(mips_or_sc_skip, sc_or_counter);
+            addInstructionMainQueueFormated(mips_or_sc_skip, local_counter);
             
             /* CGEN(exp2) */
             cgenExpression(token_right, symbol_table);
@@ -2151,10 +2179,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
             addInstructionMainQueue(mips_check_a0_nil);
             
             /* Add footer of this instruction */
-            addInstructionMainQueueFormated(mips_or_sc_footer, sc_or_counter);
-            
-            /* Increment counter */
-            sc_or_counter += 1;
+            addInstructionMainQueueFormated(mips_or_sc_footer, local_counter);
         }
         /* This should never occur */
         else{

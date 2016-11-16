@@ -1,5 +1,24 @@
-function mod(x, y) local q = x / y return x - q * y end
+function mod(x, y)
+    local q = x / y 
+    return x - q * y 
+end
 
-function gcd(x, y) if x > y then x, y = y, x end if x == 0 then return y else return gcd(x, mod(y, x)) end end
+function gcd(x, y) 
+    if x > y then
+        x, y = y, x 
+    end 
+    if x == 0 then
+        return y
+    else 
+        return gcd(x, mod(y, x)) 
+    end 
+end
 
-for x = 0, 30 do for y = 0, 30 do if x ~= 0 or y ~= 0 then print(gcd(x, y)) end end end
+
+for x = 0, 30 do 
+    for y = 0, 30 do 
+        if x ~= 0 or y ~= 0 then
+            print(gcd(x, y)) 
+        end 
+    end 
+end
