@@ -30,8 +30,8 @@
 #define GLOBAL_VARIABLE_PREFIX                      "__"
 
 /* Value of a nil variable */
-#define NIL_TYPE_MASK                               "0x7FFFFFFF"
-#define NIL_TYPE_VALUE                              "0x80000000"
+#define NIL_TYPE_MASK                               "0x7FFFFFFD"
+#define NIL_TYPE_VALUE                              "0x80000002"
 
 /* Logical type */
 #define VOID_TYPE                                   0

@@ -4,7 +4,6 @@ function fibo(n)
     else
         return fibo(n - 1) + fibo(n - 2) 
     end
-
 end
 
 function teste(n) 
@@ -15,7 +14,8 @@ function teste(n)
     end
 end
 
-for n = 1, 20 do 
+n = 1
+while n <= 20 do
     if n / 2 * 2 == n then
         x, y, z = teste(n) 
         print(x) 
@@ -26,5 +26,20 @@ for n = 1, 20 do
         print(x) 
         print(y) 
     end
+    n = n + 1
 end
+--for n = 1, 20 do
+--    print(n)
+--    print(1111111111)
+--    if n / 2 * 2 == n then
+--        x, y, z = teste(n) 
+--        print(x) 
+--        print(y) 
+--        print(z) 
+--    else
+--        x, y = teste(n) 
+--        print(x) 
+--        print(y) 
+--    end
+--end
 
