@@ -1040,6 +1040,12 @@ bool cgenIf(TokenNode *if_token, SymbolTable *actual_symbol_table){
             /* Add check for next if condition {else if / else} */
             addInstructionMainQueueFormated(mips_next_if, if_counter, if_counter, i);
         }
+        
+        /* Delete exp list */
+        deleteTokenList(&exp_list, false);
+        
+        /* Delete block list */
+        deleteTokenList(&block_list, false);
     }
     
     /* Check if 'if token' has a else condition */

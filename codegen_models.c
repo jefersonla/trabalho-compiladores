@@ -904,7 +904,7 @@ const char mips_start_return[] =
 const char mips_return_multiple[] =
     "\tli $t2, 0            # Load first value of 'i'\n"
     "\tli $t3, %d           # Load final value of 'i'\n"
-    "\treturn_loop_%d:      # while (there are values on stack)\n"
+    "return_loop_%d:      # while (there are values on stack)\n"
     "\tlw $t1, 4($s0)       # Pick bottom value of exp stack\n"
     "\tsw $t1, 4($sp)       # and store on top of stack\n"
     "\taddiu $s0, $s0, -4   # Decrease exp stack\n"
