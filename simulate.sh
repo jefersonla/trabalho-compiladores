@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MAX_RUNNING_TIME=10
+MAX_RUNNING_TIME=60
 
 # Show help usage
 if [ "$#" -eq "0" ] || [ "$#" -gt "2" ]
