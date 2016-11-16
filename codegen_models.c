@@ -267,6 +267,12 @@ const char mips_move_a0_t1[] =
     "\tmove $t1, $a0\n"
     "\t# ----------------------------------------------- #\n";
 
+/* Move from $a0 to $t4 */
+const char mips_move_a0_t4[] =
+    "\t# --------------- Move $t4 = $a0 ---------------- #\n"
+    "\tmove $t4, $a0\n"
+    "\t# ----------------------------------------------- #\n";
+
 /* ------------------------------------------------------------- */
 /*                  Unary Operations Template                    */
 /* ------------------------------------------------------------- */
@@ -544,7 +550,7 @@ const char mips_for_ini[] =
 
 /* Begin of for */
 const char mips_start_for[] =
-        "\tsle $a2, $a0, $t1    # Store the type of the for_check\n"
+        "\tsle $a2, $t4, $a0    # Store the type of the for_check\n"
     "start_for_%d:\n";
 
 /* For condition check */

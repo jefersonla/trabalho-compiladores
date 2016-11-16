@@ -171,6 +171,9 @@ extern const char mips_static_number_load[];
 /* Move $a0 to $t1 */
 extern const char mips_move_a0_t1[];
 
+/* Move from $a0 to $t4 */
+extern const char mips_move_a0_t4[];
+
 /* Not a number in $a0 */
 extern const char mips_not_a0[];
  

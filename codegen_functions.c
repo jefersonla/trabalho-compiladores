@@ -715,16 +715,6 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
         return false;
     }
     
-    // --- CHECK THE TYPE OF THE FOR --- //
-    
-    /* Execute for expression condition */
-    cgenExpression(token_exp, new_symbol_table);
-    
-    /* Move iterator from $a0 to $t1 */
-    addInstructionMainQueue(mips_move_a0_t1);
-    
-    // --- CHECK THE TYPE OF THE FOR --- //
-    
     /* Add definition of this token */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetDefineInstruction(symbol_node));
     
@@ -734,13 +724,23 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Assign the local iterator variable */
     instructionQueueEnqueueInstructionNode(main_instruction_queue, symbolNodeGetStoreInstruction(symbol_node));
 
+    // --- CHECK THE TYPE OF THE FOR --- //
+    
+    /* Move iterator from $a0 to $t4 */
+    addInstructionMainQueue(mips_move_a0_t4);
+    
+    /* Execute for expression condition */
+    cgenExpression(token_exp, new_symbol_table);
+    
+    // --- CHECK THE TYPE OF THE FOR --- //
+    
     /* Add label of for begin */
     addInstructionMainQueueFormated(mips_start_for, loop_for_counter);
     
     /* Execute for expression condition */
     cgenExpression(token_exp, new_symbol_table);
     
-    /* Move iterator from $a0 to $t1 */
+    /* Move expression from $a0 to $t1 */
     addInstructionMainQueue(mips_move_a0_t1);
     
     /* Load value of the iterator */
@@ -1538,6 +1538,7 @@ bool cgenCommand(TokenNode *command_token, SymbolTable *actual_symbol_table){
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symbol_table){
+    int i;
     int pop_size;
     int exp_shift;
     int ra_address;
@@ -1809,6 +1810,11 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     
     /* Add end of a return expression */
     addInstructionMainQueue(mips_end_return);
+    
+    /* Removed the executed symbol nodes from the symbol table */
+    for(i = 0; i < exp_executed; i++){
+        symbolTablePopVar(actual_symbol_table);
+    }
     
     /* Return success */
     return true;
