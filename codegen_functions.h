@@ -174,6 +174,9 @@ extern const char mips_move_a0_t1[];
 /* Move from $a0 to $t4 */
 extern const char mips_move_a0_t4[];
 
+/* Move from $a0 to $a2 */
+extern const char mips_move_a0_a2[];
+
 /* Not a number in $a0 */
 extern const char mips_not_a0[];
  
@@ -245,6 +248,9 @@ extern const char mips_end_while[];
 
 /* Loop type for */
 extern const char mips_for_ini[];
+
+/* Store for interval type */
+extern const char mips_for_interval[];
 
 /* Begin of for */
 extern const char mips_start_for[];

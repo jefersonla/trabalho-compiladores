@@ -740,8 +740,22 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     /* Move iterator from $a0 to $t4 */
     addInstructionMainQueue(mips_move_a0_t4);
     
-    /* Execute for expression condition */
-    cgenExpression(token_exp, new_symbol_table);
+    /* If our for has a non default increment, check the interval of the for */
+    if(for_token->token_type == TI_FOR_INC){
+        /* Execute for expression condition */
+        cgenExpression(token_exp, new_symbol_table);
+        
+        /* Add check for the expression */
+        addInstructionMainQueue(mips_for_interval);
+    }
+    /* Otherwise we have only one type of interval */
+    else{
+        /* Load default type of interval for 'for' */
+        addInstructionMainQueueFormated(mips_static_number_load, " 1 ");
+        
+        /* Move this value to $a2 */
+        addInstructionMainQueue(mips_move_a0_a2);
+    }
     
     // --- CHECK THE TYPE OF THE FOR --- //
     
