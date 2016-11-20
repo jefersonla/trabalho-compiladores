@@ -552,7 +552,9 @@ const char mips_end_while[] =
 
 /* Loop type for */
 const char mips_for_ini[] =
-    "\t# v--------------------- For -------------------v #\n";
+    "\t# v--------------------- For -------------------v #\n"
+    "\taddiu $sp, $sp, -4\n"
+    "\tsw $a2, 4($sp)\n";
 
 /* Store for interval type */
 const char mips_for_interval[] =
@@ -586,9 +588,11 @@ const char mips_for_inc[] =
 
 /* End of for defition */
 const char mips_end_for[]=
-    "\tj start_for_%d\n"
+        "\tj start_for_%d\n"
     "end_for_%d:\n"
-    "\t# ^----------------- End of For ----------------^ #\n";
+        "\tlw $a2, 4($sp)\n"
+        "\taddiu $sp, $sp, 4\n"
+        "\t# ^----------------- End of For ----------------^ #\n";
 
 /* ------------------------------------------------------------- */
 /*                    Function Definitions                       */
@@ -913,7 +917,7 @@ const char mips_start_return[] =
 const char mips_return_multiple[] =
     "\tli $t2, 0            # Load first value of 'i'\n"
     "\tli $t3, %d           # Load final value of 'i'\n"
-    "return_loop_%d:      # while (there are values on stack)\n"
+    "return_loop_%d:        # while (there are values on stack)\n"
     "\tlw $t1, 4($s0)       # Pick bottom value of exp stack\n"
     "\tsw $t1, 4($sp)       # and store on top of stack\n"
     "\taddiu $s0, $s0, -4   # Decrease exp stack\n"
