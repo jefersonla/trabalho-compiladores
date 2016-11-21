@@ -1,45 +1,8 @@
-function fibo(n) 
-    if n <= 1 then
-        return 1 
-    else
-        return fibo(n - 1) + fibo(n - 2) 
+for i = 0, 10, 2 do
+    for j = 10, 0, -2 do
+        print(j)
     end
+    print(1234)
+    print(i)
+    print(1234)
 end
-
-function teste(n) 
-    if n / 2 * 2 == n then
-        return fibo(n), fibo(n / 2), fibo(n / 3) + fibo(n / 4) 
-    else
-        return fibo(n), fibo(n + 1) 
-    end
-end
-
-n = 1
-while n <= 20 do
-    if n / 2 * 2 == n then
-        x, y, z = teste(n) 
-        print(x) 
-        print(y) 
-        print(z) 
-    else
-        x, y = teste(n) 
-        print(x) 
-        print(y) 
-    end
-    n = n + 1
-end
---for n = 1, 20 do
---    print(n)
---    print(1111111111)
---    if n / 2 * 2 == n then
---        x, y, z = teste(n) 
---        print(x) 
---        print(y) 
---        print(z) 
---    else
---        x, y = teste(n) 
---        print(x) 
---        print(y) 
---    end
---end
-

@@ -74,6 +74,7 @@ bool popSymbolTable(SymbolTable *symbol_table){
     
     /* Remove each variable shift from all scopes */
     for(i = 0; i < no_variables; i++){
+        fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
         symbolTablePopVar(symbol_table);
     }
     
@@ -87,7 +88,7 @@ bool popSymbolTable(SymbolTable *symbol_table){
  * @param list_names a valid list of *ONLY* token names.
  * @return true if there's no error on execution and false otherwise.
  */
-bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
+bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table, int exp_executed){
     int i;
     TokenNode *token_name;
     SymbolNode *symbol_node;
@@ -157,7 +158,11 @@ bool assignStackHelper(TokenList *list_names, SymbolTable *actual_symbol_table){
         addInstructionMainQueue(mips_pop);
         
         /* Pop address on symbol table too. This assume that the symbol table has a lot of blank spaces */
-        symbolTablePopVar(actual_symbol_table);
+        if(exp_executed > 0){
+            fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
+            symbolTablePopVar(actual_symbol_table);
+            exp_executed -= 1;
+        }
     }
     
     /* Return success */
@@ -328,6 +333,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     addInstructionMainQueue(mips_start_function_call);
     
     /* Push var */
+    fprintf(stderr, "PUSH >> LINE: %d \n", __LINE__);
     symbolTablePushVar(actual_symbol_table);
     
     /* Iniitalize list of expressions executed */
@@ -354,10 +360,12 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
     
     /* Pop All parameters */
     for(i = 0; i < no_exp_executed; i++){
+        fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
         symbolTablePopVar(actual_symbol_table);
     }
     
     /* Pop var */
+    fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
     symbolTablePopVar(actual_symbol_table);
     
     /* Return success */
@@ -372,6 +380,7 @@ bool cgenCallFunction(TokenNode *call_function_token, SymbolTable *actual_symbol
  * @return true if there's no error on execution and false otherwise.
  */
 bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
+    int num_exp;
     TokenList *list_names;
     TokenNode *token_exp;
     TokenNode *token_name;
@@ -474,10 +483,10 @@ bool cgenAssign(TokenNode *assign_token, SymbolTable *actual_symbol_table){
         }
 
         /* Execute list of expressions, and put reverse results on stack */
-        cgenExpressionList(list_exp_token, actual_symbol_table);
+        num_exp = cgenExpressionList(list_exp_token, actual_symbol_table);
         
         /* Assign our list of names with our actual symbol table, the values stacked */
-        assignStackHelper(list_names, actual_symbol_table);
+        assignStackHelper(list_names, actual_symbol_table, num_exp);
     }
     
     /* Add footer of a assign instruction */
@@ -693,6 +702,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     addInstructionMainQueue(mips_for_ini);
     
     /* Add a symbol to symbol table */
+    fprintf(stderr, "PUSH >> LINE: %d \n", __LINE__);
     symbolTablePushVar(actual_symbol_table);
     
     /* Initialize a new symbol table just for iterator */
@@ -717,6 +727,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     symbolTableAddSymbol(new_symbol_table_iterator, token_name->lex_str, NUMBER_TYPE);
 
     ///// JUST A TEST
+    ///// fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
     ///// symbolTablePopVar(new_symbol_table_iterator);
     ///// INITIALIZING LOCAL VARIABLES WITH WRONG ADDRESS -_-
     
@@ -844,6 +855,7 @@ bool cgenFor(TokenNode *for_token, SymbolTable *actual_symbol_table){
     popSymbolTable(new_symbol_table_iterator);
     
     /* Pop var from symbol table */
+    fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
     symbolTablePopVar(actual_symbol_table);
 
     /* Delte actual scope */
@@ -1267,6 +1279,7 @@ bool cgenFunction(TokenNode *function_def_token, SymbolTable *actual_symbol_tabl
  */
 bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symbol_table){
     int i;
+    int num_exp;
     TokenList *list_names;
     TokenNode *token_exp;
     TokenNode *token_name;
@@ -1471,10 +1484,10 @@ bool cgenLocalVariable(TokenNode *local_variable_token, SymbolTable *actual_symb
             }
             
             /* Execute list of expressions, and put reverse results on stack */
-            cgenExpressionList(list_exp_token, actual_symbol_table);
+            num_exp = cgenExpressionList(list_exp_token, actual_symbol_table);
             
             /* Assign our list of names with our actual symbol table, the values stacked */
-            assignStackHelper(list_names, actual_symbol_table);
+            assignStackHelper(list_names, actual_symbol_table, num_exp);
         }
     }
     
@@ -1854,6 +1867,7 @@ bool cgenCommandReturn(TokenNode *command_return_token, SymbolTable *actual_symb
     
     /* Removed the executed symbol nodes from the symbol table */
     for(i = 0; i < exp_executed; i++){
+        fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
         symbolTablePopVar(actual_symbol_table);
     }
     
@@ -1973,6 +1987,7 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
             addInstructionMainQueue(mips_push_a0);
             
             /* Increase symbol table */
+            fprintf(stderr, "PUSH >> LINE: %d \n", __LINE__);
             symbolTablePushVar(symbol_table);
             
             /* If we get there we have an expression, so increment counter of expressions */
@@ -1996,6 +2011,7 @@ int cgenExpressionList(TokenNode *list_exp_token, SymbolTable *symbol_table) {
         addInstructionMainQueue(mips_push_a0);
         
         /* Increase symbol table */
+        fprintf(stderr, "PUSH >> LINE: %d \n", __LINE__);
         symbolTablePushVar(symbol_table);
         
         /* Processed only one exp */
@@ -2069,6 +2085,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         addInstructionMainQueue(mips_push_a0);
         
         /* Increase symbol table to avoid errors */
+        fprintf(stderr, "PUSH >> LINE: %d \n", __LINE__);
         symbolTablePushVar(symbol_table);
         
         /* CGEN(exp2) */
@@ -2135,6 +2152,7 @@ bool cgenExpression(TokenNode *exp_token, SymbolTable *symbol_table) {
         addInstructionMainQueue(mips_pop);
         
         /* Pop symbol table */
+        fprintf(stderr, "POP >> LINE: %d \n", __LINE__);
         symbolTablePopVar(symbol_table);
     }
     /* And & Or should use short-circuit evaluation */
